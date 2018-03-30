@@ -752,6 +752,7 @@ class Home extends Component {
                       style={{
                         background: hue,
                         border: "1px solid rgba(255,255,255,.1)",
+                        display: "none",
                       }}
                       elevation={4}>
                       <AdSense.Google

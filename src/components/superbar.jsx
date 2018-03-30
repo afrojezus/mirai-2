@@ -847,7 +847,7 @@ class Superbar extends Component {
             <IconButton
               onClick={() => {
                 this.toggleDrawer();
-                window.open("https://discord.gg/gt69fbe");
+                window.open("https://discord.gg/pKE7QZE");
               }}>
               <svg style={{ width: 28, height: 28 }} viewBox="0 0 24 24">
                 <path
