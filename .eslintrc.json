@@ -1,0 +1,14 @@
+{
+	"env": {
+		"browser": true,
+		"commonjs": true,
+		"es6": true,
+		"node": true
+	},
+	"extends": ["react-app", "prettier"],
+	"rules": {
+		"jsx-a11y/href-no-hash": "off",
+		"jsx-a11y/anchor-is-valid": ["warn", { "aspects": ["invalidHref"] }],
+		"consistent-return": "warn"
+	}
+}
