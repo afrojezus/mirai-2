@@ -12,7 +12,6 @@ import classnames from "classnames";
 import { MIR_PLAY_SHOW } from "../constants";
 import withStyles from "material-ui/styles/withStyles";
 import grey from "material-ui/colors/grey";
-import { Draggable } from "@shopify/draggable";
 import PropTypes from "prop-types";
 import * as Icon from "material-ui-icons";
 import CircularProgress from "material-ui/Progress/CircularProgress";
@@ -48,7 +47,7 @@ import strings from "../strings.json";
 import Avatar from "material-ui/Avatar";
 import checklang from "../checklang";
 
-const style = theme => ({
+const style = (theme) => ({
   root: {
     minHeight: "100vh",
     minWidth: "100%",
@@ -59,7 +58,7 @@ const style = theme => ({
     left: 0,
     overflow: "hidden",
     animation: "playerLoad .5s ease",
-    transition: theme.transitions.create(["all"])
+    transition: theme.transitions.create(["all"]),
   },
   rootSmol: {
     minHeight: 140,
@@ -76,8 +75,8 @@ const style = theme => ({
     borderRadius: theme.spacing.unit,
     [theme.breakpoints.down("sm")]: {
       minHeight: 80,
-      minWidth: 140
-    }
+      minWidth: 140,
+    },
   },
   player: {
     height: "100%",
@@ -86,20 +85,20 @@ const style = theme => ({
     top: 0,
     left: 0,
     background: "black",
-    transition: theme.transitions.create(["all"])
+    transition: theme.transitions.create(["all"]),
   },
   controlpanel: {
     position: "fixed",
     bottom: 0,
     width: "100%",
     background: "linear-gradient(to top, rgba(0,0,0,.75), rgba(0,0,0,.1))",
-    transition: theme.transitions.create(["all"])
+    transition: theme.transitions.create(["all"]),
   },
   backToolbar: {
     zIndex: 10,
     transition: theme.transitions.create(["all"]),
     "-webkitAppRegion": "drag",
-    background: "linear-gradient(to top, rgba(0,0,0,.1), rgba(0,0,0,.75))"
+    background: "linear-gradient(to top, rgba(0,0,0,.1), rgba(0,0,0,.75))",
   },
   indicator: {
     flexDirection: "row",
@@ -108,56 +107,56 @@ const style = theme => ({
     position: "relative",
     marginRight: theme.spacing.unit * 2,
     marginLeft: theme.spacing.unit * 2,
-    boxSizing: "border-box"
+    boxSizing: "border-box",
   },
   progress: {
-    flex: 1
+    flex: 1,
   },
   progressVolume: {
     flex: 1,
     position: "absolute",
     margin: "7px 0",
     width: "100%",
-    zIndex: -1
+    zIndex: -1,
   },
   progressLoaded: {
     zIndex: -1,
     position: "absolute",
     top: 0,
     left: 0,
-    width: "100%"
+    width: "100%",
   },
   progressBg: {
-    backgroundColor: "rgba(255,255,255,.3)"
+    backgroundColor: "rgba(255,255,255,.3)",
   },
   progressBgOver: {
-    backgroundColor: "transparent"
+    backgroundColor: "transparent",
   },
   progressBar: {
     transition: "none",
-    background: "white"
+    background: "white",
   },
   progressBarLoaded: {
     transition: "none",
-    backgroundColor: "rgba(255,255,255,.6)"
+    backgroundColor: "rgba(255,255,255,.6)",
   },
   duration: {
     padding: theme.spacing.unit,
-    fontFamily: "SF Mono"
+    fontFamily: "SF Mono",
   },
   left: {
-    padding: theme.spacing.unit
+    padding: theme.spacing.unit,
   },
   epListCont: {
     maxHeight: 300,
     overflowY: "scroll",
-    padding: 0
+    padding: 0,
   },
   epListItem: {},
   volumeSlider: {
     outline: "none",
     "-webkit-appearance": "none",
-    zIndex: 5
+    zIndex: 5,
   },
   progressInput: {
     background: "transparent",
@@ -169,8 +168,8 @@ const style = theme => ({
     transition: theme.transitions.create(["all"]),
     opacity: 0,
     "&:hover": {
-      opacity: 1
-    }
+      opacity: 1,
+    },
   },
   loading: {
     height: "100%",
@@ -184,7 +183,7 @@ const style = theme => ({
     margin: "auto",
     transition: theme.transitions.create(["all"]),
     color: "white",
-    pointerEvents: "none"
+    pointerEvents: "none",
   },
   showInfo: {
     margin: "auto",
@@ -192,32 +191,32 @@ const style = theme => ({
     padding: theme.spacing.unit * 8,
     display: "flex",
     zIndex: 500,
-    boxSizing: "border-box"
+    boxSizing: "border-box",
   },
   showInfoColumn: {
     display: "flex",
     flexDirection: "column",
-    margin: 8
+    margin: 8,
   },
   showInfoTitle: {
     fontWeight: 700,
     padding: theme.spacing.unit,
     paddingLeft: 0,
-    color: "white"
+    color: "white",
   },
   showInfoDesc: {
     paddingTop: theme.spacing.unit * 2,
-    fontSize: 16
+    fontSize: 16,
   },
   showInfoArtwork: {
     width: 300,
     objectFit: "cover",
-    boxShadow: "0 2px 16px rgba(0,0,0,.2)"
+    boxShadow: "0 2px 16px rgba(0,0,0,.2)",
   },
   nextButton: {},
   nextButtonWrapper: {
     margin: theme.spacing.unit,
-    position: "relative"
+    position: "relative",
   },
   nextButtonProgress: {
     color: blue.A200,
@@ -225,7 +224,7 @@ const style = theme => ({
     top: "50%",
     left: "50%",
     marginTop: -12,
-    marginLeft: -12
+    marginLeft: -12,
   },
   qualityTitle: {
     border: "2px solid white",
@@ -233,10 +232,10 @@ const style = theme => ({
     padding: theme.spacing.unit / 2,
     boxSizing: "border-box",
     fontSize: 14,
-    fontWeight: 500
+    fontWeight: 500,
   },
   menuPaper: {
-    outline: "none"
+    outline: "none",
   },
   pipcontrols: {
     margin: "auto",
@@ -251,43 +250,43 @@ const style = theme => ({
     opacity: 0,
     background: "linear-gradient(to bottom, transparent, rgba(0,0,0,.95))",
     [theme.breakpoints.down("sm")]: {
-      opacity: 1
-    }
+      opacity: 1,
+    },
   },
   piptitle: {
     [theme.breakpoints.down("sm")]: {
-      display: "none"
+      display: "none",
     },
     margin: "auto",
     fontSize: theme.typography.pxToRem(12),
-    paddingLeft: theme.spacing.unit
+    paddingLeft: theme.spacing.unit,
   },
   controlpanelActions: {
-    margin: theme.spacing.unit
+    margin: theme.spacing.unit,
   },
   episodeName: {
     fontSize: ".6em",
-    opacity: 0.5
+    opacity: 0.5,
   },
   episodeCount: {
-    fontSize: "1em"
+    fontSize: "1em",
   },
   episodeThumb: {
     width: 60,
-    objectFit: "cover"
+    objectFit: "cover",
   },
   marginAuto: {
-    margin: "auto"
+    margin: "auto",
   },
   secTitleText: {
     fontWeight: 700,
-    fontSize: 22
-  }
+    fontSize: 22,
+  },
 });
 
 class MirStreamer extends Component {
   static defaultProps = {
-    history
+    history,
   };
   state = {
     playing: false,
@@ -325,13 +324,13 @@ class MirStreamer extends Component {
     date: "",
     alphaMsg: true,
     id: 0,
-    lang: strings.enus
+    lang: strings.enus,
   };
 
   componentWillMount = async () => {
     const playerVolume = await localForage.getItem("player-settings-volume");
     const playerUseTorrent = await localForage.getItem(
-      "player-setting-torrent"
+      "player-setting-torrent",
     );
 
     checklang(this);
@@ -341,7 +340,7 @@ class MirStreamer extends Component {
     if (playerVolume) this.setState({ volume: playerVolume });
 
     console.info(
-      "[mirai] This feature is quite experimental, but shouldn't run into issues most of the time."
+      "[mirai] This feature is quite experimental, but shouldn't run into issues most of the time.",
     );
 
     if (localStorage.getItem("hasSeenTheAlphaMsgForStreamingLikeACoolDude")) {
@@ -363,7 +362,7 @@ class MirStreamer extends Component {
     }
   };
 
-  componentWillReceiveProps = async nextProps => {
+  componentWillReceiveProps = async (nextProps) => {
     /*if (this.props.mir !== nextProps.mir) {
             if (this.props.profile !== nextProps.profile) return false;
             if (!this.props.fullSize) {
@@ -412,7 +411,7 @@ class MirStreamer extends Component {
     }
   };
 
-  joinStream = async streamId => {
+  joinStream = async (streamId) => {
     const db = await this.props.firebase
       .database()
       .ref("/streams")
@@ -426,16 +425,16 @@ class MirStreamer extends Component {
           name: this.props.profile.username,
           avatar: this.props.profile.avatar,
           reaction: "LOVE",
-          king: false
+          king: false,
         });
 
-      return db.once("value").then(value => this.loadStream(value.val()));
+      return db.once("value").then((value) => this.loadStream(value.val()));
     } catch (error) {
       return console.error(error);
     }
   };
 
-  makeStream = async streamData => {
+  makeStream = async (streamData) => {
     const db = await this.props.firebase
       .database()
       .ref("/streams")
@@ -455,17 +454,17 @@ class MirStreamer extends Component {
               name: this.props.profile.username,
               avatar: this.props.profile.avatar,
               reaction: "LOVE",
-              king: true
-            }
+              king: true,
+            },
           },
           private: false,
           playstate: {
             playing: false,
             loaded: 0,
             played: 0,
-            ep: 1
+            ep: 1,
           },
-          date: Date.now()
+          date: Date.now(),
         })
         .then(async () => {
           return await this.startStream(streamData.eps);
@@ -474,14 +473,14 @@ class MirStreamer extends Component {
     return null;
   };
 
-  startStream = async eps => {
+  startStream = async (eps) => {
     const db = await this.props.firebase
       .database()
       .ref("/streams")
       .child(this.props.profile.userID);
 
     // Synced info (this is for preventing playback to manually fetch ep every damn second info syncs.)
-    db.on("value", value => {
+    db.on("value", (value) => {
       const val = value.val();
       if (val) {
         this.setState({
@@ -492,7 +491,7 @@ class MirStreamer extends Component {
           hosterAva: this.props.profile.avatar,
           date: val.date,
           id: this.props.profile.userID,
-          private: val.private
+          private: val.private,
         });
       }
       return null;
@@ -507,21 +506,21 @@ class MirStreamer extends Component {
         playing: false,
         played: 0,
         loaded: 0,
-        status: "Setting up..."
+        status: "Setting up...",
       },
       async () => {
         loadEp(this, this.state.eps[0], null);
-      }
+      },
     );
   };
 
-  loadStream = async stream => {
+  loadStream = async (stream) => {
     const db = await this.props.firebase
       .database()
       .ref("/streams")
       .child(stream.id);
     // Synced info (this is for preventing playback to manually fetch ep every damn second info syncs.)
-    db.on("value", value => {
+    db.on("value", (value) => {
       const val = value.val();
       if (val) {
         this.setState({
@@ -531,7 +530,7 @@ class MirStreamer extends Component {
           hoster: val.hoster,
           hosterAva: val.hosterAva,
           date: val.date,
-          private: val.private
+          private: val.private,
         });
       }
       return null;
@@ -546,27 +545,27 @@ class MirStreamer extends Component {
         played: 0,
         loaded: 0,
         status: "Connecting...",
-        id: stream.id
+        id: stream.id,
       },
       async () => {
         loadEp(
           this,
           this.state.eps[stream.playstate.ep - 1],
-          this.state.played
+          this.state.played,
         );
-      }
+      },
     );
   };
 
-  onSeekMouseDown = e => {
+  onSeekMouseDown = (e) => {
     this.setState({ seeking: true });
   };
 
-  onSeekChange = e => {
+  onSeekChange = (e) => {
     this.setState({ played: parseFloat(e.target.value) });
   };
 
-  onSeekMouseUp = e => {
+  onSeekMouseUp = (e) => {
     this.setState({ seeking: false, buffering: true });
     this.player.seekTo(parseFloat(e.target.value));
   };
@@ -575,7 +574,7 @@ class MirStreamer extends Component {
     this.setState({ buffering: true, status: "Buffering..." }, () => {});
   };
 
-  onProgress = state => {
+  onProgress = (state) => {
     const play = this.state.played;
     if (!this.state.seeking)
       this.setState(state, async () => {
@@ -583,7 +582,7 @@ class MirStreamer extends Component {
           videoQuality: this.player
             ? this.player.getInternalPlayer().videoHeight
             : null,
-          recentlyWatched: Date.now()
+          recentlyWatched: Date.now(),
         });
         if (
           this.player !== null &&
@@ -621,7 +620,7 @@ class MirStreamer extends Component {
                 played: this.state.played,
                 loaded: this.state.loaded,
                 playing: this.state.playing,
-                ep: this.state.ep
+                ep: this.state.ep,
               });
           } else {
             this.props.firebase
@@ -629,11 +628,11 @@ class MirStreamer extends Component {
               .ref("/streams")
               .child(this.state.id)
               .child("playstate")
-              .on("value", async value => {
+              .on("value", async (value) => {
                 try {
                   const val = await value.val();
                   return this.setState({
-                    hosterPlayTime: val.played
+                    hosterPlayTime: val.played,
                   });
                 } catch (error) {
                   return console.error(error);
@@ -644,19 +643,19 @@ class MirStreamer extends Component {
       });
   };
 
-  setVolume = e => {
+  setVolume = (e) => {
     this.setState({ volume: parseFloat(e.target.value) }, async () => {
       await localForage.setItem("player-settings-volume", this.state.volume);
     });
   };
 
-  setPlaybackRate = e => {
+  setPlaybackRate = (e) => {
     this.setState({ playbackRate: parseFloat(e.target.value) });
   };
 
   draggable = undefined;
 
-  mute = e => {
+  mute = (e) => {
     const prevVol = this.state.volume;
     if (this.state.volume > 0) {
       this.setState({ volume: 0 });
@@ -670,7 +669,7 @@ class MirStreamer extends Component {
         this.setState({ source: null, playing: false });
       }; */
 
-  playPause = resume => {
+  playPause = (resume) => {
     this.setState({ playing: !this.state.playing });
     if (this.timer && this.timer !== undefined) clearInterval(this.timer);
   };
@@ -696,7 +695,7 @@ class MirStreamer extends Component {
     }, 4000);
   };
 
-  reveal = event => {
+  reveal = (event) => {
     const back = document.getElementById("backbutton");
     const controls = document.getElementById("controls");
     const pcontrols = document.getElementById("pipcontrols");
@@ -730,7 +729,7 @@ class MirStreamer extends Component {
     }
   };
 
-  handleFullscreen = e =>
+  handleFullscreen = (e) =>
     this.setState({ fullscreen: !this.state.fullscreen }, () => {
       const docElm = document.documentElement;
       if (this.state.fullscreen) {
@@ -841,7 +840,7 @@ class MirStreamer extends Component {
       hosterAva,
       date,
       alphaMsg,
-      lang
+      lang,
     } = this.state;
     const menu = Boolean(menuEl);
     const volumeMenu = Boolean(volEl);
@@ -854,8 +853,7 @@ class MirStreamer extends Component {
           played === 1 ? null : menu || volumeMenu ? null : this.hide
         }
         onMouseMove={this.reveal}
-        onTouchMove={this.reveal}
-      >
+        onTouchMove={this.reveal}>
         <div>
           <Dialogue
             open={alphaMsg}
@@ -865,11 +863,10 @@ class MirStreamer extends Component {
               this.setState({ alphaMsg: false }, () =>
                 localStorage.setItem(
                   "hasSeenTheAlphaMsgForStreamingLikeACoolDude",
-                  true
-                )
+                  true,
+                ),
               )
-            }
-          >
+            }>
             <Typography variant="body1">{lang.stream.warn}</Typography>
           </Dialogue>
           <CircularProgress
@@ -881,10 +878,9 @@ class MirStreamer extends Component {
           <IconButton
             style={{
               marginLeft: -12,
-              marginRight: 20
+              marginRight: 20,
             }}
-            onClick={() => this.props.history.goBack()}
-          >
+            onClick={() => this.props.history.goBack()}>
             <Icon.ArrowBack />
           </IconButton>
           <Typography variant={"title"}>
@@ -902,7 +898,7 @@ class MirStreamer extends Component {
         <div onClick={this.playPause}>
           <ReactPlayer
             id="player"
-            ref={player => {
+            ref={(player) => {
               this.player = player;
             }}
             url={source}
@@ -918,13 +914,13 @@ class MirStreamer extends Component {
               this.setState({
                 playing: true,
                 buffering: false,
-                status: title
+                status: title,
               })
             }
             onPause={() => this.setState({ playing: false })}
             onEnded={this.handleEnded}
-            onError={e => console.error(e)}
-            onDuration={dura => this.setState({ duration: dura })}
+            onError={(e) => console.error(e)}
+            onDuration={(dura) => this.setState({ duration: dura })}
             style={played === 1 ? { filter: "brightness(.2)" } : null}
           />
         </div>
@@ -964,7 +960,7 @@ class MirStreamer extends Component {
                 classes={{
                   root: classes.progress,
                   colorPrimary: classes.progressBgOver,
-                  barColorPrimary: classes.progressBar
+                  barColorPrimary: classes.progressBar,
                 }}
                 variant="determinate"
                 value={played * 100}
@@ -974,7 +970,7 @@ class MirStreamer extends Component {
                 classes={{
                   root: classes.progressLoaded,
                   colorPrimary: classes.progressBg,
-                  barColorPrimary: classes.progressBarLoaded
+                  barColorPrimary: classes.progressBarLoaded,
                 }}
                 variant="determinate"
                 value={loaded * 100}
@@ -982,7 +978,7 @@ class MirStreamer extends Component {
               <input
                 className={classnames(
                   classes.progressInput,
-                  "webKitThumbButton"
+                  "webKitThumbButton",
                 )}
                 type="range"
                 step="any"
@@ -999,8 +995,7 @@ class MirStreamer extends Component {
                 <div>
                   <IconButton
                     disabled={!!(loaded === 0 || !source)}
-                    onClick={this.playPause}
-                  >
+                    onClick={this.playPause}>
                     {playing ? (
                       <Icon.Pause />
                     ) : played === 1 ? (
@@ -1015,16 +1010,14 @@ class MirStreamer extends Component {
                 <div>
                   <IconButton
                     disabled={king ? true : loaded === 0}
-                    onClick={this.skipToHostersTime}
-                  >
+                    onClick={this.skipToHostersTime}>
                     <Icon.FastForward />
                   </IconButton>
                 </div>
               </Tooltip>
               <Typography
                 variant="title"
-                className={!source ? classes.left : null}
-              >
+                className={!source ? classes.left : null}>
                 {status} {played > 0 && source ? ` Episode ${ep}` : null}
               </Typography>
               <div style={{ flex: 1 }} />
@@ -1036,7 +1029,7 @@ class MirStreamer extends Component {
               </Tooltip>
               {users &&
                 Object.values(users)
-                  .filter(u => !u.king)
+                  .filter((u) => !u.king)
                   .map((user, index) => (
                     <Tooltip title={user.name}>
                       <Avatar key={index} src={user.avatar} />
@@ -1046,30 +1039,26 @@ class MirStreamer extends Component {
                 disabled={!torrent}
                 aria-owns={qualityMenu ? "quality-menu" : null}
                 aria-haspopup="true"
-                onClick={e => this.setState({ quaEl: e.currentTarget })}
+                onClick={(e) => this.setState({ quaEl: e.currentTarget })}
                 color="default"
-                style={{ marginLeft: 8 }}
-              >
+                style={{ marginLeft: 8 }}>
                 {torrent ? (
                   quality === 480 ? (
                     <Typography
                       variant="title"
-                      className={classes.qualityTitle}
-                    >
+                      className={classes.qualityTitle}>
                       480p
                     </Typography>
                   ) : quality === 720 ? (
                     <Typography
                       variant="title"
-                      className={classes.qualityTitle}
-                    >
+                      className={classes.qualityTitle}>
                       720p
                     </Typography>
                   ) : quality === 1080 ? (
                     <Typography
                       variant="title"
-                      className={classes.qualityTitle}
-                    >
+                      className={classes.qualityTitle}>
                       1080p
                     </Typography>
                   ) : null
@@ -1077,8 +1066,7 @@ class MirStreamer extends Component {
                   <Typography
                     variant="title"
                     style={torrent ? null : { opacity: ".2" }}
-                    className={classes.qualityTitle}
-                  >
+                    className={classes.qualityTitle}>
                     {videoQuality ? `${videoQuality}p` : "HD"}
                   </Typography>
                 )}
@@ -1091,15 +1079,15 @@ class MirStreamer extends Component {
                 anchorEl={quaEl}
                 anchorOrigin={{
                   vertical: "top",
-                  horizontal: "right"
+                  horizontal: "right",
                 }}
                 transformOrigin={{
                   vertical: "center",
-                  horizontal: "right"
+                  horizontal: "right",
                 }}
                 open={qualityMenu}
                 classes={{
-                  paper: classes.menuPaper
+                  paper: classes.menuPaper,
                 }}
                 onClose={() => this.setState({ quaEl: null })}
                 PaperProps={{
@@ -1107,16 +1095,15 @@ class MirStreamer extends Component {
                     width: 300,
                     padding: 0,
                     outline: "none",
-                    background: grey[800]
-                  }
+                    background: grey[800],
+                  },
                 }}
                 MenuListProps={{
                   style: {
                     padding: 0,
-                    outline: "none"
-                  }
-                }}
-              >
+                    outline: "none",
+                  },
+                }}>
                 <Card style={{ background: grey[800] }}>
                   <CardHeader
                     style={{ background: grey[900] }}
@@ -1127,8 +1114,7 @@ class MirStreamer extends Component {
                     <MenuItem
                       onClick={() => this.changeQuality(1080)}
                       selected={quality === 1080}
-                      className={classes.epListItem}
-                    >
+                      className={classes.epListItem}>
                       1080p
                       <div style={{ flex: 1 }} />
                       {quality === 1080 ? <Icon.PlayArrow /> : null}
@@ -1136,8 +1122,7 @@ class MirStreamer extends Component {
                     <MenuItem
                       onClick={() => this.changeQuality(720)}
                       selected={quality === 720}
-                      className={classes.epListItem}
-                    >
+                      className={classes.epListItem}>
                       720p
                       <div style={{ flex: 1 }} />
                       {quality === 720 ? <Icon.PlayArrow /> : null}
@@ -1145,8 +1130,7 @@ class MirStreamer extends Component {
                     <MenuItem
                       onClick={() => this.changeQuality(480)}
                       selected={quality === 480}
-                      className={classes.epListItem}
-                    >
+                      className={classes.epListItem}>
                       480p
                       <div style={{ flex: 1 }} />
                       {quality === 480 ? <Icon.PlayArrow /> : null}
@@ -1157,9 +1141,8 @@ class MirStreamer extends Component {
               <IconButton
                 aria-owns={volumeMenu ? "volume-menu" : null}
                 aria-haspopup="true"
-                onClick={e => this.setState({ volEl: e.currentTarget })}
-                color="default"
-              >
+                onClick={(e) => this.setState({ volEl: e.currentTarget })}
+                color="default">
                 {volume > 0 ? <Icon.VolumeUp /> : <Icon.VolumeOff />}
               </IconButton>
               <Menu
@@ -1167,33 +1150,32 @@ class MirStreamer extends Component {
                 anchorEl={volEl}
                 anchorOrigin={{
                   vertical: "top",
-                  horizontal: "right"
+                  horizontal: "right",
                 }}
                 transformOrigin={{
                   vertical: "bottom",
-                  horizontal: "right"
+                  horizontal: "right",
                 }}
                 open={volumeMenu}
                 onClose={() => this.setState({ volEl: null })}
                 PaperProps={{
                   style: {
                     outline: "none",
-                    background: grey[800]
-                  }
+                    background: grey[800],
+                  },
                 }}
                 MenuListProps={{
                   style: {
                     padding: 8,
                     outline: "none",
-                    boxSizing: "border-box"
-                  }
-                }}
-              >
+                    boxSizing: "border-box",
+                  },
+                }}>
                 <LinearProgress
                   classes={{
                     root: classes.progressVolume,
                     colorPrimary: classes.progressBgOver,
-                    barColorPrimary: classes.progressBar
+                    barColorPrimary: classes.progressBar,
                   }}
                   variant="determinate"
                   value={volume * 100}
@@ -1204,7 +1186,7 @@ class MirStreamer extends Component {
                   className={classnames(
                     classes.volumeSlider,
                     "webKitThumbButton",
-                    "webKitSlider"
+                    "webKitSlider",
                   )}
                   max={1}
                   min={0}
@@ -1215,8 +1197,7 @@ class MirStreamer extends Component {
               <Tooltip
                 title={
                   fullscreen ? lang.watch.fullscreenExit : lang.watch.fullscreen
-                }
-              >
+                }>
                 <IconButton onClick={this.handleFullscreen}>
                   {fullscreen ? <Icon.FullscreenExit /> : <Icon.Fullscreen />}
                 </IconButton>
@@ -1230,9 +1211,10 @@ class MirStreamer extends Component {
                       }
                       aria-owns={menu ? "ep-menu" : null}
                       aria-haspopup="true"
-                      onClick={e => this.setState({ menuEl: e.currentTarget })}
-                      color="default"
-                    >
+                      onClick={(e) =>
+                        this.setState({ menuEl: e.currentTarget })
+                      }
+                      color="default">
                       <Icon.ViewList />
                     </IconButton>
                   </div>
@@ -1242,15 +1224,15 @@ class MirStreamer extends Component {
                   anchorEl={menuEl}
                   anchorOrigin={{
                     vertical: "top",
-                    horizontal: "right"
+                    horizontal: "right",
                   }}
                   transformOrigin={{
                     vertical: "center",
-                    horizontal: "right"
+                    horizontal: "right",
                   }}
                   open={menu}
                   classes={{
-                    paper: classes.menuPaper
+                    paper: classes.menuPaper,
                   }}
                   onClose={this.closeMenu}
                   PaperProps={{
@@ -1258,23 +1240,22 @@ class MirStreamer extends Component {
                       width: 420,
                       padding: 0,
                       outline: "none",
-                      background: grey[800]
-                    }
+                      background: grey[800],
+                    },
                   }}
                   MenuListProps={{
                     style: {
                       padding: 0,
-                      outline: "none"
-                    }
-                  }}
-                >
+                      outline: "none",
+                    },
+                  }}>
                   <Card style={{ background: grey[800] }}>
                     <CardHeader
                       style={{ background: grey[900] }}
                       title={lang.watch.episodes}
                       classes={{
                         action: classes.marginAuto,
-                        title: classes.secTitleText
+                        title: classes.secTitleText,
                       }}
                       action={
                         <IconButton onClick={this.closeMenu}>
@@ -1285,17 +1266,16 @@ class MirStreamer extends Component {
                     <Divider />
                     <CardContent className={classes.epListCont}>
                       {eps &&
-                        eps.map(e => (
+                        eps.map((e) => (
                           <MenuItem
                             onClick={() => {
                               this.setState({ ep: e.ep }, async () =>
-                                loadEp(this, e, null)
+                                loadEp(this, e, null),
                               );
                             }}
                             key={e.ep}
                             selected={e.ep === ep}
-                            className={classes.epListItem}
-                          >
+                            className={classes.epListItem}>
                             {e.thumb ? (
                               <img
                                 alt=""
@@ -1307,20 +1287,17 @@ class MirStreamer extends Component {
                               style={{
                                 display: "flex",
                                 flexFlow: "column nowrap",
-                                paddingLeft: 8
-                              }}
-                            >
+                                paddingLeft: 8,
+                              }}>
                               <Typography
                                 variant="title"
-                                className={classes.episodeCount}
-                              >
+                                className={classes.episodeCount}>
                                 Episode {e.ep}
                               </Typography>
                               {e.canon ? (
                                 <Typography
                                   variant="body1"
-                                  className={classes.episodeName}
-                                >
+                                  className={classes.episodeName}>
                                   {e.canon}
                                 </Typography>
                               ) : null}
@@ -1355,14 +1332,13 @@ class MirStreamer extends Component {
               disabled={!(eps.length > 0)}
               aria-owns={menu ? "ep-menu" : null}
               aria-haspopup="true"
-              onClick={e => this.setState({ menuEl: e.currentTarget })}
+              onClick={(e) => this.setState({ menuEl: e.currentTarget })}
               color="default"
               style={{
                 position: "fixed",
                 bottom: theme.spacing.unit * 4,
-                right: theme.spacing.unit * 4
-              }}
-            >
+                right: theme.spacing.unit * 4,
+              }}>
               <Icon.ViewList />
             </IconButton>
             <Menu
@@ -1370,15 +1346,15 @@ class MirStreamer extends Component {
               anchorEl={menuEl}
               anchorOrigin={{
                 vertical: "top",
-                horizontal: "right"
+                horizontal: "right",
               }}
               transformOrigin={{
                 vertical: "center",
-                horizontal: "right"
+                horizontal: "right",
               }}
               open={menu}
               classes={{
-                paper: classes.menuPaper
+                paper: classes.menuPaper,
               }}
               onClose={this.closeMenu}
               PaperProps={{
@@ -1386,16 +1362,15 @@ class MirStreamer extends Component {
                   width: 300,
                   padding: 0,
                   outline: "none",
-                  background: grey[800]
-                }
+                  background: grey[800],
+                },
               }}
               MenuListProps={{
                 style: {
                   padding: 0,
-                  outline: "none"
-                }
-              }}
-            >
+                  outline: "none",
+                },
+              }}>
               <Card style={{ background: grey[800] }}>
                 <CardHeader
                   style={{ background: grey[900] }}
@@ -1404,17 +1379,16 @@ class MirStreamer extends Component {
                 <Divider />
                 <CardContent className={classes.epListCont}>
                   {eps &&
-                    eps.map(e => (
+                    eps.map((e) => (
                       <MenuItem
                         onClick={() => {
                           this.setState({ ep: e.ep }, async () =>
-                            loadEp(e, null)
+                            loadEp(e, null),
                           );
                         }}
                         key={e.ep}
                         selected={e.ep === ep}
-                        className={classes.epListItem}
-                      >
+                        className={classes.epListItem}>
                         Episode {e.ep}
                         <div style={{ flex: 1 }} />
                         {e.ep === ep ? <Icon.PlayArrow /> : null}
@@ -1430,17 +1404,17 @@ class MirStreamer extends Component {
   }
 }
 
-export const loadPlayer = play => ({
+export const loadPlayer = (play) => ({
   type: MIR_PLAY_SHOW,
-  play
+  play,
 });
 
-const mapPTS = dispatch => ({
-  removeDataFromMir: play => dispatch(loadPlayer(play))
+const mapPTS = (dispatch) => ({
+  removeDataFromMir: (play) => dispatch(loadPlayer(play)),
 });
 
 export default firebaseConnect()(
   connect(({ firebase: { profile }, mir }) => ({ profile, mir }), mapPTS)(
-    withStyles(style, { withTheme: true })(MirStreamer)
-  )
+    withStyles(style, { withTheme: true })(MirStreamer),
+  ),
 );

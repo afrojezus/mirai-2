@@ -832,7 +832,7 @@ class Superbar extends Component {
     const metaShit = (
       <div className={classes.metashit}>
         <Typography className={classes.footerCopy} variant="headline">
-          Mirai 1.0.1
+          Mirai 1.0.1f1
           <br />
           {onlineUsers ? Object.values(onlineUsers).length : 0} users online
           <br />
