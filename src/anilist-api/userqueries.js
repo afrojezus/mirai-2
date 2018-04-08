@@ -28,3 +28,5 @@ export const userQuery = `
     }
   }
 `;
+
+export default {};

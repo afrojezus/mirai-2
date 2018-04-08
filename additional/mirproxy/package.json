@@ -1,8 +1,0 @@
-{
-  "name": "mirproxy",
-  "version": "1.0.0",
-  "description": "proxy for mirai",
-  "main": "index.js",
-  "license": "MIT",
-  "private": true
-}

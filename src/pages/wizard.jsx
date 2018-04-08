@@ -1,168 +1,176 @@
-import React, { Component } from "react";
-import { withStyles } from "material-ui/styles";
-import { connect } from "react-redux";
-import Dropzone from "react-dropzone";
-import { blue } from "material-ui/colors";
-import { firebaseConnect } from "react-redux-firebase";
-
-import { TitleHeader, Header, Root, Container } from "../components/layouts";
-import Typography from "material-ui/Typography/Typography";
-import Divider from "material-ui/Divider/Divider";
-import Button from "material-ui/Button/Button";
-import * as Icon from "material-ui-icons";
-import Avatar from "material-ui/Avatar/Avatar";
-import TextField from "material-ui/TextField/TextField";
-import { scrollFix } from "./../utils/scrollFix";
+import React, { Component } from 'react';
+import { withStyles } from 'material-ui/styles';
+import { connect } from 'react-redux';
+import Dropzone from 'react-dropzone';
+import { blue } from 'material-ui/colors';
+import { firebaseConnect } from 'react-redux-firebase';
+import Typography from 'material-ui/Typography/Typography';
+import Divider from 'material-ui/Divider/Divider';
+import Button from 'material-ui/Button/Button';
+import * as Icon from 'material-ui-icons';
+import Avatar from 'material-ui/Avatar/Avatar';
+import TextField from 'material-ui/TextField/TextField';
+import { scrollFix } from './../utils/scrollFix';
+import { TitleHeader, Header, Root, Container } from '../components/layouts';
 
 const styles = theme => ({
   column: {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%"
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
   },
   fabDone: {
-    position: "fixed",
+    position: 'fixed',
     bottom: theme.spacing.unit * 3,
-    right: theme.spacing.unit * 3
+    right: theme.spacing.unit * 3,
   },
   ava: {
-    height: "100%",
-    width: "100%",
-    position: "absolute",
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
     top: 0,
     left: 0,
-    objectFit: "cover",
-    transition: theme.transitions.create(["all"])
+    objectFit: 'cover',
+    transition: theme.transitions.create(['all']),
   },
   bg: {
-    height: "100%",
-    width: "100%",
-    position: "absolute",
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
     top: 0,
     left: 0,
-    objectFit: "cover",
-    transition: theme.transitions.create(["all"])
+    objectFit: 'cover',
+    transition: theme.transitions.create(['all']),
   },
   dropzone: {
     height: 256,
     width: 256,
-    position: "relative",
-    borderRadius: "50%",
-    margin: "auto",
-    border: "2px solid white",
-    "&:hover > div": {
-      filter: "brightness(0.5)"
+    position: 'relative',
+    borderRadius: '50%',
+    margin: 'auto',
+    border: '2px solid white',
+    '&:hover > div': {
+      filter: 'brightness(0.5)',
     },
-    "&:hover > svg": {
-      opacity: 1
+    '&:hover > svg': {
+      opacity: 1,
     },
-    transition: theme.transitions.create(["all"]),
+    transition: theme.transitions.create(['all']),
     zIndex: 1000,
-    cursor: "pointer"
+    cursor: 'pointer',
   },
   dropzoneBg: {
     height: 256,
     width: 480,
-    position: "relative",
-    margin: "auto",
-    border: "2px solid white",
-    "&:hover > img": {
-      filter: "brightness(0.5)"
+    position: 'relative',
+    margin: 'auto',
+    border: '2px solid white',
+    '&:hover > img': {
+      filter: 'brightness(0.5)',
     },
-    "&:hover > svg": {
-      opacity: 1
+    '&:hover > svg': {
+      opacity: 1,
     },
     zIndex: 1000,
-    transition: theme.transitions.create(["all"])
+    transition: theme.transitions.create(['all']),
   },
   avaImg: {
-    height: "100%",
-    width: "100%",
-    objectFit: "cover",
-    borderRadius: "50%"
+    height: '100%',
+    width: '100%',
+    objectFit: 'cover',
+    borderRadius: '50%',
   },
   pictureIcon: {
-    top: "50%",
-    left: "50%",
-    position: "absolute",
-    transform: "translate(-50%,-50%)",
-    color: "white",
+    top: '50%',
+    left: '50%',
+    position: 'absolute',
+    transform: 'translate(-50%,-50%)',
+    color: 'white',
     fontSize: 48,
     opacity: 0,
-    transition: theme.transitions.create(["all"])
-  }
+    transition: theme.transitions.create(['all']),
+  },
 });
 
-class Wizard extends Component {
+class Wizard extends Component
+{
   state = {
     data: {},
-    user: "",
+    user: '',
     ava: null,
-    avaLoading: false
+    avaLoading: false,
   };
-  componentWillMount = () => {
+  componentWillMount = () =>
+  {
     scrollFix();
   };
 
-  componentDidMount = () => {};
+  componentDidMount = () =>
+  {};
 
   handleAva = accept =>
-    accept.forEach(file => this.setState({ ava: file }, () => {}));
+    accept.forEach(file => this.setState({ ava: file }, () =>
+    {}));
 
-  changeAva = async () => {
+  changeAva = async () =>
+  {
     const ava = this.props.firebase
       .storage()
-      .ref("userData")
-      .child("avatar")
+      .ref('userData')
+      .child('avatar')
       .child(this.state.ava.name)
       .put(this.state.ava);
 
     return ava.on(
-      "state_changed",
-      () => {},
+      'state_changed',
+      () =>
+      {},
       error => console.error(error),
-      () => {
+      () =>
         // console.log(ava);
-        return this.props.firebase
+        this.props.firebase
           .updateProfile({
-            avatar: ava.snapshot.downloadURL
+            avatar: ava.snapshot.downloadURL,
           })
-          .then(() => {
-            console.info("Avatar updated.");
+          .then(() =>
+          {
+            console.info('Avatar updated.');
             return this.setState({ avaLoading: false, ava: null });
-          });
-      }
+          }),
     );
   };
 
   changeUsername = async () =>
     this.props.firebase
       .updateProfile({
-        username: this.state.user
+        username: this.state.user,
       })
-      .then(() => {});
+      .then(() =>
+      {});
 
-  continue = () => {
-    if (this.state.ava && this.state.user) {
+  continue = () =>
+  {
+    if (this.state.ava && this.state.user)
+    {
       return this.changeAva().then(() =>
         this.changeUsername().then(() =>
-          this.props.history.push("/", { firstTime: true })
-        )
-      );
-    } else if (this.state.ava && !this.state.user) {
-      return this.changeAva().then(() =>
-        this.props.history.push("/", { firstTime: true })
-      );
-    } else if (this.state.user && !this.state.ava) {
-      return this.changeUsername().then(() =>
-        this.props.history.push("/", { firstTime: true })
-      );
-    } else {
-      return this.props.history.push("/", { firstTime: true });
+          this.props.history.push('/', { firstTime: true })));
     }
+    else if (this.state.ava && !this.state.user)
+    {
+      return this.changeAva().then(() =>
+        this.props.history.push('/', { firstTime: true }));
+    }
+    else if (this.state.user && !this.state.ava)
+    {
+      return this.changeUsername().then(() =>
+        this.props.history.push('/', { firstTime: true }));
+    }
+    return this.props.history.push('/', { firstTime: true });
   };
 
-  render() {
+  render()
+  {
     const { classes, theme } = this.props;
     return (
       <div>
@@ -192,7 +200,7 @@ class Wizard extends Component {
                 in the Help section of the app, which is also avaliable on the
                 menu of the app.
               </Typography>
-              <Divider style={{ margin: "16px 0" }} />
+              <Divider style={{ margin: '16px 0' }} />
               <Typography
                 variant="title"
                 style={{ marginBottom: theme.spacing.unit * 2 }}
@@ -204,12 +212,11 @@ class Wizard extends Component {
                 value={this.state.user}
                 onChange={e => this.setState({ user: e.target.value })}
                 placeholder={this.props.profile.username}
-                helperText="Change your username to something quite
-							rememberable... this is your display name afterall!"
+                helperText="Change your username to something quite rememberable... this is your display name afterall!"
                 fullWidth
                 margin="normal"
               />
-              <Divider style={{ margin: "16px 0" }} />
+              <Divider style={{ margin: '16px 0' }} />
               <Typography
                 variant="title"
                 style={{ marginBottom: theme.spacing.unit * 2 }}
@@ -248,8 +255,4 @@ class Wizard extends Component {
   }
 }
 
-export default firebaseConnect()(
-  connect(({ firebase: { auth, profile } }) => ({ auth, profile }))(
-    withStyles(styles, { withTheme: true })(Wizard)
-  )
-);
+export default firebaseConnect()(connect(({ firebase: { auth, profile } }) => ({ auth, profile }))(withStyles(styles, { withTheme: true })(Wizard)));

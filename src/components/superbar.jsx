@@ -1,101 +1,103 @@
-import React, { Component } from "react";
-import Button from "material-ui/Button";
-import AppBar from "material-ui/AppBar";
-import Typography from "material-ui/Typography";
-import IconButton from "material-ui/IconButton";
-import { withStyles } from "material-ui/styles";
-import Toolbar from "material-ui/Toolbar";
-import Menu from "material-ui/Menu";
-import MenuIcon from "material-ui-icons/Menu";
-import { grey } from "material-ui/colors";
-import Drawer from "material-ui/Drawer";
-import checklang from "../checklang";
-import Close from "material-ui-icons/Close";
-import Minimize from "material-ui-icons/Remove";
-import Maximize from "material-ui-icons/Fullscreen";
-import UnMaximize from "material-ui-icons/FullscreenExit";
-import Dotdotdot from "react-dotdotdot";
+import React, { Component } from 'react';
+import Button from 'material-ui/Button';
+import AppBar from 'material-ui/AppBar';
+import Typography from 'material-ui/Typography';
+import IconButton from 'material-ui/IconButton';
+import { withStyles } from 'material-ui/styles';
+import Toolbar from 'material-ui/Toolbar';
+import Menu, { MenuItem } from 'material-ui/Menu';
+import MenuIcon from 'material-ui-icons/Menu';
+import { grey } from 'material-ui/colors';
+import Drawer from 'material-ui/Drawer';
+import Close from 'material-ui-icons/Close';
+import Minimize from 'material-ui-icons/Remove';
+import Maximize from 'material-ui-icons/Fullscreen';
+import UnMaximize from 'material-ui-icons/FullscreenExit';
+import Dotdotdot from 'react-dotdotdot';
 import List, {
   ListItem,
   ListItemIcon,
   ListItemText,
   ListSubheader,
-} from "material-ui/List";
-import isElectron from "../utils/electron.js";
-import Tooltip from "material-ui/Tooltip";
-import Hidden from "material-ui/Hidden";
-import Divider from "material-ui/Divider";
-import { CardHeader } from "material-ui/Card";
-import HomeIcon from "material-ui-icons/Home";
-import SearchIcon from "material-ui-icons/Search";
-import LiveTvIcon from "material-ui-icons/LiveTv";
-import BellIcon from "material-ui-icons/Notifications";
-import BellOffIcon from "material-ui-icons/NotificationsNone";
-import Avatar from "material-ui/Avatar";
-import CompassIcon from "material-ui-icons/Explore";
-import ArrowBackIcon from "material-ui-icons/ArrowBack";
-import MoreVert from "material-ui-icons/MoreHoriz";
-import TranslateIcon from "material-ui-icons/Translate";
-import strings from "../strings.json";
+} from 'material-ui/List';
+import Tooltip from 'material-ui/Tooltip';
+import Hidden from 'material-ui/Hidden';
+import Divider from 'material-ui/Divider';
+import { CardHeader } from 'material-ui/Card';
+import HomeIcon from 'material-ui-icons/Home';
+import SearchIcon from 'material-ui-icons/Search';
+import LiveTvIcon from 'material-ui-icons/LiveTv';
+import BellIcon from 'material-ui-icons/Notifications';
+import BellOffIcon from 'material-ui-icons/NotificationsNone';
+import Avatar from 'material-ui/Avatar';
+import CompassIcon from 'material-ui-icons/Explore';
+import MoreVert from 'material-ui-icons/MoreHoriz';
+import TranslateIcon from 'material-ui-icons/Translate';
 
-import localForage from "localforage";
 
-import { connect } from "react-redux";
-import TextField from "material-ui/TextField";
-import Paper from "material-ui/Paper";
+import localForage from 'localforage';
 
-import Tabs, { Tab } from "material-ui/Tabs";
+import { connect } from 'react-redux';
+import TextField from 'material-ui/TextField';
+import Paper from 'material-ui/Paper';
 
-import { firebaseConnect, isEmpty } from "react-redux-firebase";
-import miraiLogo from "../assets/mirai-icon.png";
-import miraiLogoBlack from "../assets/mirai-icon-dark.png";
-import NotificationForm, { types } from "./notificationForm";
-import { history } from "../store";
-import MirPlayer from "./mirplayer";
-import { Dialogue } from "./layouts";
-import { MenuItem } from "material-ui/Menu";
+import Tabs, { Tab } from 'material-ui/Tabs';
+
+import { firebaseConnect, isEmpty } from 'react-redux-firebase';
+
+
+import isElectron from '../utils/electron';
+import strings from '../strings.json';
+
+import checklang from '../checklang';
+import miraiLogo from '../assets/mirai-icon.png';
+import miraiLogoBlack from '../assets/mirai-icon-dark.png';
+import NotificationForm from './notificationForm';
+import { history } from '../store';
+import MirPlayer from './mirplayer';
+import { Dialogue } from './layouts';
 
 const drawerWidth = 240;
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
-    width: "100%",
-    transition: theme.transitions.create(["all"]),
-    paddingLeft: "env(safe-area-inset-left)",
-    paddingRight: "env(safe-area-inset-right)",
+    width: '100%',
+    transition: theme.transitions.create(['all']),
+    paddingLeft: 'env(safe-area-inset-left)',
+    paddingRight: 'env(safe-area-inset-right)',
   },
   mainToolbar: {
-    //maxWidth: 1500,
-    marginLeft: "auto",
-    width: "100%",
-    marginRight: "auto",
+    // maxWidth: 1500,
+    marginLeft: 'auto',
+    width: '100%',
+    marginRight: 'auto',
     paddingRight: isElectron() ? theme.spacing.unit : null,
   },
   gd: {
-    width: "100%",
+    width: '100%',
     height: 82,
-    position: "fixed",
-    transition: theme.transitions.create(["all"]),
-    background: "linear-gradient(to top, transparent, rgba(0,0,0,1))",
+    position: 'fixed',
+    transition: theme.transitions.create(['all']),
+    background: 'linear-gradient(to top, transparent, rgba(0,0,0,1))',
   },
   appBar: {
-    background: "rgba(0,0,0,.75)",
-    boxShadow: "none",
-    borderBottom: `1px solid rgba(255,255,255,.16)`,
-    "-webkitAppRegion": "drag",
+    background: 'rgba(0,0,0,.75)',
+    boxShadow: 'none',
+    borderBottom: '1px solid rgba(255,255,255,.16)',
+    '-webkitAppRegion': 'drag',
   },
   appBarTop: {
-    background: "rgba(0,0,0,0)",
-    boxShadow: "none",
-    borderBottom: `1px solid rgba(255,255,255,.16)`,
-    backdropFilter: "blur(10px)",
-    "-webkitAppRegion": "drag",
+    background: 'rgba(0,0,0,0)',
+    boxShadow: 'none',
+    borderBottom: '1px solid rgba(255,255,255,.16)',
+    backdropFilter: 'blur(10px)',
+    '-webkitAppRegion': 'drag',
   },
   appFrame: {
-    position: "relative",
-    display: "flex",
-    width: "100%",
-    height: "100%",
+    position: 'relative',
+    display: 'flex',
+    width: '100%',
+    height: '100%',
   },
   flex: {
     flex: 1,
@@ -103,47 +105,47 @@ const styles = (theme) => ({
   menuButton: {
     marginLeft: -12,
     marginRight: 20,
-    "-webkitAppRegion": "no-drag",
+    '-webkitAppRegion': 'no-drag',
   },
   logoButton: {
-    position: "absolute",
-    left: "50%",
-    right: "50%",
-    transform: "translate(-50%, -50%)",
-    margin: "auto",
+    position: 'absolute',
+    left: '50%',
+    right: '50%',
+    transform: 'translate(-50%, -50%)',
+    margin: 'auto',
     top: theme.spacing.unit * 4,
-    [theme.breakpoints.down("sm")]: {
-      position: "initial",
-      left: "initial",
-      right: "initial",
-      transform: "initial",
-      margin: "auto",
-      top: "initial",
+    [theme.breakpoints.down('sm')]: {
+      position: 'initial',
+      left: 'initial',
+      right: 'initial',
+      transform: 'initial',
+      margin: 'auto',
+      top: 'initial',
     },
   },
   userButton: {
     width: 32,
     height: 32,
-    margin: "auto",
-    overflow: "hidden",
+    margin: 'auto',
+    overflow: 'hidden',
   },
   userButtonImg: {
     height: 32,
-    objectFit: "cover",
+    objectFit: 'cover',
   },
   list: {
     width: drawerWidth,
-    [theme.breakpoints.up("md")]: {
-      width: "100%",
+    [theme.breakpoints.up('md')]: {
+      width: '100%',
     },
   },
   listFull: {
-    width: "auto",
+    width: 'auto',
   },
   listDivider: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
-    [theme.breakpoints.up("md")]: {
+    [theme.breakpoints.up('md')]: {
       marginLeft: 0,
       marginRight: 0,
     },
@@ -151,61 +153,61 @@ const styles = (theme) => ({
   drawerToolbar: theme.mixins.toolbar,
   drawer: {
     width: drawerWidth,
-    height: "100%",
-    overflowX: "hidden",
+    height: '100%',
+    overflowX: 'hidden',
   },
   drawerBg: {},
   drawerDocked: {
-    height: "100%",
-    position: "fixed",
+    height: '100%',
+    position: 'fixed',
   },
   menuPadding: {
     padding: 0,
-    overflow: "initial",
+    overflow: 'initial',
   },
   profileCard: {
     width: 345,
   },
   profileCardHeader: {},
   profileCardAction: {
-    margin: "auto",
+    margin: 'auto',
   },
   profileCardImg: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     height: 96 + 8,
-    objectFit: "cover",
-    width: "100%",
+    objectFit: 'cover',
+    width: '100%',
     opacity: 0.4,
     zIndex: -1,
-    transition: theme.transitions.create(["all"]),
+    transition: theme.transitions.create(['all']),
   },
   searchContainer: {
     flexGrow: 1,
-    position: "relative",
+    position: 'relative',
   },
   suggestionsContainerOpen: {
-    position: "absolute",
+    position: 'absolute',
     marginTop: theme.spacing.unit,
     marginBottom: theme.spacing.unit * 3,
     left: 0,
     right: 0,
   },
   suggestion: {
-    display: "block",
+    display: 'block',
   },
   suggestionsList: {
     margin: 0,
     padding: 0,
-    listStyleType: "none",
+    listStyleType: 'none',
   },
   textField: {
-    width: "100%",
+    width: '100%',
     padding: 0,
-    "label + &": {
+    'label + &': {
       marginTop: theme.spacing.unit * 3,
     },
   },
@@ -213,26 +215,26 @@ const styles = (theme) => ({
     borderRadius: 4,
     background: grey[900],
     fontSize: 16,
-    textAlign: "center",
-    padding: "10px 12px",
-    width: "calc(100% - 24px)",
-    transition: theme.transitions.create(["box-shadow"]),
-    "&:focus": {
-      boxShadow: "0 1pt 0.2rem rgba(0,0,0,.25)",
+    textAlign: 'center',
+    padding: '10px 12px',
+    width: 'calc(100% - 24px)',
+    transition: theme.transitions.create(['box-shadow']),
+    '&:focus': {
+      boxShadow: '0 1pt 0.2rem rgba(0,0,0,.25)',
     },
   },
   content: {
     backgroundColor: theme.palette.background.default,
-    width: "100%",
-    height: "calc(100% - 56px)",
-    [theme.breakpoints.up("sm")]: {
-      height: "calc(100% - 64px)",
+    width: '100%',
+    height: 'calc(100% - 56px)',
+    [theme.breakpoints.up('sm')]: {
+      height: 'calc(100% - 64px)',
     },
-    position: "relative",
-    "& > div": {
-      position: "absolute",
-      width: "100%",
-      [theme.breakpoints.down("md")]: {
+    position: 'relative',
+    '& > div': {
+      position: 'absolute',
+      width: '100%',
+      [theme.breakpoints.down('md')]: {
         marginBottom: 56,
       },
     },
@@ -241,37 +243,37 @@ const styles = (theme) => ({
     fontWeight: 700,
     padding: theme.spacing.unit * 3,
     fontSize: theme.typography.pxToRem(12),
-    color: "rgba(255,255,255, .7)",
-    [theme.breakpoints.up("md")]: {
+    color: 'rgba(255,255,255, .7)',
+    [theme.breakpoints.up('md')]: {
       padding: theme.spacing.unit * 2,
     },
   },
   contextBar: {
-    [theme.breakpoints.down("sm")]: {
-      display: "none",
+    [theme.breakpoints.down('sm')]: {
+      display: 'none',
     },
   },
   tabLabel: {
     opacity: 0.5,
-    color: "white",
+    color: 'white',
     fontSize: theme.typography.pxToRem(14),
-    textTransform: "initial",
+    textTransform: 'initial',
   },
   tabLabelActive: {
     fontWeight: 700,
     fontSize: theme.typography.pxToRem(14),
-    textTransform: "initial",
-    color: "white",
+    textTransform: 'initial',
+    color: 'white',
   },
   tabLine: {
-    filter: "drop-shadow(0 1px 12px rgba(0,0,255,.2))",
+    filter: 'drop-shadow(0 1px 12px rgba(0,0,255,.2))',
     height: 2,
-    background: "white",
-    display: "none",
+    background: 'white',
+    display: 'none',
   },
   tab: {
     height: 64,
-    [theme.breakpoints.down("md")]: {
+    [theme.breakpoints.down('md')]: {
       minWidth: 72,
     },
   },
@@ -280,117 +282,118 @@ const styles = (theme) => ({
     width: 64,
   },
   avatarImg: {
-    height: "100%",
-    width: "100%",
-    objectFit: "cover",
-    transition: theme.transitions.create(["all"]),
+    height: '100%',
+    width: '100%',
+    objectFit: 'cover',
+    transition: theme.transitions.create(['all']),
   },
   statusForm: {
-    width: "100%",
+    width: '100%',
   },
   navBar: {
-    position: "fixed",
-    width: "100%",
+    position: 'fixed',
+    width: '100%',
     bottom: 0,
     zIndex: 9999,
   },
   sideNav: {
-    position: "fixed",
-    height: "100%",
+    position: 'fixed',
+    height: '100%',
     top: theme.spacing.unit * 8,
     left: 0,
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
     margin: theme.spacing.unit,
     zIndex: 1200,
   },
   sideButton: {
-    display: "flex",
-    "& > span": {
-      flexDirection: "column",
-      textTransform: "initial",
+    display: 'flex',
+    '& > span': {
+      flexDirection: 'column',
+      textTransform: 'initial',
     },
   },
   searchBar: {
-    background: "rgba(255,255,255,.05)",
-    border: "1px solid rgba(255,255,255,.1)",
-    boxShadow: "none",
+    background: 'rgba(255,255,255,.05)',
+    border: '1px solid rgba(255,255,255,.1)',
+    boxShadow: 'none',
     maxWidth: 1970,
     minWidth: 300,
-    display: "flex",
-    transition: theme.transitions.create(["all"]),
-    "&:hover": {
-      background: "rgba(255,255,255,.08)",
-      border: "1px solid rgba(255,255,255,.15)",
+    display: 'flex',
+    transition: theme.transitions.create(['all']),
+    '&:hover': {
+      background: 'rgba(255,255,255,.08)',
+      border: '1px solid rgba(255,255,255,.15)',
     },
-    "&:focus": {
-      background: "rgba(255,255,255,.08)",
-      border: "1px solid rgba(255,255,255,.15)",
+    '&:focus': {
+      background: 'rgba(255,255,255,.08)',
+      border: '1px solid rgba(255,255,255,.15)',
     },
-    margin: "auto",
+    margin: 'auto',
     marginRight: theme.spacing.unit,
   },
   searchInput: {
-    boxSizing: "border-box",
+    boxSizing: 'border-box',
   },
   searchIcon: {
     paddingLeft: theme.spacing.unit * 2,
     paddingRight: theme.spacing.unit * 2,
-    margin: "auto 0",
-    width: "auto",
-    color: "white",
+    margin: 'auto 0',
+    width: 'auto',
+    color: 'white',
   },
   white: {
-    color: "white",
+    color: 'white',
   },
   barTitle: {
     fontFamily: "'Fugaz One', cursive",
   },
   logoImg: {
     height: 38,
-    margin: "auto",
-    position: "relative",
+    margin: 'auto',
+    position: 'relative',
   },
   metashit: {
-    [theme.breakpoints.up("md")]: {
-      display: "flex",
+    [theme.breakpoints.up('md')]: {
+      display: 'flex',
     },
   },
   tabwrapper: {
-    [theme.breakpoints.up("md")]: {
-      flexDirection: "row",
+    [theme.breakpoints.up('md')]: {
+      flexDirection: 'row',
     },
   },
   tablabelcontainer: {
-    [theme.breakpoints.down("md")]: {
-      display: "none",
+    [theme.breakpoints.down('md')]: {
+      display: 'none',
     },
   },
   quicklinks: {
-    display: "flex",
-    width: "100%",
-    margin: "0 16px",
-    boxSizing: "border-box",
-    [theme.breakpoints.up("md")]: {
-      margin: "auto",
-      width: "auto",
+    display: 'flex',
+    width: '100%',
+    margin: '0 16px',
+    boxSizing: 'border-box',
+    [theme.breakpoints.up('md')]: {
+      margin: 'auto',
+      width: 'auto',
     },
   },
 });
 
-class Superbar extends Component {
+class Superbar extends Component
+{
   state = {
     anchorEl: null,
     infoEl: null,
     drawerOpen: false,
-    searchVal: "",
+    searchVal: '',
     notAtTop: true,
-    currentPage: "",
+    currentPage: '',
     watchIsOn: false,
     status: 0,
-    mirTitle: "",
+    mirTitle: '',
     scrolling: false,
-    commit: "d12",
+    commit: 'd12',
     hue: null,
     hueVib: null,
     hueVibN: null,
@@ -400,193 +403,259 @@ class Superbar extends Component {
     donateModal: false,
     langMenu: null,
     openSnack: false,
-    snackMessage: "",
+    snackMessage: '',
   };
 
-  componentWillMount = () => {
-    if (this.props.history.location.pathname === "/")
-      this.setState({ tabVal: 0, currentPage: "Mirai" });
-    else {
+  componentWillMount = () =>
+  {
+    if (this.props.history.location.pathname === '/')
+    {
+      this.setState({ tabVal: 0, currentPage: 'Mirai' });
+    }
+    else
+    {
       this.setState({ tabVal: 3 });
     }
 
     if (
-      this.props.history.location.pathname === "/watch" &&
-      window.location.pathname === "/watch"
-    ) {
+      this.props.history.location.pathname === '/watch' &&
+      window.location.pathname === '/watch'
+    )
+    {
       this.setState({ watchIsOn: true });
-    } else {
+    }
+    else
+    {
       this.setState({ watchIsOn: false });
     }
 
     if (
-      this.props.history.location.pathname === "/stream" &&
-      window.location.pathname === "/stream"
-    ) {
+      this.props.history.location.pathname === '/stream' &&
+      window.location.pathname === '/stream'
+    )
+    {
       this.setState({ watchIsOn: true });
-    } else {
+    }
+    else
+    {
       this.setState({ watchIsOn: false });
     }
 
     checklang(this);
   };
 
-  componentDidMount = async () => {
-    window.addEventListener("scroll", this.handleScroll);
+  componentDidMount = async () =>
+  {
+    window.addEventListener('scroll', this.handleScroll);
     await this.getUsersOnline();
     // await this.handleNotifications(); TODO: Service worker method instead of this.
   };
 
-  componentWillReceiveProps = (nextProps) => {
+  componentWillReceiveProps = (nextProps) =>
+  {
     if (this.props.mir)
-      if (this.props.mir.title !== nextProps.mir.title) {
-        this.setState({ mirTitle: "" }, () =>
-          this.setState({ mirTitle: nextProps.mir.title }),
-        );
+    {
+      if (this.props.mir.title !== nextProps.mir.title)
+      {
+        this.setState({ mirTitle: '' }, () =>
+          this.setState({ mirTitle: nextProps.mir.title }));
       }
+    }
   };
 
-  handleNotifications = async () => {
-    if (!isEmpty(this.props.profile)) {
+  shouldComponentUpdate = (nextProps, nextState) =>
+  {
+    if (this.state !== nextState)
+    {
+      return true;
+    }
+
+    if (this.props !== nextProps)
+    {
+      return true;
+    }
+
+    return false;
+  };
+
+  componentWillUnmount = () =>
+  {
+    window.removeEventListener('scroll', this.handleScroll);
+    this.listenToHistory();
+  };
+
+  getUsersOnline = () =>
+    this.props.firebase
+      .database()
+      .ref('presence')
+      .on('value', value =>
+        this.setState({
+          onlineUsers: value === undefined ? 0 : value.val(),
+        }));
+
+      getColors = () =>
+      {
+        const hue = localStorage.getItem('user-hue');
+        if (hue)
+        {
+          const hues = JSON.parse(hue);
+          return this.setState({
+            hue: hues.hue,
+            hueVib: hues.hueVib,
+            hueVibN: hues.hueVibN,
+          });
+        }
+        return null;
+      };
+
+  handleNotifications = async () =>
+  {
+    if (!isEmpty(this.props.profile))
+    {
       return this.props.firebase
         .database()
-        .ref("/users")
+        .ref('/users')
         .child(this.props.profile.userID)
-        .child("notifications")
-        .on("value", (val) => {
+        .child('notifications')
+        .on('value', (val) =>
+        {
           const data = val.val();
-          if (data) {
-            const notifications = Object.values(data).filter(
-              (n) => n.ignored === false,
-            );
+          if (data)
+          {
+            const notifications = Object.values(data).filter(n => n.ignored === false);
             const sortedNotificationsByDate =
               notifications.length > 0
                 ? notifications.sort((a, b) => b.date - a.date)
                 : null;
             return this.checkForNotifications(sortedNotificationsByDate);
-          } else {
-            return null;
           }
+          return null;
         });
-    } else {
-      return null;
     }
+    return null;
   };
 
-  checkForNotifications = async (notification) => {
-    if (!("Notification" in window)) {
-      return console.info(
-        "[mirai] Web notification support not found on this browser.",
-      );
+  checkForNotifications = async (notification) =>
+  {
+    if (!('Notification' in window))
+    {
+      return null;
     }
 
-    if (isEmpty(this.props.profile)) {
-      return console.info(
-        "[mirai] Guest mode detected, notifications disabled.",
-      );
+    if (isEmpty(this.props.profile))
+    {
+      return null;
     }
 
-    try {
+    try
+    {
       await Notification.requestPermission();
-      if (Notification.permission === "denied") {
-        throw new Error("Web notifications denied.");
-      } else {
-        if (!notification) return null;
-        else {
-          notification.forEach((s) => {
-            const n = new Notification("Mirai", {
-              body: s.desc,
-              icon: s.avatar,
-              badge: miraiLogoBlack,
-              vibrate: [110],
-              tag: s.id,
-            });
-            n.addEventListener("click", (event) => {
-              n.close();
-            });
-          });
-        }
+      if (Notification.permission === 'denied')
+      {
+        throw new Error('Web notifications denied.');
       }
-    } catch (error) {
-      return console.error(error);
+      else
+      {
+        if (!notification) return null;
+
+        return notification.forEach((s) =>
+        {
+          const n = new Notification('Mirai', {
+            body: s.desc,
+            icon: s.avatar,
+            badge: miraiLogoBlack,
+            vibrate: [110],
+            tag: s.id,
+          });
+          n.addEventListener('click', () =>
+          {
+            n.close();
+          });
+        });
+      }
+    }
+    catch (error)
+    {
+      return error;
     }
   };
 
-  componentWillUnmount = () => {
-    window.removeEventListener("scroll", this.handleScroll);
-    this.listenToHistory();
-  };
-
-  getColors = () => {
-    const hue = localStorage.getItem("user-hue");
-    if (hue) {
-      let hues = JSON.parse(hue);
-      return this.setState({
-        hue: hues.hue,
-        hueVib: hues.hueVib,
-        hueVibN: hues.hueVibN,
-      });
-    } else {
-      return null;
-    }
-  };
-
-  handleScroll = (event) => {
+  handleScroll = () =>
+  {
     if (window.scrollY === 0 && this.state.scrolling === true)
-      this.setState({ scrolling: false }, () => {
-        if (document.getElementById("fabShowButton") && !window.safari)
-          document.getElementById("fabShowButton").style.opacity = 0;
-        const mainH = document.getElementById("mainHeader");
-        const mainC = document.getElementById("mainCard");
-        const commando = document.getElementById("commandoBar");
-        if (mainH && mainC && commando) {
-          mainH.classList.remove("compacMode");
-          commando.classList.remove("fixedcommando");
+    {
+      this.setState({ scrolling: false }, () =>
+      {
+        if (document.getElementById('fabShowButton') && !window.safari)
+        {
+          document.getElementById('fabShowButton').style.opacity = 0;
+        }
+        const mainH = document.getElementById('mainHeader');
+        const mainC = document.getElementById('mainCard');
+        const commando = document.getElementById('commandoBar');
+        if (mainH && mainC && commando)
+        {
+          mainH.classList.remove('compacMode');
+          commando.classList.remove('fixedcommando');
         }
       });
+    }
     else if (window.scrollY !== 0 && this.state.scrolling !== true)
-      this.setState({ scrolling: true }, () => {
-        if (document.getElementById("fabShowButton"))
-          document.getElementById("fabShowButton").style.opacity = 1;
-        const mainH = document.getElementById("mainHeader");
-        const mainC = document.getElementById("mainCard");
-        const commando = document.getElementById("commandoBar");
-        if (mainH && mainC && commando) {
-          mainH.classList.add("compacMode");
-          commando.classList.add("fixedcommando");
+    {
+      this.setState({ scrolling: true }, () =>
+      {
+        if (document.getElementById('fabShowButton'))
+        {
+          document.getElementById('fabShowButton').style.opacity = 1;
+        }
+        const mainH = document.getElementById('mainHeader');
+        const mainC = document.getElementById('mainCard');
+        const commando = document.getElementById('commandoBar');
+        if (mainH && mainC && commando)
+        {
+          mainH.classList.add('compacMode');
+          commando.classList.add('fixedcommando');
         }
       });
+    }
   };
 
-  handleMenu = (event) => {
+  handleMenu = (event) =>
+  {
     this.setState({ anchorEl: event.currentTarget });
   };
 
-  handleRequestClose = () => {
+  handleRequestClose = () =>
+  {
     this.setState({ anchorEl: null });
   };
 
-  handleInfoMenu = (event) => {
+  handleInfoMenu = (event) =>
+  {
     this.setState({ infoEl: event.currentTarget });
   };
 
-  handleInfoRequestClose = () => {
+  handleInfoRequestClose = () =>
+  {
     this.setState({ infoEl: null });
   };
 
   toggleDrawer = () => this.setState({ drawerOpen: !this.state.drawerOpen });
 
-  tabChange = (e, val) => {
-    this.setState({ tabVal: val }, () => {
-      switch (this.state.tabVal) {
+  tabChange = (e, val) =>
+  {
+    this.setState({ tabVal: val }, () =>
+    {
+      switch (this.state.tabVal)
+      {
         case 0:
-          this.props.history.push("/");
+          this.props.history.push('/');
           break;
         case 1:
-          this.props.history.push("/rankings");
+          this.props.history.push('/rankings');
           break;
         case 2:
-          this.props.history.push("/live");
+          this.props.history.push('/live');
           break;
         default:
           break;
@@ -594,185 +663,168 @@ class Superbar extends Component {
     });
   };
 
-  listenToHistory = this.props.history.listen((location) => {
+  listenToHistory = this.props.history.listen((location) =>
+  {
     const { superbar } = this.state.lang;
-    switch (location.pathname) {
-      case "/":
+    switch (location.pathname)
+    {
+      case '/':
         this.setState({
           currentPage: superbar.home,
           tabVal: 0,
           watchIsOn: false,
         });
         break;
-      /*case "/feeds":
+      /* case "/feeds":
         this.setState({
           currentPage: superbar.feeds,
           tabVal: 1,
           watchIsOn: false
         });
-        break;*/
-      case "/rankings":
+        break; */
+      case '/rankings':
         this.setState({
           currentPage: superbar.rankings,
           tabVal: 1,
           watchIsOn: false,
         });
         break;
-      case "/live":
+      case '/live':
         this.setState({
           currentPage: superbar.live,
           tabVal: 2,
           watchIsOn: false,
         });
         break;
-      case "/user":
+      case '/user':
         this.setState({
           currentPage: superbar.user,
           tabVal: 3,
           watchIsOn: false,
         });
         break;
-      case "/history":
+      case '/history':
         this.setState({
           currentPage: superbar.history,
           tabVal: 3,
           watchIsOn: false,
         });
         break;
-      case "/later":
+      case '/later':
         this.setState({
           currentPage: superbar.later,
           tabVal: 3,
           watchIsOn: false,
         });
         break;
-      case "/help":
+      case '/help':
         this.setState({
           currentPage: superbar.help,
           tabVal: 3,
           watchIsOn: false,
         });
         break;
-      case "/studio":
+      case '/studio':
         this.setState({
-          currentPage: "",
+          currentPage: '',
           tabVal: 3,
           watchIsOn: false,
         });
         break;
-      case "/fig":
+      case '/fig':
         this.setState({
-          currentPage: "",
+          currentPage: '',
           tabVal: 3,
           watchIsOn: false,
         });
         break;
-      case "/show":
+      case '/show':
         this.setState({
-          currentPage: "",
+          currentPage: '',
           tabVal: 3,
           watchIsOn: false,
         });
         break;
-      case "/settings":
+      case '/settings':
         this.setState({
           currentPage: superbar.usermenu.settings,
           tabVal: 3,
           watchIsOn: false,
         });
         break;
-      case "/setup":
-        this.setState({ currentPage: "Setup", tabVal: 3, watchIsOn: false });
+      case '/setup':
+        this.setState({ currentPage: 'Setup', tabVal: 3, watchIsOn: false });
         break;
-      case "/wizard":
-        this.setState({ currentPage: "Wizard", tabVal: 3, watchIsOn: false });
+      case '/wizard':
+        this.setState({ currentPage: 'Wizard', tabVal: 3, watchIsOn: false });
         break;
-      case "/watch":
-        this.setState({ currentPage: "", tabVaL: 3, watchIsOn: true });
+      case '/watch':
+        this.setState({ currentPage: '', tabVaL: 3, watchIsOn: true });
         break;
-      case "/stream":
-        this.setState({ currentPage: "", tabVaL: 3, watchIsOn: true });
+      case '/stream':
+        this.setState({ currentPage: '', tabVaL: 3, watchIsOn: true });
         break;
-      case "/tag":
-        this.setState({ currentPage: "", tabVal: 3, watchIsOn: false });
+      case '/tag':
+        this.setState({ currentPage: '', tabVal: 3, watchIsOn: false });
         break;
-      case "/tou":
+      case '/tou':
         this.setState({
           currentPage: superbar.termsofusage,
           tabVal: 3,
           watchIsOn: false,
         });
         break;
-      case "/monika":
-        this.setState({ currentPage: "Monika", tabVal: 3, watchIsOn: false });
+      case '/monika':
+        this.setState({ currentPage: 'Monika', tabVal: 3, watchIsOn: false });
         break;
-      case "/search":
+      case '/search':
         this.setState({
           currentPage: superbar.search,
           tabVal: 3,
           watchIsOn: false,
         });
         break;
-      case "/dev/player":
-        this.setState({ currentPage: "Developer", tabVaL: 3 });
+      case '/dev/player':
+        this.setState({ currentPage: 'Developer', tabVaL: 3 });
         break;
-      case "/admin/db":
-        this.setState({ currentPage: "Admin", tabVaL: 3 });
+      case '/admin/db':
+        this.setState({ currentPage: 'Admin', tabVaL: 3 });
         break;
       default:
         break;
     }
   });
 
-  shouldComponentUpdate = (nextProps, nextState) => {
-    if (this.state !== nextState) {
-      return true;
-    }
+  revealBar = () => document.getElementById('superBar').style.opacity === 1;
 
-    if (this.props !== nextProps) {
-      return true;
-    }
-
-    return false;
-  };
-
-  revealBar = () => document.getElementById("superBar").style.opacity === 1;
-
-  hideBar = () => document.getElementById("superBar").style.opacity === 0;
+  hideBar = () => document.getElementById('superBar').style.opacity === 0;
 
   handleMenuOver = () =>
     this.setState({ userMenuHover: !this.state.userMenuHover });
 
-  getUsersOnline = () =>
-    this.props.firebase
-      .database()
-      .ref("presence")
-      .on("value", (value) =>
-        this.setState({
-          onlineUsers: value === undefined ? 0 : value.val(),
-        }),
-      );
-
   openDonate = () => this.setState({ donateModal: true, anchorEl: null });
 
-  handleLangMenu = (event) => {
+  handleLangMenu = (event) =>
+  {
     this.setState({ langMenu: event.currentTarget });
   };
 
-  changeLang = (lang) => {
-    switch (lang) {
-      case "en":
-        localStorage.setItem("language", "en-us");
+  changeLang = (lang) =>
+  {
+    switch (lang)
+    {
+      case 'en':
+        localStorage.setItem('language', 'en-us');
         window.location.reload();
         break;
 
-      case "no":
-        localStorage.setItem("language", "nb-no");
+      case 'no':
+        localStorage.setItem('language', 'nb-no');
         window.location.reload();
         break;
 
-      case "jp":
-        localStorage.setItem("language", "jp");
+      case 'jp':
+        localStorage.setItem('language', 'jp');
         window.location.reload();
         break;
 
@@ -782,23 +834,27 @@ class Superbar extends Component {
   };
 
   // Electron functions
-  eMaximize = () => {
-    const electron = window.require("electron").remote.getCurrentWindow();
+  eMaximize = () =>
+  {
+    const electron = window.require('electron').remote.getCurrentWindow();
     if (electron.isMaximized()) return electron.unmaximize();
-    else return electron.maximize();
+    return electron.maximize();
   };
 
-  eMinimize = () => {
-    const electron = window.require("electron").remote.getCurrentWindow();
+  eMinimize = () =>
+  {
+    const electron = window.require('electron').remote.getCurrentWindow();
     return electron.minimize();
   };
 
-  eClose = () => {
-    const electron = window.require("electron").remote.getCurrentWindow();
+  eClose = () =>
+  {
+    const electron = window.require('electron').remote.getCurrentWindow();
     return electron.close();
   };
 
-  render() {
+  render()
+  {
     const { classes } = this.props;
     const {
       anchorEl,
@@ -813,16 +869,13 @@ class Superbar extends Component {
       onlineUsers,
       donateModal,
       langMenu,
-      openSnack,
-      snackMessage,
     } = this.state;
 
     const user = !isEmpty(this.props.profile) ? this.props.profile : null;
 
     const notifications = user
-      ? user.notifications
-        ? Object.values(user.notifications).filter((n) => n.ignored === false)
-        : null
+      && user.notifications
+      ? Object.values(user.notifications).filter(n => n.ignored === false)
       : null;
 
     const open = Boolean(anchorEl);
@@ -845,10 +898,12 @@ class Superbar extends Component {
         <div className={classes.quicklinks}>
           <Tooltip title="Our Discord server">
             <IconButton
-              onClick={() => {
+              onClick={() =>
+{
                 this.toggleDrawer();
-                window.open("https://discord.gg/pKE7QZE");
-              }}>
+                window.open('https://discord.gg/pKE7QZE');
+              }}
+            >
               <svg style={{ width: 28, height: 28 }} viewBox="0 0 24 24">
                 <path
                   fill="rgba(255,255,255,1)"
@@ -858,12 +913,14 @@ class Superbar extends Component {
             </IconButton>
           </Tooltip>
           <IconButton
-            style={{ display: "none" }}
+            style={{ display: 'none' }}
             disabled
-            onClick={() => {
+            onClick={() =>
+{
               this.toggleDrawer();
-              window.open("https://github.com/afrojezus/mirai");
-            }}>
+              window.open('https://github.com/afrojezus/mirai');
+            }}
+          >
             <svg style={{ width: 28, height: 28 }} viewBox="0 0 24 24">
               <path
                 fill="rgba(255,255,255,.3)"
@@ -871,14 +928,14 @@ class Superbar extends Component {
               />
             </svg>
           </IconButton>
-          {/*<IconButton
+          {/* <IconButton
             onClick={() => {
               this.toggleDrawer();
               window.open("mailto:thoralf21@gmail.com");
             }}
           >
             <AtIcon />
-          </IconButton>*/}
+          </IconButton> */}
         </div>
       </div>
     );
@@ -897,10 +954,12 @@ class Superbar extends Component {
           <List>
             <ListItem
               button
-              onClick={() => {
+              onClick={() =>
+{
                 this.toggleDrawer();
                 this.tabChange(null, 0);
-              }}>
+              }}
+            >
               <ListItemIcon>
                 <HomeIcon />
               </ListItemIcon>
@@ -917,13 +976,15 @@ class Superbar extends Component {
                 <DashboardIcon />
               </ListItemIcon>
               <ListItemText primary={lang.superbar.feeds} />
-            </ListItem>*/}
+            </ListItem> */}
             <ListItem
               button
-              onClick={() => {
+              onClick={() =>
+{
                 this.toggleDrawer();
                 this.tabChange(null, 1);
-              }}>
+              }}
+            >
               <ListItemIcon>
                 <CompassIcon />
               </ListItemIcon>
@@ -932,10 +993,12 @@ class Superbar extends Component {
             <ListItem
               button
               disabled={!user}
-              onClick={() => {
+              onClick={() =>
+{
                 this.toggleDrawer();
                 this.tabChange(null, 2);
-              }}>
+              }}
+            >
               <ListItemIcon>
                 <LiveTvIcon />
               </ListItemIcon>
@@ -953,35 +1016,42 @@ class Superbar extends Component {
                 <Hidden mdUp>
                   <ListSubheader>{lang.superbar.you}</ListSubheader>
                 </Hidden>
-              }>
+              }
+            >
               <ListItem
                 button
-                onClick={() => {
+                onClick={() =>
+{
                   this.handleRequestClose();
                   this.toggleDrawer();
                   this.tabChange(null, 3);
-                  this.props.history.push("/history");
-                }}>
+                  this.props.history.push('/history');
+                }}
+              >
                 <ListItemText primary={lang.superbar.history} />
               </ListItem>
               <ListItem
                 button
-                onClick={() => {
+                onClick={() =>
+{
                   this.handleRequestClose();
                   this.toggleDrawer();
                   this.tabChange(null, 3);
-                  this.props.history.push("/later");
-                }}>
+                  this.props.history.push('/later');
+                }}
+              >
                 <ListItemText primary={lang.superbar.later} />
               </ListItem>
               <ListItem
                 button
-                onClick={() => {
+                onClick={() =>
+{
                   this.handleRequestClose();
                   this.toggleDrawer();
                   this.tabChange(null, 3);
-                  this.props.history.push("/user#favorites");
-                }}>
+                  this.props.history.push('/user#favorites');
+                }}
+              >
                 <ListItemText primary={lang.superbar.favorites} />
               </ListItem>
             </List>
@@ -991,25 +1061,29 @@ class Superbar extends Component {
         <List>
           <ListItem
             button
-            onClick={() => {
+            onClick={() =>
+{
               this.handleRequestClose();
               this.toggleDrawer();
               this.tabChange(null, 3);
-              this.props.history.push("/help");
-            }}>
+              this.props.history.push('/help');
+            }}
+          >
             <ListItemText primary={lang.superbar.help} />
           </ListItem>
           <ListItem
             button
-            onClick={() => {
+            onClick={() =>
+{
               this.handleRequestClose();
               this.toggleDrawer();
               this.tabChange(null, 3);
-              this.props.history.push("/privacy");
-            }}>
+              this.props.history.push('/privacy');
+            }}
+          >
             <ListItemText primary={lang.superbar.privay} />
           </ListItem>
-          {/*<ListItem
+          {/* <ListItem
             button
             onClick={() => {
               this.handleRequestClose();
@@ -1018,30 +1092,34 @@ class Superbar extends Component {
             }}
           >
             <ListItemText primary={lang.superbar.feedback} />
-          </ListItem>*/}
+          </ListItem> */}
           <ListItem
             button
-            onClick={() => {
+            onClick={() =>
+{
               this.handleRequestClose();
               this.toggleDrawer();
               this.tabChange(null, 3);
-              this.props.history.push("/tou");
-            }}>
+              this.props.history.push('/tou');
+            }}
+          >
             <ListItemText primary={lang.superbar.termsofusage} />
           </ListItem>
           <ListItem
             button
-            onClick={() => {
+            onClick={() =>
+{
               this.handleRequestClose();
               this.toggleDrawer();
               this.tabChange(null, 3);
-              this.props.history.push("/monika");
-            }}>
+              this.props.history.push('/monika');
+            }}
+          >
             <ListItemText primary="Monika" />
           </ListItem>
-          {/*<ListItem button onClick={this.openDonate}>
+          {/* <ListItem button onClick={this.openDonate}>
             <ListItemText primary={lang.superbar.donate} />
-          </ListItem>*/}
+          </ListItem> */}
         </List>
         <Divider className={classes.listDivider} />
         <Hidden mdUp>{metaShit}</Hidden>
@@ -1051,13 +1129,14 @@ class Superbar extends Component {
     return (
       <div className={classes.appFrame}>
         <AppBar
-          color={"default"}
+          color="default"
           id="superBar"
           classes={{ root: classes.root }}
           className={
             scrolling && !window.safari ? classes.appBar : classes.appBarTop
           }
-          style={watchIsOn ? { display: "none" } : null}>
+          style={watchIsOn ? { display: 'none' } : null}
+        >
           {window.safari ? null : (
             <div
               className={classes.gd}
@@ -1066,13 +1145,15 @@ class Superbar extends Component {
           )}
           <Toolbar
             className={classes.mainToolbar}
-            disableGutters={isElectron()}>
+            disableGutters={isElectron()}
+          >
             <Hidden mdUp>
               <IconButton
                 className={classes.menuButton}
-                contrast={"default"}
+                contrast="default"
                 aria-label="Menu"
-                onClick={this.toggleDrawer}>
+                onClick={this.toggleDrawer}
+              >
                 <MenuIcon />
               </IconButton>
             </Hidden>
@@ -1081,7 +1162,8 @@ class Superbar extends Component {
               value={tabVal}
               onChange={this.tabChange}
               indicatorClassName={classes.tabLine}
-              centered>
+              centered
+            >
               <Tab
                 classes={{
                   root: classes.tab,
@@ -1093,7 +1175,7 @@ class Superbar extends Component {
                 icon={<HomeIcon className={classes.white} />}
                 label={lang.superbar.home}
               />
-              {/*<Tab
+              {/* <Tab
                 icon={<DashboardIcon />}
                 classes={{
                   root: classes.tab,
@@ -1103,7 +1185,7 @@ class Superbar extends Component {
                   labelContainer: classes.tablabelcontainer
                 }}
                 label={lang.superbar.feeds}
-              />*/}
+              /> */}
               <Tab
                 icon={<CompassIcon className={classes.white} />}
                 classes={{
@@ -1127,7 +1209,7 @@ class Superbar extends Component {
                 }}
                 label={lang.superbar.live}
               />
-              <Tab style={{ display: "none" }} />
+              <Tab style={{ display: 'none' }} />
             </Tabs>
             <Hidden smDown>
               <div className={classes.flex} />
@@ -1135,7 +1217,7 @@ class Superbar extends Component {
             <Hidden mdUp>
               <Typography variant="title">
                 <Dotdotdot clamp={1}>
-                  {mirTitle !== "" ? mirTitle : currentPage}
+                  {mirTitle !== '' ? mirTitle : currentPage}
                 </Dotdotdot>
               </Typography>
             </Hidden>
@@ -1143,10 +1225,11 @@ class Superbar extends Component {
               <IconButton
                 className={classes.logoButton}
                 onClick={() =>
-                  window.scrollY === 0
-                    ? this.props.history.push("/")
-                    : window.scroll({ top: 0, behavior: "smooth" })
-                }>
+                  (window.scrollY === 0
+                    ? this.props.history.push('/')
+                    : window.scroll({ top: 0, behavior: 'smooth' }))
+                }
+              >
                 <img src={miraiLogo} alt="" className={classes.logoImg} />
               </IconButton>
             </Hidden>
@@ -1181,16 +1264,18 @@ class Superbar extends Component {
             {!user && tabVal === 0 ? null : !user ? (
               <Hidden mdUp>
                 <IconButton
-                  onClick={() => this.props.history.push("/search")}
-                  contrast={"default"}>
+                  onClick={() => this.props.history.push('/search')}
+                  contrast="default"
+                >
                   <SearchIcon />
                 </IconButton>
               </Hidden>
             ) : (
               <Hidden mdUp>
                 <IconButton
-                  onClick={() => this.props.history.push("/search")}
-                  contrast={"default"}>
+                  onClick={() => this.props.history.push('/search')}
+                  contrast="default"
+                >
                   <SearchIcon />
                 </IconButton>
               </Hidden>
@@ -1198,10 +1283,11 @@ class Superbar extends Component {
             <div>
               <IconButton
                 disabled={!user}
-                aria-owns={open ? "info-menu" : null}
+                aria-owns={open ? 'info-menu' : null}
                 aria-haspopup="true"
                 onClick={this.handleInfoMenu}
-                contrast={"default"}>
+                contrast="default"
+              >
                 {notifications && notifications.length > 0 ? (
                   <BellIcon />
                 ) : (
@@ -1212,34 +1298,37 @@ class Superbar extends Component {
                 id="info-menu"
                 anchorEl={infoEl}
                 anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
+                  vertical: 'top',
+                  horizontal: 'right',
                 }}
                 transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
+                  vertical: 'top',
+                  horizontal: 'right',
                 }}
                 MenuListProps={{ style: { padding: 0 } }}
                 open={infoOpen}
-                onClose={this.handleInfoRequestClose}>
+                onClose={this.handleInfoRequestClose}
+              >
                 <NotificationForm />
               </Menu>
             </div>
             {isEmpty(user) ? (
               <IconButton
-                aria-owns={openLangMenu ? "lang-menu" : null}
+                aria-owns={openLangMenu ? 'lang-menu' : null}
                 aria-haspopup="true"
                 onClick={this.handleLangMenu}
-                contrast={"default"}>
+                contrast="default"
+              >
                 <TranslateIcon />
               </IconButton>
             ) : null}
             <div>
               <IconButton
-                aria-owns={open ? "profile-menu" : null}
+                aria-owns={open ? 'profile-menu' : null}
                 aria-haspopup="true"
                 onClick={this.handleMenu}
-                contrast={"default"}>
+                contrast="default"
+              >
                 {user ? (
                   <Avatar
                     src={user.avatar}
@@ -1248,7 +1337,10 @@ class Superbar extends Component {
                     classes={{ img: classes.userButtonImg }}
                     imgProps={{
                       style: { opacity: 0 },
-                      onLoad: (e) => (e.currentTarget.style.opacity = null),
+                      onLoad: (e) =>
+{
+ e.currentTarget.style.opacity = null;
+},
                     }}
                   />
                 ) : (
@@ -1259,34 +1351,38 @@ class Superbar extends Component {
                 id="profile-menu"
                 anchorEl={anchorEl}
                 anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
+                  vertical: 'top',
+                  horizontal: 'right',
                 }}
                 transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
+                  vertical: 'top',
+                  horizontal: 'right',
                 }}
                 open={open}
                 PaperProps={{
                   style: {
                     maxHeight: window.innerHeight / 1.05,
-                    overflowY: "auto",
+                    overflowY: 'auto',
                     zIndex: 2000,
                   },
                 }}
                 onClose={this.handleRequestClose}
-                PopoverClasses={{ paper: classes.menuPadding }}>
+                PopoverClasses={{ paper: classes.menuPadding }}
+              >
                 <div
-                  style={{ outline: "none", maxHeight: "inherit" }}
-                  className={classes.profileCard}>
+                  style={{ outline: 'none', maxHeight: 'inherit' }}
+                  className={classes.profileCard}
+                >
                   <CardHeader
                     className={classes.profileCardHeader}
-                    style={{ cursor: user ? "pointer" : null }}
-                    onClick={() => {
-                      if (user) {
+                    style={{ cursor: user ? 'pointer' : null }}
+                    onClick={() =>
+{
+                      if (user)
+{
                         this.handleRequestClose();
                         this.tabChange(null, 3);
-                        this.props.history.push("/user");
+                        this.props.history.push('/user');
                       }
                       return null;
                     }}
@@ -1300,25 +1396,29 @@ class Superbar extends Component {
                           classes={{ img: classes.avatarImg }}
                           className={classes.avatar}
                           imgProps={{
-                            style: { opacity: 0, borderRadius: "50%" },
+                            style: { opacity: 0, borderRadius: '50%' },
                             onLoad: (e) =>
-                              (e.currentTarget.style.opacity = null),
+                              {
+                                e.currentTarget.style.opacity = null;
+                              },
                           }}
                         />
                       ) : null
                     }
-                    title={user ? user.username : "Mirai"}
+                    title={user ? user.username : 'Mirai'}
                     subheader={
                       user ? user.nick : lang.superbar.usermenu.subheader
                     }
                     action={
                       user ? null : (
                         <Button
-                          onClick={() => {
+                          onClick={() =>
+{
                             this.handleRequestClose();
                             this.tabChange(null, 3);
-                            this.props.history.push("/setup");
-                          }}>
+                            this.props.history.push('/setup');
+                          }}
+                        >
                           {lang.superbar.usermenu.loginbutton}
                         </Button>
                       )
@@ -1353,14 +1453,17 @@ class Superbar extends Component {
                             <ListSubheader>
                               {lang.superbar.usermenu.developer}
                             </ListSubheader>
-                          }>
+                          }
+                        >
                           <ListItem
                             button
-                            onClick={() => {
+                            onClick={() =>
+{
                               this.handleRequestClose();
                               this.tabChange(null, 3);
-                              this.props.history.push("/dev");
-                            }}>
+                              this.props.history.push('/dev');
+                            }}
+                          >
                             <ListItemText
                               primary={lang.superbar.usermenu.developerDb}
                             />
@@ -1369,7 +1472,7 @@ class Superbar extends Component {
                         <Divider />
                       </div>
                     )}
-                  {/*user.role.includes("admin") && (
+                  {/* user.role.includes("admin") && (
                     <div>
                       <List
                         subheader={
@@ -1391,37 +1494,40 @@ class Superbar extends Component {
                       </List>
                       <Divider />
                     </div>
-                  )*/}
+                  ) */}
                   <Hidden smDown>{menuList}</Hidden>
                   {user ? (
                     <List>
                       <ListItem
                         button
-                        onClick={() => {
+                        onClick={() =>
+{
                           this.handleRequestClose();
                           this.tabChange(null, 3);
-                          this.props.history.push("/settings");
-                        }}>
+                          this.props.history.push('/settings');
+                        }}
+                      >
                         <ListItemText
                           primary={lang.superbar.usermenu.settings}
                         />
                       </ListItem>
                       <ListItem
                         button
-                        onClick={() => {
+                        onClick={() =>
+{
                           this.handleRequestClose();
-                          this.props.firebase
+                          return this.props.firebase
                             .logout()
                             .then(async () =>
-                              localForage.removeItem("user", async () => {
+                              localForage.removeItem('user', async () =>
+{
                                 this.tabChange(null, 3);
-                                localStorage.removeItem("user-hue");
-                                this.props.history.push("/setup");
-                                await localForage.removeItem("player-state");
-                              }),
-                            )
-                            .catch((err) => console.error(err.message));
-                        }}>
+                                localStorage.removeItem('user-hue');
+                                this.props.history.push('/setup');
+                                await localForage.removeItem('player-state');
+                              }));
+                        }}
+                      >
                         <ListItemText
                           primary={lang.superbar.usermenu.signout}
                         />
@@ -1436,81 +1542,95 @@ class Superbar extends Component {
               id="lang-menu"
               anchorEl={langMenu}
               anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
+                vertical: 'top',
+                horizontal: 'right',
               }}
               transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
+                vertical: 'top',
+                horizontal: 'right',
               }}
               open={openLangMenu}
               PaperProps={{
                 style: {
                   maxHeight: window.innerHeight / 1.05,
-                  overflowY: "auto",
+                  overflowY: 'auto',
                   zIndex: 2000,
                 },
               }}
               onClose={() => this.setState({ langMenu: null })}
-              PopoverClasses={{ paper: classes.menuPadding }}>
+              PopoverClasses={{ paper: classes.menuPadding }}
+            >
               <div
-                style={{ outline: "none", maxHeight: "inherit", maxWidth: 350 }}
-                className={classes.profileCard}>
+                style={{ outline: 'none', maxHeight: 'inherit', maxWidth: 350 }}
+                className={classes.profileCard}
+              >
                 <MenuItem
-                  onClick={() => {
-                    this.changeLang("en");
+                  onClick={() =>
+{
+                    this.changeLang('en');
                     this.setState({ langMenu: null });
-                  }}>
+                  }}
+                >
                   <Avatar
                     style={{
-                      color: "white",
+                      color: 'white',
                       marginRight: 8,
-                      background: "transparent",
-                    }}>
+                      background: 'transparent',
+                    }}
+                  >
                     <span
                       role="img"
                       aria-label="English"
-                      style={{ color: "white", marginBottom: 4 }}>
+                      style={{ color: 'white', marginBottom: 4 }}
+                    >
                       🇬🇧
                     </span>
                   </Avatar>
                   English
                 </MenuItem>
                 <MenuItem
-                  onClick={() => {
-                    this.changeLang("no");
+                  onClick={() =>
+{
+                    this.changeLang('no');
                     this.setState({ langMenu: null });
-                  }}>
+                  }}
+                >
                   <Avatar
                     style={{
-                      color: "white",
+                      color: 'white',
                       marginRight: 8,
-                      background: "transparent",
-                    }}>
+                      background: 'transparent',
+                    }}
+                  >
                     <span
                       role="img"
                       aria-label="Norsk Bokmål"
-                      style={{ color: "white", marginBottom: 4 }}>
+                      style={{ color: 'white', marginBottom: 4 }}
+                    >
                       🇳🇴
                     </span>
                   </Avatar>
                   Norsk Bokmål (Semi-experimental)
                 </MenuItem>
                 <MenuItem
-                  onClick={() => {
-                    this.changeLang("jp");
+                  onClick={() =>
+{
+                    this.changeLang('jp');
                     this.setState({ langMenu: null });
-                  }}>
+                  }}
+                >
                   <Avatar
                     style={{
-                      color: "white",
+                      color: 'white',
                       marginRight: 8,
-                      background: "transparent",
-                    }}>
+                      background: 'transparent',
+                    }}
+                  >
                     <span
                       role="img"
                       aria-label="Norsk Bokmål"
-                      style={{ color: "white", marginBottom: 4 }}>
+                      style={{ color: 'white', marginBottom: 4 }}
+                    >
                       🇯🇵
                     </span>
                   </Avatar>
@@ -1526,10 +1646,10 @@ class Superbar extends Component {
             {isElectron() ? (
               <IconButton onClick={this.eMaximize}>
                 {window
-                  .require("electron")
+                  .require('electron')
                   .remote.getCurrentWindow()
                   .isMaximized() ? (
-                  <UnMaximize />
+                    <UnMaximize />
                 ) : (
                   <Maximize />
                 )}
@@ -1542,42 +1662,6 @@ class Superbar extends Component {
             ) : null}
           </Toolbar>
         </AppBar>
-        {/* <Hidden lgDown>
-					<div
-						className={classes.sideNav}
-						id="sideNav"
-						style={watchIsOn ? { display: 'none' } : null}
-					>
-						<Button
-							className={classes.sideButton}
-							onClick={() => this.props.history.push('/')}
-						>
-							<HomeIcon />
-							Home
-						</Button>
-						<Button
-							className={classes.sideButton}
-							onClick={() => this.props.history.push('/feeds')}
-						>
-							<DashboardIcon />
-							Feeds
-						</Button>
-						<Button
-							className={classes.sideButton}
-							onClick={() => this.props.history.push('/rankings')}
-						>
-							<StarIcon />
-							Rankings
-						</Button>
-						<Button
-							className={classes.sideButton}
-							onClick={() => this.props.history.push('/live')}
-						>
-							<LiveTvIcon />
-							Live
-						</Button>
-					</div>
-				</Hidden> */}
         <Hidden mdUp>
           <Drawer
             classes={{ paper: classes.drawer }}
@@ -1586,96 +1670,89 @@ class Superbar extends Component {
             type="temporary"
             ModalProps={{
               keepMounted: true,
-            }}>
+            }}
+          >
             {menuList}
           </Drawer>
         </Hidden>
         <Dialogue
           open={donateModal}
           onClose={() => this.setState({ donateModal: false })}
-          title={lang.superbar.donate}>
+          title={lang.superbar.donate}
+        >
           <Typography variant="body1">
             Donate to the Mirai project to bettern the quality of the
             application and encourage newer features.
           </Typography>
         </Dialogue>
         <div className={classes.content}>{this.props.children}</div>
-        {/* <Hidden xlUp>
-					<BottomNavigation
-						value={tabVal}
-						onChange={this.tabChange}
-						showLabels
-						className={classes.navBar}
-						style={watchIsOn ? { display: 'none' } : null}
-					>
-						<BottomNavigationAction label="Home" icon={<HomeIcon />} />
-						<BottomNavigationAction label="Feeds" icon={<DashboardIcon />} />
-						<BottomNavigationAction label="Rankings" icon={<StarIcon />} />
-						<BottomNavigationAction label="Live" icon={<LiveTvIcon />} />
-					</BottomNavigation>
-				</Hidden> */}
         <MirPlayer fullSize={watchIsOn} />
       </div>
     );
   }
 }
 
-export class SearchBox extends Component {
+export class SearchBox extends Component
+{
   state = {
-    value: "",
+    value: '',
     suggestionList: null,
     lang: strings.enus,
   };
 
-  componentWillMount = () => {
+  componentWillMount = () =>
+  {
     checklang(this);
   };
 
-  onChange = (e) =>
-    this.setState({ value: e.currentTarget.value }, () => {
-      if (this.props.mir !== null && this.props.mir.twist !== null) {
+  onChange = e =>
+    this.setState({ value: e.currentTarget.value }, () =>
+    {
+      if (this.props.mir !== null && this.props.mir.twist !== null)
+      {
         const search = this.state.value;
         this.setState({
-          suggestionList: this.props.mir.twist.filter((s) =>
-            s.name.toLowerCase().match(search.toLowerCase()),
-          ),
+          suggestionList: this.props.mir.twist.filter(s =>
+            s.name.toLowerCase().match(search.toLowerCase())),
         });
       }
     });
 
-  onSubmit = (e) => {
+  onSubmit = (e) =>
+  {
     e.preventDefault();
     const search = this.state.value;
-    if (search.length > 2 && search.value !== "") {
+    if (search.length > 2 && search.value !== '')
+    {
       if (
-        search.match("cory in the house") ||
-        search.match("Cory in the house") ||
-        search.match("Cory In The House")
-      ) {
-        return this.props.history.push(`/show?s=99999999999`);
-      } else {
-        return this.props.history.push(`/search?q=${search}`);
+        search.match('cory in the house') ||
+        search.match('Cory in the house') ||
+        search.match('Cory In The House')
+      )
+      {
+        return this.props.history.push('/show?s=99999999999');
       }
-    } else {
-      return null;
+      return this.props.history.push(`/search?q=${search}`);
     }
+    return null;
   };
 
-  render() {
+  render()
+  {
     const { value, suggestionList, lang } = this.state;
     const { classes, main } = this.props;
     return (
       <div>
         <Paper className={classes.searchBar}>
           <SearchIcon className={classes.searchIcon} />
-          <form onSubmit={this.onSubmit} style={{ width: "100%" }}>
+          <form onSubmit={this.onSubmit} style={{ width: '100%' }}>
             <TextField
               autoFocus
               onChange={this.onChange}
               fullWidth
               value={value}
               placeholder={
-                main ? "Search anime" : lang.superbar.searchbox.placeholder
+                main ? 'Search anime' : lang.superbar.searchbox.placeholder
               }
               InputProps={{
                 className: classes.searchInput,
@@ -1692,12 +1769,10 @@ export class SearchBox extends Component {
   }
 }
 
-export default firebaseConnect()(
-  connect(
-    ({ firebase: { profile }, mir }) => ({
-      profile,
-      mir,
-    }),
-    null,
-  )(withStyles(styles)(Superbar)),
-);
+export default firebaseConnect()(connect(
+  ({ firebase: { profile }, mir }) => ({
+    profile,
+    mir,
+  }),
+  null,
+)(withStyles(styles)(Superbar)));

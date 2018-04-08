@@ -1,12 +1,11 @@
-import React, { Component } from "react";
-import LoadableVisibility from "react-loadable-visibility/react-loadable";
-import { Route, withRouter, Switch } from "react-router-dom";
-import { CircularProgress } from "material-ui/Progress";
-import { withStyles } from "material-ui/styles";
-import { firebaseConnect, isLoaded, isEmpty } from "react-redux-firebase";
-import { connect } from "react-redux";
-import colorizer from "../utils/colorizer";
-import { MIR_PLAY_SHOW } from "../constants";
+import React, { Component } from 'react';
+import LoadableVisibility from 'react-loadable-visibility/react-loadable';
+import { Route, withRouter, Switch } from 'react-router-dom';
+import { withStyles } from 'material-ui/styles';
+import { firebaseConnect } from 'react-redux-firebase';
+import { connect } from 'react-redux';
+import colorizer from '../utils/colorizer';
+import { MIR_PLAY_SHOW } from '../constants';
 /* import Home from './home';
 import Setup from './setup';
 import Show from './show';
@@ -28,159 +27,160 @@ import Tos from './tos';
 import DevPlayer from './dev/player';
 import DevDB from './dev/db';
 */
-import Watch from "./watch";
-import PageNotFound from "./pnf";
-import Stream from "../components/mirstreamer";
+import Watch from './watch';
+import PageNotFound from './pnf';
+import Stream from '../components/mirstreamer';
 
-import withRoot from "../components/withRoot";
+import withRoot from '../components/withRoot';
 
-import Superbar from "../components/superbar";
-import { LoadingScreen } from "../components/layouts";
+import Superbar from '../components/superbar';
+import { LoadingScreen } from '../components/layouts';
 
-import { history } from "../store";
-import { mirLoader } from "../utils/mirLoader";
-import AniList from "../anilist-api";
-import Snackbar from "material-ui";
+import { history } from '../store';
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {},
   welcomeMessage: {
-    margin: "auto",
+    margin: 'auto',
     flex: 0,
     marginBottom: -500,
-    color: "white",
+    color: 'white',
     fontWeight: 700,
-    transition: theme.transitions.create(["all"]),
+    transition: theme.transitions.create(['all']),
   },
 });
 const Home = LoadableVisibility({
-  loader: () => import("./home.jsx"),
+  loader: () => import('./home.jsx'),
   loading: LoadingScreen,
 });
 const Setup = LoadableVisibility({
-  loader: () => import("./setup.jsx"),
+  loader: () => import('./setup.jsx'),
   loading: LoadingScreen,
 });
 const Show = LoadableVisibility({
-  loader: () => import("./show.jsx"),
+  loader: () => import('./show.jsx'),
   loading: LoadingScreen,
 });
 const Wizard = LoadableVisibility({
-  loader: () => import("./wizard.jsx"),
+  loader: () => import('./wizard.jsx'),
   loading: LoadingScreen,
 });
 const Later = LoadableVisibility({
-  loader: () => import("./later.jsx"),
+  loader: () => import('./later.jsx'),
   loading: LoadingScreen,
 });
 const Live = LoadableVisibility({
-  loader: () => import("./live.jsx"),
+  loader: () => import('./live.jsx'),
   loading: LoadingScreen,
 });
 const Monika = LoadableVisibility({
-  loader: () => import("./monika.jsx"),
+  loader: () => import('./monika.jsx'),
   loading: LoadingScreen,
 });
 const Read = LoadableVisibility({
-  loader: () => import("./read.jsx"),
+  loader: () => import('./read.jsx'),
   loading: LoadingScreen,
 });
 const Search = LoadableVisibility({
-  loader: () => import("./search.jsx"),
+  loader: () => import('./search.jsx'),
   loading: LoadingScreen,
 });
 const History = LoadableVisibility({
-  loader: () => import("./history.jsx"),
+  loader: () => import('./history.jsx'),
   loading: LoadingScreen,
 });
 const Rankings = LoadableVisibility({
-  loader: () => import("./rankings.jsx"),
+  loader: () => import('./rankings.jsx'),
   loading: LoadingScreen,
 });
 const User = LoadableVisibility({
-  loader: () => import("./user.jsx"),
+  loader: () => import('./user.jsx'),
   loading: LoadingScreen,
 });
 const Tos = LoadableVisibility({
-  loader: () => import("./tos.jsx"),
+  loader: () => import('./tos.jsx'),
   loading: LoadingScreen,
 });
 const Tag = LoadableVisibility({
-  loader: () => import("./tag.jsx"),
+  loader: () => import('./tag.jsx'),
   loading: LoadingScreen,
 });
 const Settings = LoadableVisibility({
-  loader: () => import("./settings.jsx"),
+  loader: () => import('./settings.jsx'),
   loading: LoadingScreen,
 });
 const Fig = LoadableVisibility({
-  loader: () => import("./fig.jsx"),
+  loader: () => import('./fig.jsx'),
   loading: LoadingScreen,
 });
 const Help = LoadableVisibility({
-  loader: () => import("./help.jsx"),
+  loader: () => import('./help.jsx'),
   loading: LoadingScreen,
 });
 const Dev = LoadableVisibility({
-  loader: () => import("./dev.jsx"),
+  loader: () => import('./dev.jsx'),
   loading: LoadingScreen,
 });
 const Admin = LoadableVisibility({
-  loader: () => import("./admin.jsx"),
+  loader: () => import('./admin.jsx'),
   loading: LoadingScreen,
 });
 
 const Privacy = LoadableVisibility({
-  loader: () => import("./pri.jsx"),
+  loader: () => import('./pri.jsx'),
   loading: LoadingScreen,
 });
 
-class Index extends Component {
+class Index extends Component
+{
   state = {
     loading: true,
-    log: "Please wait",
+    log: 'Please wait',
     error: false,
-    info: "Mirai crashed. Check console for more information.",
+    info: 'Mirai crashed. Check console for more information.',
   };
 
-  componentWillMount = () => {
+  componentWillMount = () =>
+  {
     this.props.removeDataFromMir(null);
   };
 
-  componentWillReceiveProps = async ({ authExists, mir, profile }) => {
-    if (authExists) {
+  componentWillReceiveProps = async ({ authExists, profile }) =>
+  {
+    if (authExists)
+    {
       this.handleProfile(profile);
       return this.handleColors(profile);
-    } else {
-      return this.timedLoad();
     }
+    return this.timedLoad();
   };
 
-  handleColors = (profile) =>
-    this.setState({}, async () => {
-      if (profile.headers) {
-        const hues = localStorage.getItem("user-hue");
-        if (!hues) {
-          return this.setState({ log: "Applying coloring..." }, () =>
-            colorizer(profile.headers).then((pal) => {
-              let hues = {
+  handleColors = profile =>
+    this.setState({}, async () =>
+    {
+      if (profile.headers)
+      {
+        const hues = localStorage.getItem('user-hue');
+        if (!hues)
+        {
+          return this.setState({ log: 'Applying coloring...' }, () =>
+            colorizer(profile.headers).then((pal) =>
+            {
+              const huesJ = {
                 hue: pal.DarkMuted && pal.DarkMuted.getHex(),
                 hueVib: pal.LightVibrant && pal.LightVibrant.getHex(),
                 hueVibN: pal.DarkVibrant && pal.DarkVibrant.getHex(),
               };
-              localStorage.setItem("user-hue", JSON.stringify(hues));
-              return this.timedLoad("[mirai] Coloring applied.");
-            }),
-          );
-        } else {
-          return this.timedLoad();
+              localStorage.setItem('user-hue', JSON.stringify(huesJ));
+              return this.timedLoad('[mirai] Coloring applied.');
+            }));
         }
-      } else {
         return this.timedLoad();
       }
+      return this.timedLoad();
     });
 
-  timedLoad = (message) =>
+  timedLoad = message =>
     setTimeout(
       () =>
         this.setState(
@@ -190,28 +190,30 @@ class Index extends Component {
       1000,
     );
 
-  handleProfile = (profile) =>
-    this.setState({ log: "Getting user info..." }, async () => {
-      if (profile.userID) {
+  handleProfile = profile =>
+    this.setState({ log: 'Getting user info...' }, async () =>
+    {
+      if (profile.userID)
+      {
         if (profile.role !== undefined) return null;
-        else
-          return this.setState({ log: "Adding role..." }, () =>
-            this.props.firebase
-              .database()
-              .ref("/users")
-              .child(profile.userID)
-              .update({ role: "Normal" }),
-          );
+        return this.setState({ log: 'Adding role...' }, () =>
+          this.props.firebase
+            .database()
+            .ref('/users')
+            .child(profile.userID)
+            .update({ role: 'Normal' }));
       }
       return null;
     });
 
-  componentDidCatch = (error, info) => {
+  componentDidCatch = (error, info) =>
+  {
     console.error(error, info);
-    this.setState({ error: error, errorInfo: info });
+    this.setState({ error, errorInfo: info });
   };
 
-  render() {
+  render()
+  {
     if (this.state.error) return <LoadingScreen error log={this.state.info} />;
     return (
       <div className={this.props.classes.root}>
@@ -257,25 +259,21 @@ class Index extends Component {
   }
 }
 
-export const loadPlayer = (play) => ({
+export const loadPlayer = play => ({
   type: MIR_PLAY_SHOW,
   play,
 });
 
-const mapPTS = (dispatch) => ({
-  removeDataFromMir: (play) => dispatch(loadPlayer(play)),
+const mapPTS = dispatch => ({
+  removeDataFromMir: play => dispatch(loadPlayer(play)),
 });
 
-export default withRouter(
-  firebaseConnect()(
-    connect(
-      ({ firebase: { auth, profile }, mir, routing }) => ({
-        authExists: !!auth && !!auth.uid && !!profile,
-        mir,
-        routing,
-        profile,
-      }),
-      mapPTS,
-    )(withRoot(withStyles(styles, { withTheme: true })(Index))),
-  ),
-);
+export default withRouter(firebaseConnect()(connect(
+  ({ firebase: { auth, profile }, mir, routing }) => ({
+    authExists: !!auth && !!auth.uid && !!profile,
+    mir,
+    routing,
+    profile,
+  }),
+  mapPTS,
+)(withRoot(withStyles(styles, { withTheme: true })(Index)))));
