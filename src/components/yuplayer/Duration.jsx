@@ -1,26 +1,22 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-function pad(string)
-{
+function pad(string) {
   return `0${string}`.slice(-2);
 }
 
-function format(seconds)
-{
+function format(seconds) {
   const date = new Date(seconds * 1000);
   const hh = date.getUTCHours();
   const mm = date.getUTCMinutes();
   const ss = pad(date.getUTCSeconds());
-  if (hh)
-  {
+  if (hh) {
     return `${hh}:${pad(mm)}:${ss}`;
   }
   return `${mm}:${ss}`;
 }
 
-export default function Duration({ className, seconds })
-{
+export default function Duration({ className, seconds }) {
   return (
     <time dateTime={`P${Math.round(seconds)}S`} className={className}>
       {format(seconds)}
@@ -30,10 +26,10 @@ export default function Duration({ className, seconds })
 
 Duration.propTypes = {
   className: PropTypes.string,
-  seconds: PropTypes.number,
+  seconds: PropTypes.number
 };
 
 Duration.defaultProps = {
   className: null,
-  seconds: null,
+  seconds: null
 };

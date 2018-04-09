@@ -1,131 +1,126 @@
-import Divider from 'material-ui/Divider';
-import Hidden from 'material-ui/Hidden/Hidden';
-import { withStyles } from 'material-ui/styles';
-import Tab from 'material-ui/Tabs/Tab';
-import Tabs from 'material-ui/Tabs/Tabs';
-import Typography from 'material-ui/Typography/Typography';
-import moment from 'moment';
-import Component, { React } from 'react';
-import { connect } from 'react-redux';
-import { firebaseConnect, isEmpty } from 'react-redux-firebase';
-
-import checklang from '../checklang';
-import CardButton from '../components/cardButton';
-import { Feed } from '../components/feed';
+import React, { Component } from "react";
+import { withStyles } from "material-ui/styles";
+import { connect } from "react-redux";
+import { firebaseConnect, isEmpty } from "react-redux-firebase";
+import Typography from "material-ui/Typography/Typography";
+import SwipeableViews from "react-swipeable-views";
+import Tab from "material-ui/Tabs/Tab";
+import Tabs from "material-ui/Tabs/Tabs";
+import moment from "moment";
+import strings from "../strings.json";
+import Hidden from "material-ui/Hidden/Hidden";
 import {
-  Column,
+  Root,
   CommandoBarTop,
   Container,
-  Header,
-  ItemContainer,
-  Root,
-  SectionSubTitle,
-  SectionTitle,
   TitleHeader,
-} from '../components/layouts';
-import SuperTable from '../components/supertable';
-import strings from '../strings.json';
-import { scrollFix } from './../utils/scrollFix';
+  Header,
+  Column,
+  SectionTitle,
+  ItemContainer,
+  SectionSubTitle
+} from "../components/layouts";
+import SuperTable from "../components/supertable";
+import checklang from "../checklang";
+import Divider from "material-ui/Divider";
+import { Feed } from "../components/feed";
+import { scrollFix } from "./../utils/scrollFix";
+import CardButton from "../components/cardButton";
 
 const style = theme => ({
   tabLabel: {
     opacity: 0.5,
     fontSize: 16,
-    color: 'white',
-    textTransform: 'initial',
+    color: "white",
+    textTransform: "initial"
   },
   tabLabelActive: {
     fontWeight: 700,
     fontSize: 16,
     opacity: 1,
-    color: 'white',
-    textTransform: 'initial',
+    color: "white",
+    textTransform: "initial"
   },
   tabLine: {
-    filter: 'drop-shadow(0 1px 12px rgba(0,0,255,.2))',
+    filter: "drop-shadow(0 1px 12px rgba(0,0,255,.2))",
     height: 2,
-    background: 'white',
+    background: "white"
   },
   tab: {
-    height: 64,
+    height: 64
   },
   feedTitle: {
     fontWeight: 800,
-    textShadow: '0 2px 24px rgba(0,0,0,.07)',
+    textShadow: "0 2px 24px rgba(0,0,0,.07)",
     marginBottom: theme.spacing.unit * 3,
     zIndex: 20,
-    color: 'white',
+    color: "white"
   },
   infoBox: {
-    display: 'flex',
-    marginBottom: theme.spacing.unit * 2,
+    display: "flex",
+    marginBottom: theme.spacing.unit * 2
   },
   feedContext: {
-    fontSize: theme.typography.pxToRem(16),
+    fontSize: theme.typography.pxToRem(16)
   },
   commandoText: {
-    margin: 'auto',
-    textAlign: 'center',
+    margin: "auto",
+    textAlign: "center"
   },
   commandoTextBox: {
     paddingLeft: theme.spacing.unit,
     paddingRight: theme.spacing.unit,
-    margin: 'auto',
+    margin: "auto"
   },
   divider: {
     marginTop: theme.spacing.unit,
-    marginBottom: theme.spacing.unit,
-  },
+    marginBottom: theme.spacing.unit
+  }
 });
 
-class History extends Component
-{
+class History extends Component {
   state = {
     index: 0,
-    lang: strings.enus,
+    lang: strings.enus
   };
 
-  componentWillMount = () =>
-  {
+  componentWillMount = () => {
     checklang(this);
     scrollFix();
     this.getColors();
   };
 
-  componentDidMount = () =>
-  {};
+  componentDidMount = () => {};
 
-  getColors = () =>
-  {
-    const hue = localStorage.getItem('user-hue');
-    if (hue)
-    {
-      const hues = JSON.parse(hue);
+  getColors = () => {
+    const hue = localStorage.getItem("user-hue");
+    if (hue) {
+      let hues = JSON.parse(hue);
       return this.setState({
         hue: hues.hue,
         hueVib: hues.hueVib,
-        hueVibN: hues.hueVibN,
+        hueVibN: hues.hueVibN
       });
+    } else {
+      return null;
     }
-    return null;
   };
 
-  render()
-  {
+  render() {
     const { classes, profile } = this.props;
     const { index, lang, hue } = this.state;
     const user = isEmpty(profile) ? null : profile;
     return (
       <div>
-        <TitleHeader color={hue || '#000'} />
-        <Header color={hue || '#111'} />
+        <TitleHeader color={hue ? hue : "#000"} />
+        <Header color={hue ? hue : "#111"} />
         <CommandoBarTop title={lang.superbar.history}>
           <Hidden smDown>
             <div
               className={classes.commandoTextBox}
               style={{ marginRight: 16, marginLeft: 16 }}
             >
-              <Typography variant="title" className={classes.commandoText}>
+              <Typography variant={"title"} className={classes.commandoText}>
                 {lang.superbar.history}
               </Typography>
             </div>
@@ -142,7 +137,7 @@ class History extends Component
                 label:
                   this.state.index === 0
                     ? classes.tabLabelActive
-                    : classes.tabLabel,
+                    : classes.tabLabel
               }}
             />
             <Tab
@@ -152,7 +147,7 @@ class History extends Component
                 label:
                   this.state.index === 1
                     ? classes.tabLabelActive
-                    : classes.tabLabel,
+                    : classes.tabLabel
               }}
             />
             <Tab
@@ -162,7 +157,7 @@ class History extends Component
                 label:
                   this.state.index === 2
                     ? classes.tabLabelActive
-                    : classes.tabLabel,
+                    : classes.tabLabel
               }}
             />
             <Tab
@@ -172,7 +167,7 @@ class History extends Component
                 label:
                   this.state.index === 3
                     ? classes.tabLabelActive
-                    : classes.tabLabel,
+                    : classes.tabLabel
               }}
             />
           </Tabs>
@@ -189,15 +184,21 @@ class History extends Component
                   <div>
                     <SectionTitle noPad title={lang.home.animehistoryTitle} />
                     <SectionSubTitle
-                      title={`${Object.values(user.episodeProgress).length -
-                        1} ${lang.home.animehistoryEstimate}`}
+                      title={
+                        Object.values(user.episodeProgress).length -
+                        1 +
+                        " " +
+                        lang.home.animehistoryEstimate
+                      }
                     />
                     <Container spacing={16}>
                       {user.episodeProgress ? (
                         <SuperTable
                           data={Object.values(user.episodeProgress)
                             .filter(s => s.recentlyWatched)
-                            .sort((a, b) => b.recentlyWatched - a.recentlyWatched)}
+                            .sort(
+                              (a, b) => b.recentlyWatched - a.recentlyWatched
+                            )}
                           limit={24}
                           type="s"
                           typeof="progress"
@@ -210,7 +211,7 @@ class History extends Component
                 ) : (
                   <Typography
                     variant="title"
-                    style={{ color: 'rgba(255,255,255, .5)' }}
+                    style={{ color: "rgba(255,255,255, .5)" }}
                   >
                     {lang.history.noneA}
                   </Typography>
@@ -220,15 +221,21 @@ class History extends Component
                   <div>
                     <SectionTitle noPad title={lang.home.animehistoryTitle} />
                     <SectionSubTitle
-                      title={`${Object.values(user.episodeProgress).length -
-                        1} ${lang.home.animehistoryEstimate}`}
+                      title={
+                        Object.values(user.episodeProgress).length -
+                        1 +
+                        " " +
+                        lang.home.animehistoryEstimate
+                      }
                     />
                     <Container spacing={16}>
                       {user.episodeProgress ? (
                         <SuperTable
                           data={Object.values(user.episodeProgress)
                             .filter(s => s.recentlyWatched)
-                            .sort((a, b) => b.recentlyWatched - a.recentlyWatched)}
+                            .sort(
+                              (a, b) => b.recentlyWatched - a.recentlyWatched
+                            )}
                           limit={24}
                           type="s"
                           typeof="progress"
@@ -241,7 +248,7 @@ class History extends Component
                 ) : (
                   <Typography
                     variant="title"
-                    style={{ color: 'rgba(255,255,255, .5)' }}
+                    style={{ color: "rgba(255,255,255, .5)" }}
                   >
                     {lang.history.noneM}
                   </Typography>
@@ -251,17 +258,19 @@ class History extends Component
                   <div>
                     <SectionTitle noPad title="Activity" />
                     <SectionSubTitle
-                      title={`${Object.values(user.feed).length} ${
+                      title={
+                        Object.values(user.feed).length +
+                        " " +
                         lang.history.instances
-                      }`}
+                      }
                     />
                     <ItemContainer>
                       <Column>
                         {Object.values(user.feed)
                           .sort((a, b) => b.date - a.date)
-                          .map((feed, i) => (
+                          .map((feed, index) => (
                             <Feed
-                              key={i}
+                              key={index}
                               ftitle={feed.user.username}
                               context={feed.activity}
                               date={feed.date}
@@ -271,7 +280,7 @@ class History extends Component
                               user={{
                                 avatar: feed.user.avatar,
                                 id: feed.user.userID,
-                                username: feed.user.username,
+                                username: feed.user.username
                               }}
                               format={feed.format}
                               activity
@@ -285,7 +294,7 @@ class History extends Component
                 ) : (
                   <Typography
                     variant="title"
-                    style={{ color: 'rgba(255,255,255, .5)' }}
+                    style={{ color: "rgba(255,255,255, .5)" }}
                   >
                     {user && !user.willLog
                       ? lang.history.logdisabled
@@ -316,7 +325,9 @@ class History extends Component
                           image={show.showArtwork}
                           subtitle={
                             show.ep
-                              ? `Episode ${show.ep} | ${moment(show.recentlyWatched).from(Date.now())}`
+                              ? `Episode ${show.ep} | ${moment(
+                                  show.recentlyWatched
+                                ).from(Date.now())}`
                               : null
                           }
                         />
@@ -324,7 +335,7 @@ class History extends Component
                   ) : (
                     <Typography
                       variant="title"
-                      style={{ color: 'rgba(255,255,255, .5)' }}
+                      style={{ color: "rgba(255,255,255, .5)" }}
                     >
                       {lang.history.noneA}
                     </Typography>
@@ -354,7 +365,9 @@ class History extends Component
                           image={show.showArtwork}
                           subtitle={
                             show.ep
-                              ? `Chapter ${show.ch} | ${moment(show.recentlyRead).from(Date.now())}`
+                              ? `Chapter ${show.ch} | ${moment(
+                                  show.recentlyRead
+                                ).from(Date.now())}`
                               : null
                           }
                         />
@@ -362,7 +375,7 @@ class History extends Component
                   ) : (
                     <Typography
                       variant="title"
-                      style={{ color: 'rgba(255,255,255, .5)' }}
+                      style={{ color: "rgba(255,255,255, .5)" }}
                     >
                       {lang.history.noneM}
                     </Typography>
@@ -381,9 +394,9 @@ class History extends Component
                   {user && user.feed ? (
                     Object.values(user.feed)
                       .sort((a, b) => b.date - a.date)
-                      .map((feed, i) => (
+                      .map((feed, index) => (
                         <Feed
-                          key={i}
+                          key={index}
                           ftitle={feed.user.username}
                           context={feed.activity}
                           date={feed.date}
@@ -393,7 +406,7 @@ class History extends Component
                           user={{
                             avatar: feed.user.avatar,
                             id: feed.user.userID,
-                            username: feed.user.username,
+                            username: feed.user.username
                           }}
                           activity
                           format={feed.format}
@@ -404,7 +417,7 @@ class History extends Component
                   ) : (
                     <Typography
                       variant="title"
-                      style={{ color: 'rgba(255,255,255, .5)' }}
+                      style={{ color: "rgba(255,255,255, .5)" }}
                     >
                       {user && !user.willLog
                         ? lang.history.logdisabled
@@ -421,4 +434,8 @@ class History extends Component
   }
 }
 
-export default firebaseConnect()(connect(({ firebase: { profile } }) => ({ profile }))(withStyles(style)(History)));
+export default firebaseConnect()(
+  connect(({ firebase: { profile } }) => ({ profile }))(
+    withStyles(style)(History)
+  )
+);

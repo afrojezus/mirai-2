@@ -4,6 +4,7 @@
 /node_modules
 /additional/mirproxy/node_modules
 /functions/node_modules
+/src/kitsu-api/kitsu
 
 # testing
 /coverage

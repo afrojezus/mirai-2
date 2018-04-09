@@ -1,123 +1,126 @@
-import classnames from 'classnames';
-import * as ICON from 'material-ui-icons';
-import Avatar from 'material-ui/Avatar';
-import Button from 'material-ui/Button';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import * as ICON from "material-ui-icons";
 import Card, {
+  CardHeader,
   CardActions,
   CardContent,
-  CardHeader,
-  CardMedia,
-} from 'material-ui/Card';
-import Divider from 'material-ui/Divider';
-import Grid from 'material-ui/Grid';
-import IconButton from 'material-ui/IconButton';
-import CircularProgress from 'material-ui/Progress/CircularProgress';
-import { withStyles } from 'material-ui/styles';
-import TextField from 'material-ui/TextField';
-import Tooltip from 'material-ui/Tooltip/Tooltip';
-import Typography from 'material-ui/Typography';
-import moment from 'moment';
-import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import FadeIn from 'react-fade-in';
-import { connect } from 'react-redux';
-import { firebaseConnect, isEmpty } from 'react-redux-firebase';
-import checklang from '../checklang';
-import { history } from '../store';
-import strings from '../strings.json';
-import { guid } from '../utils/uuid';
-import { Dialogue } from './layouts';
+  CardMedia
+} from "material-ui/Card";
+import { withStyles } from "material-ui/styles";
+import Typography from "material-ui/Typography";
+import Button from "material-ui/Button";
+import Grid from "material-ui/Grid";
+import TextField from "material-ui/TextField";
+import Paper from "material-ui/Paper";
+import Divider from "material-ui/Divider";
+import { firebaseConnect, isEmpty } from "react-redux-firebase";
+import { connect } from "react-redux";
+import moment from "moment";
+import classnames from "classnames";
+import Avatar from "material-ui/Avatar";
+import FadeIn from "react-fade-in";
+import IconButton from "material-ui/IconButton";
+import { guid } from "../utils/uuid";
+import Tooltip from "material-ui/Tooltip/Tooltip";
+import CircularProgress from "material-ui/Progress/CircularProgress";
+import { history } from "../store";
+import Hidden from "material-ui/Hidden";
+import { Dialogue } from "./layouts";
+import checklang from "../checklang";
+import strings from "../strings.json";
 
-const feedWidth = '100%';
+const feedWidth = "100%";
+const feedHeight = 60;
 
 const style = theme => ({
   root: {
     maxWidth: feedWidth,
     padding: theme.spacing.unit,
-    boxSizing: 'border-box',
-    [theme.breakpoints.down('md')]: {
-      maxWidth: 'initial',
-    },
+    boxSizing: "border-box",
+    [theme.breakpoints.down("md")]: {
+      maxWidth: "initial"
+    }
   },
   card: {
-    boxSizing: 'border-box',
+    boxSizing: "border-box",
     // background: '#fafafa',
-    border: '1px solid rgba(255,255,255,.1)',
+    border: "1px solid rgba(255,255,255,.1)"
   },
   cardcontent: {
-    boxSizing: 'border-box',
-    padding: theme.spacing.unit * 2,
+    boxSizing: "border-box",
+    padding: theme.spacing.unit * 2
   },
   cardheader: {},
   feedMaker: {
     maxWidth: feedWidth,
     padding: theme.spacing.unit,
-    boxSizing: 'border-box',
-    transition: theme.transitions.create(['all']),
-    [theme.breakpoints.down('md')]: {
-      maxWidth: 'initial',
+    boxSizing: "border-box",
+    transition: theme.transitions.create(["all"]),
+    [theme.breakpoints.down("md")]: {
+      maxWidth: "initial"
     },
-    animation: 'fadeIn 0.5s ease',
+    animation: "fadeIn 0.5s ease"
   },
   feedMakerActive: {
-    maxWidth: feedWidth * (2 / 1.5),
-    transition: theme.transitions.create(['all']),
-    [theme.breakpoints.down('md')]: {
-      maxWidth: 'initial',
-    },
+    maxWidth: feedWidth * 2 / 1.5,
+    transition: theme.transitions.create(["all"]),
+    [theme.breakpoints.down("md")]: {
+      maxWidth: "initial"
+    }
   },
   feedmakerTextField: {
     padding: theme.spacing.unit,
-    boxSizing: 'border-box',
+    boxSizing: "border-box"
   },
   feedmakerTextFieldActive: {
-    fontSize: theme.typography.pxToRem(24),
+    fontSize: theme.typography.pxToRem(24)
   },
   button: {
-    flex: 1,
+    flex: 1
   },
   cardactions: {
     padding: 0,
-    position: 'relative',
+    position: "relative",
     bottom: 0,
-    boxSizing: 'border-box',
+    boxSizing: "border-box",
     maxHeight: 0,
-    transition: theme.transitions.create(['all']),
-    opacity: 0,
+    transition: theme.transitions.create(["all"]),
+    opacity: 0
   },
   cardactionsActive: {
     maxHeight: 64,
     padding: theme.spacing.unit,
-    transition: theme.transitions.create(['all']),
-    opacity: 1,
+    transition: theme.transitions.create(["all"]),
+    opacity: 1
   },
   cardactionsF: {
     padding: theme.spacing.unit,
-    position: 'relative',
+    position: "relative",
     bottom: 0,
-    boxSizing: 'border-box',
+    boxSizing: "border-box",
     opacity: 1,
-    [theme.breakpoints.down('sm')]: {
-      justifyContent: 'space-around',
-    },
+    [theme.breakpoints.down("sm")]: {
+      justifyContent: "space-around"
+    }
   },
   headerAva: {
-    cursor: 'pointer',
+    cursor: "pointer"
   },
   media: {
-    transition: theme.transitions.create(['all']),
+    transition: theme.transitions.create(["all"]),
     minHeight: 300,
     maxHeight: 700,
-    borderBottom: '1px solid rgba(255,255,255,.1)',
+    borderBottom: "1px solid rgba(255,255,255,.1)"
   },
   mediaF: {
-    transition: theme.transitions.create(['all']),
+    transition: theme.transitions.create(["all"]),
     height: 200,
-    width: '100%',
-    objectFit: 'cover',
+    width: "100%",
+    objectFit: "cover"
   },
   cardaction: {
-    margin: 'auto',
+    margin: "auto"
   },
   text: {
     // color: '#111'
@@ -134,116 +137,105 @@ const style = theme => ({
   activityImage: {
     width: 60,
     maxHeight: 80,
-    objectFit: 'cover',
+    objectFit: "cover",
     borderBottomLeftRadius: 1,
     borderTopLeftRadius: 1,
-    cursor: 'pointer',
+    cursor: "pointer"
   },
   likeContainer: {
-    display: 'flex',
+    display: "flex",
     opacity: 0.7,
-    margin: '0 4px',
+    margin: "0 4px"
   },
   likeIcon: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    margin: 'auto',
+    margin: "auto"
   },
   likeCount: {
     marginLeft: theme.spacing.unit,
-    fontWeight: 700,
-  },
+    fontWeight: 700
+  }
 });
 
-export const FeedMaker = firebaseConnect()(connect(({ firebase: { profile }, ...state }) => ({ profile, ...state }))(withStyles(style, { withTheme: true })(class extends Component
-{
+export const FeedMaker = firebaseConnect()(
+  connect(({ firebase: { profile }, ...state }) => ({ profile, ...state }))(
+    withStyles(style, { withTheme: true })(
+      class extends Component {
         static propTypes = {
-          classes: PropTypes.object.isRequired,
+          classes: PropTypes.object.isRequired
         };
 
         state = {
-          text: '',
-          context: 'STATUS',
-          title: '',
-          image: '',
+          text: "",
+          context: "STATUS",
+          title: "",
+          image: "",
           date: Date.now(),
-          avatar: '',
+          avatar: "",
           uploadingImage: false,
           error: false,
           lang: strings.enus,
-          forbidden: false,
+          forbidden: false
         };
 
-        componentWillMount()
-        {
+        componentWillMount() {
           checklang(this);
         }
 
-        componentDidMount = () =>
-        {
+        componentDidMount = () => {
           const { id, image, date } = this.state;
-          if (id)
-          {
+          if (id) {
             this.setState({ id });
           }
-          if (image)
-          {
+          if (image) {
             this.setState({ image });
           }
-          if (date)
-          {
+          if (date) {
             this.setState({ date });
           }
         };
 
-        setImage = () =>
-          this.imageInput.click();
+        setImage = e => {
+          return this.imageInput.click();
+        };
 
-        getImage = () =>
-        {
+        getImage = e => {
           const form = new FormData();
-          if (this.imageInput.files.length === 0)
-          {
+          if (this.imageInput.files.length === 0) {
             return false;
           }
 
-          form.append('files[]', this.imageInput.files[0]);
-          return this.setState({ uploadingImage: true }, async () =>
-          {
-            try
-            {
-              const loli = await fetch('https://mixtape.moe/upload.php', {
-                method: 'POST',
-                body: form,
+          form.append("files[]", this.imageInput.files[0]);
+          return this.setState({ uploadingImage: true }, async () => {
+            try {
+              const loli = await fetch("https://mixtape.moe/upload.php", {
+                method: "POST",
+                body: form
               });
               const loliJson = await loli.json();
               return this.setState({
                 image: loliJson.files[0].url,
-                uploadingImage: false,
+                uploadingImage: false
               });
-            }
-            catch (error)
-            {
+            } catch (error) {
+              console.error(error);
               return this.setState({ error: true }, () =>
-                setTimeout(() => this.setState({ error: false }), 3000));
+                setTimeout(() => this.setState({ error: false }), 3000)
+              );
             }
           });
         };
 
-        postFeed = async () =>
-        {
+        postFeed = async () => {
           const you = this.props.profile;
           const db = this.props.firebase
             .database()
-            .ref('/social')
-            .child('byusers');
-          const {
-            title, context, text, image, date,
-          } = this.state;
-          try
-          {
-            if (text === '' || null)
-            {
+            .ref("/social")
+            .child("byusers");
+          const { title, context, text, image, date } = this.state;
+          try {
+            if (text === "" || null) {
               return new Error("You didn't write anything...");
             }
             const id = guid();
@@ -258,32 +250,29 @@ export const FeedMaker = firebaseConnect()(connect(({ firebase: { profile }, ...
                 user: {
                   username: you.username,
                   avatar: you.avatar,
-                  id: you.userID,
+                  id: you.userID
                 },
                 id,
-                repost: false,
+                repost: false
               })
-              .then(() => this.setState({ text: '', image: '' }));
-          }
-          catch (error)
-          {
-            return error;
+              .then(() => this.setState({ text: "", image: "" }));
+          } catch (error) {
+            return console.error(error);
           }
         };
 
-        render()
-        {
-          const {
-            classes, profile, color,
-          } = this.props;
+        render() {
+          const { classes, profile, theme, color } = this.props;
           const {
             text,
             context,
+            title,
             image,
             date,
+            avatar,
             uploadingImage,
             lang,
-            forbidden,
+            forbidden
           } = this.state;
           if (isEmpty(profile)) return null;
           return (
@@ -292,14 +281,14 @@ export const FeedMaker = firebaseConnect()(connect(({ firebase: { profile }, ...
               xs
               className={classnames(
                 classes.feedMaker,
-                text ? classes.feedMakerActive : null,
+                text ? classes.feedMakerActive : null
               )}
             >
               <Card
                 className={classes.card}
                 style={{
-                  minHeight: 'inherit',
-                  background: color || null,
+                  minHeight: "inherit",
+                  background: color ? color : null
                 }}
                 elevation={3}
               >
@@ -309,26 +298,23 @@ export const FeedMaker = firebaseConnect()(connect(({ firebase: { profile }, ...
                       title={profile.username}
                       avatar={<Avatar src={profile.avatar} />}
                       subheader={
-                        `${context} | ${moment(date).from(Date.now())}`
+                        context + " | " + moment(date).from(Date.now())
                       }
                       classes={{
                         avatar: classes.headerAva,
                         title: classes.headerTitle,
-                        subheader: classes.subheader,
+                        subheader: classes.subheader
                       }}
                     />
                   </FadeIn>
                 ) : null}
                 {text ? <Divider className={classes.divider} /> : null}
-                {image !== '' ? (
+                {image !== "" ? (
                   <img
                     className={classes.mediaF}
                     alt=""
                     style={{ minHeight: 200 }}
-                    ref={(imageElement) =>
-{
-                      this.image = imageElement;
-                      }}
+                    ref={image => (this.image = image)}
                     src={image}
                   />
                 ) : null}
@@ -336,38 +322,34 @@ export const FeedMaker = firebaseConnect()(connect(({ firebase: { profile }, ...
                   <TextField
                     className={classnames(
                       classes.feedmakerTextField,
-                      text ? classes.feedmakerTextFieldActive : null,
+                      text ? classes.feedmakerTextFieldActive : null
                     )}
                     value={text}
                     multiline
                     InputProps={{
                       disableUnderline: true,
-                      style: { fontSize: text && text.length < 50 ? 24 : null },
+                      style: { fontSize: text && text.length < 50 ? 24 : null }
                     }}
                     error={forbidden}
                     placeholder={lang.feed.placeholder}
                     fullWidth
-                    onChange={(e) =>
-{
-                      const val = e.target.value;
+                    onChange={e => {
+                      let val = e.target.value;
                       if (
-                        val.includes('<script>') ||
-                        val.includes('eval') ||
-                        val.includes('<iframe>') ||
-                        val.includes('<head>') ||
-                        val.includes('<body>') ||
-                        val.includes('<html>') ||
-                        val.includes('autoplay')
-                      )
-{
+                        val.includes("<script>") ||
+                        val.includes("eval") ||
+                        val.includes("<iframe>") ||
+                        val.includes("<head>") ||
+                        val.includes("<body>") ||
+                        val.includes("<html>") ||
+                        val.includes("autoplay")
+                      ) {
                         this.setState({ forbidden: true });
-                      }
- else
-{
+                      } else {
                         this.setState(
                           { text: val, forbidden: false },
                           () =>
-                            (val === '' ? this.setState({ image: '' }) : null),
+                            val === "" ? this.setState({ image: "" }) : null
                         );
                       }
                     }}
@@ -377,7 +359,7 @@ export const FeedMaker = firebaseConnect()(connect(({ firebase: { profile }, ...
                 <CardActions
                   className={classnames(
                     classes.cardactions,
-                    text ? classes.cardactionsActive : null,
+                    text ? classes.cardactionsActive : null
                   )}
                 >
                   <form>
@@ -388,10 +370,7 @@ export const FeedMaker = firebaseConnect()(connect(({ firebase: { profile }, ...
                         name="files[]"
                         onChange={e => this.getImage(e)}
                         className="hiddenfileinput"
-                        ref={(imageInput) =>
-{
-this.imageInput = imageInput;
- }}
+                        ref={imageInput => (this.imageInput = imageInput)}
                       />
                       <Tooltip
                         title={
@@ -420,7 +399,7 @@ this.imageInput = imageInput;
                   {image ? (
                     <Button
                       classes={{ label: classes.text }}
-                      onClick={() => this.setState({ image: '' })}
+                      onClick={() => this.setState({ image: "" })}
                     >
                       {lang.feed.removeimage}
                     </Button>
@@ -440,22 +419,28 @@ this.imageInput = imageInput;
             </Grid>
           );
         }
-})));
+      }
+    )
+  )
+);
 
-export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state }) => ({ profile, ...state }))(withStyles(style, { withTheme: true })(class extends Component
-{
+export const Feed = firebaseConnect()(
+  connect(({ firebase: { profile }, ...state }) => ({ profile, ...state }))(
+    withStyles(style, { withTheme: true })(
+      class extends Component {
         static propTypes = {
           classes: PropTypes.object.isRequired,
+          theme: PropTypes.object.isRequired
         };
 
         static defaultProps = {
-          ftitle: 'Feed',
-          context: 'Feed context',
-          text: 'Feed text',
-          image: '',
+          ftitle: "Feed",
+          context: "Feed context",
+          text: "Feed text",
+          image: "",
           date: 0,
-          avatar: '',
-          user: null,
+          avatar: "",
+          user: null
         };
 
         state = {
@@ -467,81 +452,64 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
           date: this.props.date,
           avatar: this.props.avatar,
           user: this.props.user,
-          showComments: false,
+          showComments: false
         };
 
-        componentWillMount = () =>
-        {};
+        componentWillMount = () => {};
 
-        deleteOwnFeed = async () =>
-        {
+        deleteOwnFeed = async () => {
           const db = this.props.firebase
             .database()
-            .ref('/social')
-            .child('byusers')
+            .ref("/social")
+            .child("byusers")
             .child(this.props.id);
-          try
-          {
+          try {
             return await db.remove();
-          }
-          catch (error)
-          {
-            return error;
+          } catch (error) {
+            return console.error(error);
           }
         };
 
-        deleteOwnActivity = async () =>
-        {
+        deleteOwnActivity = async () => {
           const db = this.props.firebase
             .database()
-            .ref('/social')
-            .child('byusers')
+            .ref("/social")
+            .child("byusers")
             .child(this.props.id);
-          try
-          {
+          try {
             return await db.remove();
-          }
-          catch (error)
-          {
-            return error;
+          } catch (error) {
+            return console.error(error);
           }
         };
 
-        likeThis = async () =>
-        {
+        likeThis = async () => {
           const db = this.props.firebase
             .database()
-            .ref('/social')
-            .child('byusers')
+            .ref("/social")
+            .child("byusers")
             .child(this.props.id)
-            .child('likes')
+            .child("likes")
             .child(this.props.profile.userID);
-          try
-          {
+          try {
             return await db.update({ like: true });
-          }
-          catch (error)
-          {
-            return error;
+          } catch (error) {
+            return console.error(error);
           }
         };
 
-        disLikeThis = async () =>
-        {
+        disLikeThis = async () => {
           const db = this.props.firebase
             .database()
-            .ref('/social')
-            .child('byusers')
+            .ref("/social")
+            .child("byusers")
             .child(this.props.id)
-            .child('likes')
+            .child("likes")
             .child(this.props.profile.userID);
-          try
-          {
+          try {
             return await db.remove();
-          }
-          catch (error)
-          {
-            return error;
+          } catch (error) {
+            return console.error(error);
           }
         };
 
@@ -549,16 +517,17 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
 
         hideComments = () => this.setState({ showComments: false });
 
-        repostThis = async () =>
-        {
-          // console.info('[mirai] This feature is yet to be added!');
+        repostThis = async () => {
+          console.info("[mirai] This feature is yet to be added!");
         };
 
-        render()
-        {
+        render() {
           const {
             classes,
+            theme,
             profile,
+            onClick,
+            commentClick,
             noActions,
             noHeader,
             noDelete,
@@ -574,9 +543,11 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
             avatar,
             user,
             showId,
+            style,
             likes,
+            comments,
             format,
-            reposts,
+            reposts
           } = this.props;
           const { showComments } = this.state;
           return (
@@ -599,25 +570,27 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
                   reposts,
                   profile,
                   likeThis: async () => this.likeThis(),
-                  disLikeThis: async () => this.disLikeThis(),
+                  disLikeThis: async () => this.disLikeThis()
                 }}
               />
               <FadeIn>
                 <Card
-                  style={{ background: color || null }}
+                  style={{ background: color ? color : null }}
                   className={classes.card}
                 >
-                  <div style={{ display: activity ? 'flex' : null }}>
+                  <div style={{ display: activity ? "flex" : null }}>
                     {activity ? (
                       <img
                         onClick={() =>
-                          (activity
+                          activity
                             ? format
-                              ? history.push(`/show?${
-                                    format.includes('show') ? 's' : 'm'
-                                  }=${showId}`)
+                              ? history.push(
+                                  `/show?${
+                                    format.includes("show") ? "s" : "m"
+                                  }=${showId}`
+                                )
                               : history.push(`/show?s=${showId}`)
-                            : null)
+                            : null
                         }
                         src={image}
                         alt=""
@@ -629,15 +602,15 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
                         <CardHeader
                           title={
                             activity
-                              ? `${ftitle} | ${moment(date).from(Date.now())}`
+                              ? ftitle + " | " + moment(date).from(Date.now())
                               : ftitle
                           }
                           avatar={
                             <Avatar
                               onClick={() =>
-                                (!mirUpdate || !context.includes('INTRO')
+                                !mirUpdate || !context.includes("INTRO")
                                   ? history.push(`/user?u=${user.id}`)
-                                  : null)
+                                  : null
                               }
                               src={avatar}
                             />
@@ -645,17 +618,19 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
                           subheader={
                             activity
                               ? context
-                              : `${context} | ${moment(date).from(Date.now())}`
+                              : context + " | " + moment(date).from(Date.now())
                           }
                           className={classes.cardheader}
                           classes={{
                             avatar: classes.headerAva,
                             title: classes.headerTitle,
                             subheader: classes.subheader,
-                            action: classes.cardaction,
+                            action: classes.cardaction
                           }}
                           action={
-                            activity ? null : isEmpty(profile) ? null : mirUpdate ? null : noDelete ? null : user &&
+                            activity ? null : isEmpty(
+                              profile
+                            ) ? null : mirUpdate ? null : noDelete ? null : user &&
                             user.id === profile.userID ? (
                               <Tooltip title="Delete this">
                                 <IconButton
@@ -697,12 +672,12 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
                           <Tooltip
                             title={
                               !likes
-                                ? 'Nobody likes this post'
+                                ? "Nobody likes this post"
                                 : Object.values(likes).length > 1
-                                  ? `${Object.values(likes).length
-                                    } users liked this`
-                                  : `${Object.values(likes).length
-                                    } user liked this`
+                                  ? Object.values(likes).length +
+                                    " users liked this"
+                                  : Object.values(likes).length +
+                                    " user liked this"
                             }
                           >
                             <div className={classes.likeContainer}>
@@ -716,15 +691,15 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
                             </div>
                           </Tooltip>
                           <Tooltip
-                            style={{ display: 'none' }}
+                            style={{ display: "none" }}
                             title={
                               !reposts
-                                ? 'Nobody has reposted this post'
+                                ? "Nobody has reposted this post"
                                 : Object.values(reposts).length > 1
-                                  ? `${Object.values(reposts).length
-                                    } users reposted this`
-                                  : `${Object.values(reposts).length
-                                    } user reposted this`
+                                  ? Object.values(reposts).length +
+                                    " users reposted this"
+                                  : Object.values(reposts).length +
+                                    " user reposted this"
                             }
                           >
                             <div className={classes.likeContainer}>
@@ -741,21 +716,21 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
                           <Tooltip
                             title={
                               isEmpty(profile)
-                                ? 'You need to login to like posts'
+                                ? "You need to login to like posts"
                                 : likes && likes[profile.userID]
-                                  ? 'Dislike this'
-                                  : 'Like this'
+                                  ? "Dislike this"
+                                  : "Like this"
                             }
                             placement="bottom"
                           >
                             <div>
                               <IconButton
-                                disabled={!!isEmpty(profile)}
+                                disabled={isEmpty(profile) ? true : false}
                                 classes={{ label: classes.text }}
                                 onClick={async () =>
-                                  (likes && likes[profile.userID]
+                                  likes && likes[profile.userID]
                                     ? this.disLikeThis()
-                                    : this.likeThis())
+                                    : this.likeThis()
                                 }
                               >
                                 {likes && likes[profile.userID] ? (
@@ -770,15 +745,15 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
                             <Tooltip
                               title={
                                 isEmpty(profile)
-                                  ? 'You need to login to repost posts'
-                                  : 'Repost this'
+                                  ? "You need to login to repost posts"
+                                  : "Repost this"
                               }
-                              style={{ display: 'none' }}
+                              style={{ display: "none" }}
                               placement="bottom"
                             >
                               <div>
                                 <IconButton
-                                  disabled={!!isEmpty(profile)}
+                                  disabled={isEmpty(profile) ? true : false}
                                   classes={{ label: classes.text }}
                                   onClick={async () => this.repostThis()}
                                 >
@@ -787,7 +762,7 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
                               </div>
                             </Tooltip>
                           )}
-                          <Tooltip title="Show" placement="bottom">
+                          <Tooltip title={"Show"} placement="bottom">
                             <div>
                               <IconButton
                                 classes={{ label: classes.text }}
@@ -806,4 +781,7 @@ export const Feed = firebaseConnect()(connect(({ firebase: { profile }, ...state
             </Grid>
           );
         }
-})));
+      }
+    )
+  )
+);

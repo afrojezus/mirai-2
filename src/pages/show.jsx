@@ -1,672 +1,666 @@
-
-import classnames from 'classnames';
-import * as Icon from 'material-ui-icons';
-import Button from 'material-ui/Button/Button';
-import Chip from 'material-ui/Chip/Chip';
-import blue from 'material-ui/colors/blue';
-import grey from 'material-ui/colors/grey';
-import Divider from 'material-ui/Divider/Divider';
-import Grid from 'material-ui/Grid/Grid';
-import IconButton from 'material-ui/IconButton/IconButton';
-import Input, { InputLabel } from 'material-ui/Input';
-import Menu, { MenuItem } from 'material-ui/Menu';
-import Paper from 'material-ui/Paper/Paper';
-import CircularProgress from 'material-ui/Progress/CircularProgress';
-import LinearProgress from 'material-ui/Progress/LinearProgress';
-import withStyles from 'material-ui/styles/withStyles';
-import Tooltip from 'material-ui/Tooltip/Tooltip';
-import Typography from 'material-ui/Typography/Typography';
-import moment from 'moment';
-import queryString from 'query-string';
-import Component, { React } from 'react';
-import FadeIn from 'react-fade-in';
-import { connect } from 'react-redux';
-import { firebaseConnect, isEmpty } from 'react-redux-firebase';
-import { FormControl } from 'material-ui/Form';
-import Select from 'material-ui/Select';
-
-import CardButton, { PeopleButton } from '../components/cardButton';
-
-import { MIR_PLAY_SHOW, MIR_SET_TITLE } from '../constants';
-import { scrollFix } from './../utils/scrollFix';
-import Anilist from '../anilist-api';
+import React, { Component } from "react";
+import * as Icon from "material-ui-icons";
+import moment from "moment";
+import queryString from "query-string";
+import Colorizer from "../utils/colorizer";
+import FadeIn from "react-fade-in";
+import { connect } from "react-redux";
+import { firebaseConnect, isEmpty } from "react-redux-firebase";
+import Button from "material-ui/Button/Button";
+import Input, { InputLabel } from "material-ui/Input";
+import Grid from "material-ui/Grid/Grid";
+import CircularProgress from "material-ui/Progress/CircularProgress";
+import Typography from "material-ui/Typography/Typography";
+import Divider from "material-ui/Divider/Divider";
+import Chip from "material-ui/Chip/Chip";
+import LinearProgress from "material-ui/Progress/LinearProgress";
+import Tooltip from "material-ui/Tooltip/Tooltip";
+import IconButton from "material-ui/IconButton/IconButton";
+import Paper from "material-ui/Paper/Paper";
+import Modal from "material-ui/Modal/Modal";
+import blue from "material-ui/colors/blue";
+import classnames from "classnames";
+import grey from "material-ui/colors/grey";
+import checklang from "../checklang";
+import strings from "../strings.json";
+import Menu, { MenuItem } from "material-ui/Menu";
+import withStyles from "material-ui/styles/withStyles";
+import { timeFormatter } from "../components/supertable";
+import bigfuck from "../utils/bigfuck";
+import TwistFilter from "../utils/filter";
+import Anilist from "../anilist-api";
+import Kitsu from "../kitsu-api";
 import {
-  bigFuckingQueryM,
   bigFuckingQueryS,
   entryQuery,
   entryQueryM,
-} from '../anilist-api/queries';
-import checklang from '../checklang';
+  bigFuckingQueryM
+} from "../anilist-api/queries";
 import {
-  Column,
-  CommandoBar,
-  Container,
-  Dialogue,
-  Header,
-  ItemContainer,
-  LoadingIndicator,
-  MainCard,
   Root,
-  SectionTitle,
+  Container,
+  CommandoBar,
+  MainCard,
+  Header,
+  LoadingIndicator,
   TitleHeader,
-} from '../components/layouts';
-import { timeFormatter } from '../components/supertable';
-import Kitsu from '../kitsu-api';
-import strings from '../strings.json';
-import Twist from '../twist-api';
-import bigfuck from '../utils/bigfuck';
-import Colorizer from '../utils/colorizer';
-import TwistFilter from '../utils/filter';
+  SectionTitle,
+  ItemContainer,
+  Dialogue,
+  Column,
+  CommandoBarTop
+} from "../components/layouts";
+import Twist from "../twist-api";
+
+import CardButton, { PeopleButton } from "../components/cardButton";
+
+import { MIR_SET_TITLE, MIR_PLAY_SHOW } from "../constants";
+import { FormControl, FormHelperText } from "material-ui/Form";
+import Select from "material-ui/Select";
+import { scrollFix } from "./../utils/scrollFix";
+import List, { ListItem, ListItemText } from "material-ui/List";
+import { guid } from "../utils/uuid";
 
 const styles = theme => ({
   loading: {
-    height: '100%',
-    width: '100%',
+    height: "100%",
+    width: "100%",
     zIndex: 1200,
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%,-50%)',
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%,-50%)",
     padding: 0,
-    margin: 'auto',
-    color: 'white',
-    transition: theme.transitions.create(['all']),
+    margin: "auto",
+    color: "white",
+    transition: theme.transitions.create(["all"])
   },
   root: {
     paddingTop: theme.spacing.unit * 8,
-    transition: theme.transitions.create(['all']),
-    animation: 'load .3s ease',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    maxWidth: 1500,
+    transition: theme.transitions.create(["all"]),
+    animation: "load .3s ease",
+    marginLeft: "auto",
+    marginRight: "auto",
+    maxWidth: 1500
   },
   backToolbar: {
-    marginTop: theme.spacing.unit * 8,
+    marginTop: theme.spacing.unit * 8
   },
   bigBar: {
-    width: '100%',
-    height: 'auto',
-    boxShadow: '0 2px 24px rgba(0,0,0,.2)',
-    background: '#111',
-    position: 'relative',
-    overflow: 'hidden',
+    width: "100%",
+    height: "auto",
+    boxShadow: "0 2px 24px rgba(0,0,0,.2)",
+    background: "#111",
+    position: "relative",
+    overflow: "hidden",
     paddingBottom: theme.spacing.unit * 4,
     marginBottom: theme.spacing.unit * 8,
-    transition: theme.transitions.create(['all']),
+    transition: theme.transitions.create(["all"])
   },
   glassEffect: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     opacity: 0.4,
-    height: '100vh',
-    objectFit: 'cover',
-    width: '100%',
-    transform: 'scale(20)',
+    height: "100vh",
+    objectFit: "cover",
+    width: "100%",
+    transform: "scale(20)"
   },
   rootInactive: {
     opacity: 0,
-    pointerEvents: 'none',
-    transition: theme.transitions.create(['all']),
+    pointerEvents: "none",
+    transition: theme.transitions.create(["all"])
   },
   container: {
     padding: theme.spacing.unit * 3,
-    boxSizing: 'border-box',
-    [theme.breakpoints.down('sm')]: {
-      flexDirection: 'column',
-    },
+    boxSizing: "border-box",
+    [theme.breakpoints.down("sm")]: {
+      flexDirection: "column"
+    }
   },
   frame: {
-    height: '100%',
-    width: '100%',
-    position: 'relative',
-    transition: theme.transitions.create(['all']),
+    height: "100%",
+    width: "100%",
+    position: "relative",
+    transition: theme.transitions.create(["all"])
   },
   bgImage: {
-    position: 'fixed',
+    position: "fixed",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     opacity: 0.6,
-    height: '100vh',
-    objectFit: 'cover',
-    width: '100%',
+    height: "100vh",
+    objectFit: "cover",
+    width: "100%",
     zIndex: -1,
-    overflow: 'hidden',
-    filter: 'brightness(.3)',
-    transition: theme.transitions.create(['all']),
+    overflow: "hidden",
+    filter: "brightness(.3)",
+    transition: theme.transitions.create(["all"])
   },
   grDImage: {
-    position: 'fixed',
+    position: "fixed",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     opacity: 1,
-    height: '100vh',
-    width: '100%',
+    height: "100vh",
+    width: "100%",
     zIndex: -1,
-    overflow: 'hidden',
-    transition: theme.transitions.create(['all']),
+    overflow: "hidden",
+    transition: theme.transitions.create(["all"])
   },
   mainFrame: {
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       marginLeft: 0,
-      paddingTop: `${theme.spacing.unit * 8}px !important`,
-    },
+      paddingTop: `${theme.spacing.unit * 8}px !important`
+    }
   },
   bigTitle: {
     fontWeight: 800,
-    color: 'white',
-    textShadow: '0 2px 12px rgba(0,0,0,.2)',
+    color: "white",
+    textShadow: "0 2px 12px rgba(0,0,0,.2)"
   },
   smallTitle: {
     fontWeight: 600,
-    color: 'white',
+    color: "white",
     fontSize: theme.typography.pxToRem(16),
-    textShadow: '0 2px 12px rgba(0,0,0,.17)',
+    textShadow: "0 2px 12px rgba(0,0,0,.17)"
   },
   tagBox: {
-    marginTop: theme.spacing.unit,
+    marginTop: theme.spacing.unit
   },
   tagTitle: {
     fontSize: theme.typography.pxToRem(16),
     fontWeight: 600,
-    color: 'white',
-    textShadow: '0 2px 12px rgba(0,0,0,.17)',
-    marginBottom: theme.spacing.unit,
+    color: "white",
+    textShadow: "0 2px 12px rgba(0,0,0,.17)",
+    marginBottom: theme.spacing.unit
   },
   desc: {
     marginTop: theme.spacing.unit,
-    color: 'white',
-    textShadow: '0 0 12px rgba(0,0,0,.1)',
-    marginBottom: theme.spacing.unit,
+    color: "white",
+    textShadow: "0 0 12px rgba(0,0,0,.1)",
+    marginBottom: theme.spacing.unit
   },
   boldD: {
-    color: 'white',
-    textShadow: '0 0 12px rgba(0,0,0,.1)',
-    fontWeight: 600,
+    color: "white",
+    textShadow: "0 0 12px rgba(0,0,0,.1)",
+    fontWeight: 600
   },
   smallD: {
     marginLeft: theme.spacing.unit / 2,
-    color: 'white',
-    textShadow: '0 0 12px rgba(0,0,0,.1)',
+    color: "white",
+    textShadow: "0 0 12px rgba(0,0,0,.1)"
   },
   sepD: {
-    display: 'flex',
-    marginLeft: theme.spacing.unit / 2,
+    display: "flex",
+    marginLeft: theme.spacing.unit / 2
   },
   artworkimg: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    background: 'white',
-    transition: theme.transitions.create(['all']),
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    background: "white",
+    transition: theme.transitions.create(["all"])
   },
   artwork: {
     maxWidth: 350,
     height: 400,
-    margin: 'auto',
+    margin: "auto",
     borderRadius: 3,
-    overflow: 'hidden',
-    filter: 'drop-shadow(0 4px 12px rgba(0,0,0,.2))',
-    transition: theme.transitions.create(['all']),
-    position: 'relative',
-    '&:hover': {
-      overflow: 'initial',
-      boxShadow: '0 2px 14px rgba(0,0,0,.3)',
-      background: theme.palette.primary.main,
+    overflow: "hidden",
+    filter: "drop-shadow(0 4px 12px rgba(0,0,0,.2))",
+    transition: theme.transitions.create(["all"]),
+    position: "relative",
+    "&:hover": {
+      overflow: "initial",
+      boxShadow: `0 2px 14px rgba(0,0,0,.3)`,
+      background: theme.palette.primary.main
     },
-    '&:hover > .artworktitle': {
-      transform: 'translate(-50%,-50%) scale(1.2) translateZ(30%)',
+    "&:hover > .artworktitle": {
+      transform: "translate(-50%,-50%) scale(1.2) translateZ(30%)"
     },
-    '&:hover > img': {
-      transform: 'scale(0.9)',
-      filter: 'brightness(0.9)',
+    "&:hover > img": {
+      transform: "scale(0.9)",
+      filter: "brightness(0.9)"
     },
-    '&:active': {
-      opacity: 0.7,
+    "&:active": {
+      opacity: 0.7
     },
-    zIndex: 500,
+    zIndex: 500
   },
   artworkDisabled: {
     maxWidth: 300,
     height: 400,
-    margin: 'auto',
-    boxShadow: '0 3px 18px rgba(0,0,0,.5)',
-    transition: theme.transitions.create(['all']),
-    position: 'relative',
-    '& > img': {
-      opacity: 0.7,
+    margin: "auto",
+    boxShadow: "0 3px 18px rgba(0,0,0,.5)",
+    transition: theme.transitions.create(["all"]),
+    position: "relative",
+    "& > img": {
+      opacity: 0.7
     },
-    zIndex: 500,
+    zIndex: 500
   },
   genreRow: {
-    display: 'flex',
-    margin: 'auto',
-    marginBottom: theme.spacing.unit,
+    display: "flex",
+    margin: "auto",
+    marginBottom: theme.spacing.unit
   },
   tagChip: {
     margin: theme.spacing.unit / 2,
-    background: 'white',
-    color: '#111',
-    boxShadow: '0 2px 12px rgba(0,0,0,.17)',
+    background: "white",
+    color: "#111",
+    boxShadow: "0 2px 12px rgba(0,0,0,.17)"
   },
   secTitle: {
     padding: theme.spacing.unit,
     fontWeight: 700,
     fontSize: 22,
-    zIndex: 'inherit',
-    paddingBottom: theme.spacing.unit * 2,
+    zIndex: "inherit",
+    paddingBottom: theme.spacing.unit * 2
   },
   fillImg: {
-    height: '100%',
-    width: '100%',
-    objectFit: 'cover',
-    background: 'white',
-    transition: theme.transitions.create(['all']),
+    height: "100%",
+    width: "100%",
+    objectFit: "cover",
+    background: "white",
+    transition: theme.transitions.create(["all"])
   },
   peopleCard: {
-    height: 'auto',
+    height: "auto",
     width: 183,
-    flexGrow: 'initial',
-    flexBasis: 'initial',
+    flexGrow: "initial",
+    flexBasis: "initial",
     margin: theme.spacing.unit / 2,
-    transition: theme.transitions.create(['all']),
-    '&:hover': {
-      transform: 'scale(1.05)',
-      overflow: 'initial',
+    transition: theme.transitions.create(["all"]),
+    "&:hover": {
+      transform: "scale(1.05)",
+      overflow: "initial",
       zIndex: 200,
-      boxShadow: '0 2px 14px rgba(0,55,230,.3)',
-      background: blue.A200,
+      boxShadow: `0 2px 14px rgba(0,55,230,.3)`,
+      background: blue.A200
     },
-    '&:hover > * > h1': {
-      transform: 'scale(1.1)',
-      textShadow: '0 2px 12px rgba(0,0,0,.7)',
+    "&:hover > * > h1": {
+      transform: "scale(1.1)",
+      textShadow: "0 2px 12px rgba(0,0,0,.7)"
     },
-    position: 'relative',
-    overflow: 'hidden',
+    position: "relative",
+    overflow: "hidden"
   },
   peopleImage: {
     height: 156,
     width: 156,
-    margin: 'auto',
+    margin: "auto",
     zIndex: 1,
-    borderRadius: '50%',
-    boxShadow: '0 2px 12px rgba(0,0,0,.2)',
-    transition: theme.transitions.create(['all']),
-    '&:hover': {
-      boxShadow: '0 3px 16px rgba(0,0,0,.5)',
+    borderRadius: "50%",
+    boxShadow: "0 2px 12px rgba(0,0,0,.2)",
+    transition: theme.transitions.create(["all"]),
+    "&:hover": {
+      boxShadow: "0 3px 16px rgba(0,0,0,.5)"
     },
     top: 0,
-    left: 0,
+    left: 0
   },
   peopleCharImage: {
     height: 64,
     width: 64,
-    margin: 'auto',
+    margin: "auto",
     zIndex: 2,
-    position: 'absolute',
-    borderRadius: '50%',
-    boxShadow: '0 2px 12px rgba(0,0,0,.2)',
-    transition: theme.transitions.create(['all']),
-    '&:hover': {
-      boxShadow: '0 3px 16px rgba(0,0,0,.5)',
-      transform: 'scale(1.2)',
+    position: "absolute",
+    borderRadius: "50%",
+    boxShadow: "0 2px 12px rgba(0,0,0,.2)",
+    transition: theme.transitions.create(["all"]),
+    "&:hover": {
+      boxShadow: "0 3px 16px rgba(0,0,0,.5)",
+      transform: "scale(1.2)"
     },
     right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 7,
+    bottom: theme.spacing.unit * 7
   },
   entityContext: {
-    '&:last-child': {
-      paddingBottom: 12,
-    },
+    "&:last-child": {
+      paddingBottom: 12
+    }
   },
   peopleTitle: {
     fontSize: 14,
     fontWeight: 500,
     padding: theme.spacing.unit,
     paddingBottom: theme.spacing.unit / 2,
-    transition: theme.transitions.create(['transform']),
+    transition: theme.transitions.create(["transform"]),
     bottom: 0,
     zIndex: 5,
-    margin: 'auto',
-    textAlign: 'center',
-    textShadow: '0 1px 12px rgba(0,0,0,.2)',
+    margin: "auto",
+    textAlign: "center",
+    textShadow: "0 1px 12px rgba(0,0,0,.2)"
   },
   peopleSubTitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,.7)',
+    color: "rgba(255,255,255,.7)",
     fontWeight: 600,
-    margin: 'auto',
-    transition: theme.transitions.create(['transform']),
+    margin: "auto",
+    transition: theme.transitions.create(["transform"]),
     zIndex: 5,
-    textShadow: '0 1px 12px rgba(0,0,0,.2)',
-    textAlign: 'center',
-    whiteSpace: 'nowrap',
+    textShadow: "0 1px 12px rgba(0,0,0,.2)",
+    textAlign: "center",
+    whiteSpace: "nowrap"
   },
   entityCard: {
     height: 200,
     width: 183,
-    flexGrow: 'initial',
-    flexBasis: 'initial',
+    flexGrow: "initial",
+    flexBasis: "initial",
     margin: theme.spacing.unit / 2,
-    transition: theme.transitions.create(['all']),
-    '&:hover': {
-      transform: 'scale(1.05)',
-      overflow: 'initial',
+    transition: theme.transitions.create(["all"]),
+    "&:hover": {
+      transform: "scale(1.05)",
+      overflow: "initial",
       zIndex: 200,
-      boxShadow: '0 2px 14px rgba(0,55,230,.3)',
-      background: blue.A200,
+      boxShadow: `0 2px 14px rgba(0,55,230,.3)`,
+      background: blue.A200
     },
-    '&:hover > div': {
-      boxShadow: 'none',
+    "&:hover > div": {
+      boxShadow: "none"
     },
-    '&:hover > * > h1': {
-      transform: 'scale(1.4)',
+    "&:hover > * > h1": {
+      transform: "scale(1.4)",
       fontWeight: 700,
-      textShadow: '0 2px 12px rgba(0,0,0,.7)',
+      textShadow: "0 2px 12px rgba(0,0,0,.7)"
     },
-    position: 'relative',
-    overflow: 'hidden',
+    position: "relative",
+    overflow: "hidden"
   },
   entityCardDisabled: {
     height: 200,
     width: 183,
-    flexGrow: 'initial',
-    flexBasis: 'initial',
+    flexGrow: "initial",
+    flexBasis: "initial",
     margin: theme.spacing.unit / 2,
-    transition: theme.transitions.create(['all']),
-    filter: 'brightness(.8)',
-    position: 'relative',
-    overflow: 'hidden',
+    transition: theme.transitions.create(["all"]),
+    filter: "brightness(.8)",
+    position: "relative",
+    overflow: "hidden"
   },
   entityImage: {
-    height: '100%',
-    width: '100%',
-    objectFit: 'cover',
-    position: 'absolute',
+    height: "100%",
+    width: "100%",
+    objectFit: "cover",
+    position: "absolute",
     zIndex: -1,
-    transition: theme.transitions.create(['filter']),
-    '&:hover': {
-      filter: 'brightness(0.8)',
+    transition: theme.transitions.create(["filter"]),
+    "&:hover": {
+      filter: "brightness(0.8)"
     },
     top: 0,
-    left: 0,
+    left: 0
   },
   entityTitle: {
     fontSize: 14,
     fontWeight: 500,
-    position: 'absolute',
+    position: "absolute",
     padding: theme.spacing.unit * 2,
-    transition: theme.transitions.create(['transform']),
+    transition: theme.transitions.create(["transform"]),
     bottom: 0,
     zIndex: 5,
     left: 0,
-    textShadow: '0 1px 12px rgba(0,0,0,.2)',
+    textShadow: "0 1px 12px rgba(0,0,0,.2)"
   },
   entitySubTitle: {
     fontSize: 14,
     fontWeight: 600,
-    position: 'absolute',
+    position: "absolute",
     padding: theme.spacing.unit * 2,
-    transition: theme.transitions.create(['transform']),
+    transition: theme.transitions.create(["transform"]),
     top: 0,
     left: 0,
     zIndex: 5,
-    textShadow: '0 1px 12px rgba(0,0,0,.2)',
+    textShadow: "0 1px 12px rgba(0,0,0,.2)"
   },
   itemcontainer: {
     paddingBottom: theme.spacing.unit * 2,
     marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing.unit
   },
   gradientCard: {
-    position: 'relative',
-    background: 'linear-gradient(to top, transparent, rgba(0,0,0,.6))',
+    position: "relative",
+    background: "linear-gradient(to top, transparent, rgba(0,0,0,.6))",
     height: 183,
-    width: '100%',
+    width: "100%"
   },
   sectDivide: {
-    marginTop: theme.spacing.unit * 2,
+    marginTop: theme.spacing.unit * 2
   },
   sectDivideDown: {
-    marginBottom: theme.spacing.unit * 2,
+    marginBottom: theme.spacing.unit * 2
   },
   progressCon: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
     maxWidth: 400,
-    margin: 'auto',
+    margin: "auto"
   },
   progressTitle: {
-    display: 'flex',
+    display: "flex",
     fontSize: theme.typography.pxToRem(12),
-    margin: 'auto',
-    textAlign: 'center',
+    margin: "auto",
+    textAlign: "center"
   },
   progressBar: {
-    background: 'rgba(255,255,255,.3)',
-    margin: theme.spacing.unit / 2,
+    background: "rgba(255,255,255,.3)",
+    margin: theme.spacing.unit / 2
   },
   progressBarActive: {
-    background: 'white',
+    background: "white"
   },
   commandoBar: {
-    width: '100%',
-    display: 'inline-flex',
-    boxSizing: 'border-box',
-    background: '#222',
-    borderBottom: '1px solid rgba(255,255,255,.1)',
+    width: "100%",
+    display: "inline-flex",
+    boxSizing: "border-box",
+    background: "#222",
+    borderBottom: `1px solid rgba(255,255,255,.1)`
   },
   commandoText: {
-    margin: 'auto',
-    textAlign: 'center',
+    margin: "auto",
+    textAlign: "center"
   },
   commandoTextBox: {
     paddingLeft: theme.spacing.unit,
     paddingRight: theme.spacing.unit,
-    margin: 'auto',
+    margin: "auto"
   },
   commandoTextBoxRow: {
     padding: theme.spacing.unit,
     margin: theme.spacing.unit,
-    display: 'flex',
-    boxShadow: 'none',
-    border: '1px solid rgba(255,255,255,.1)',
-    background: 'transparent',
+    display: "flex",
+    boxShadow: "none",
+    border: "1px solid rgba(255,255,255,.1)",
+    background: "transparent"
   },
   commandoTextLabel: {
     fontSize: theme.typography.pxToRem(12),
-    textAlign: 'center',
-    color: 'rgba(255,255,255,.8)',
+    textAlign: "center",
+    color: "rgba(255,255,255,.8)"
   },
   commandoTextLabelRow: {
     fontSize: theme.typography.pxToRem(14),
-    color: 'white',
-    margin: 'auto',
-    paddingLeft: theme.spacing.unit,
+    color: "white",
+    margin: "auto",
+    paddingLeft: theme.spacing.unit
   },
   commandoTextNumberRow: {
-    color: 'rgba(0,0,0,1)',
-    margin: 'auto',
+    color: "rgba(0,0,0,1)",
+    margin: "auto",
     fontSize: theme.typography.pxToRem(32),
-    fontWeight: 700,
+    fontWeight: 700
   },
   smallTitlebar: {
-    display: 'flex',
+    display: "flex"
   },
   artworktype: {
     fontSize: theme.typography.pxToRem(16),
-    boxSizing: 'border-box',
+    boxSizing: "border-box",
     padding: theme.spacing.unit,
-    margin: 'auto',
-    textAlign: 'center',
-    background: 'transparent',
-    color: 'white',
-    border: '2px solid rgba(255,255,255,1)',
+    margin: "auto",
+    textAlign: "center",
+    background: "transparent",
+    color: "white",
+    border: "2px solid rgba(255,255,255,1)",
     fontWeight: 600,
-    borderRadius: theme.spacing.unit / 2,
+    borderRadius: theme.spacing.unit / 2
   },
   loadingArtwork: {
-    margin: 'auto',
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    color: 'white',
-    filter: 'drop-shadow(0 2px 16px rgba(0,0,0,.3))',
+    margin: "auto",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    color: "white",
+    filter: "drop-shadow(0 2px 16px rgba(0,0,0,.3))"
   },
   leftSide: {
-    [theme.breakpoints.down('sm')]: {
-      maxWidth: '100%',
+    [theme.breakpoints.down("sm")]: {
+      maxWidth: "100%",
       flexBasis: 0,
-      width: '100%',
-    },
+      width: "100%"
+    }
   },
   fabPlayButton: {
-    position: 'fixed',
+    position: "fixed",
     bottom: theme.spacing.unit * 4,
     right: theme.spacing.unit * 4,
     zIndex: 10000,
-    transform: 'translateZ(0)',
+    transform: "translateZ(0)"
   },
   fabProgress: {
-    color: 'white',
+    color: "white",
     zIndex: 10001,
-    transition: theme.transitions.create(['all']),
+    transition: theme.transitions.create(["all"])
   },
   fabWrapper: {
-    transition: theme.transitions.create(['all']),
+    transition: theme.transitions.create(["all"]),
     margin: theme.spacing.unit,
-    position: 'relative',
-    zIndex: 10000,
+    position: "relative",
+    zIndex: 10000
   },
   fabContainer: {
-    transition: theme.transitions.create(['all']),
+    transition: theme.transitions.create(["all"]),
     opacity: 0,
-    zIndex: 10000,
+    zIndex: 10000
   },
   playArtworkButtonContainer: {
-    borderRadius: '50%',
+    borderRadius: "50%",
     background: blue.A200,
-    transform: 'translateZ(30%)',
+    transform: "translateZ(30%)"
   },
   playArtworkButton: {
-    color: 'white',
+    color: "white",
     width: 32,
-    height: 32,
+    height: 32
   },
   selectForm: {
     margin: theme.spacing.unit,
-    minWidth: 120,
+    minWidth: 120
   },
   streamButton: {
-    width: '100%',
+    width: "100%",
     marginTop: theme.spacing.unit,
-    animation: 'loadIn .5s ease',
+    animation: "loadIn .5s ease"
   },
   epList: {
     maxHeight: 500,
-    overflowY: 'auto',
+    overflowY: "auto"
   },
   epCard: {
     width: 48,
-    borderRadius: '50%',
-    boxSizing: 'border-box',
+    borderRadius: "50%",
+    boxSizing: "border-box",
     height: 48,
-    border: '2px solid transparent',
+    border: "2px solid transparent",
     fontWeight: 700,
     fontSize: theme.typography.pxToRem(18),
-    boxShadow: theme.shadows[2],
+    boxShadow: theme.shadows[2]
   },
   epCardActive: {
-    border: '2px solid white',
+    border: "2px solid white"
   },
   activeEpDot: {
     height: 2,
     width: 2,
-    borderRadius: '50%',
+    borderRadius: "50%",
     boxShadow: theme.shadows[3],
-    background: 'white',
+    background: "white"
   },
   statusForm: {
     minWidth: 300,
-    marginBottom: theme.spacing.unit * 3,
-  },
+    marginBottom: theme.spacing.unit * 3
+  }
 });
 
-class Show extends Component
-{
+const nameSwapper = (first, last) => (last ? `${first} ${last}` : first);
+
+class Show extends Component {
   state = {
     data: {},
     tabVal: 0,
     loading: true,
     playerActive: false,
     id: 0,
-    hue: '#111',
+    hue: "#111",
     hueVib: grey.A200,
     hueVibN: grey[900],
     eps: null,
     epError: false,
     menuEl: null,
     reportModal: false,
-    status: '',
+    status: "",
     lang: strings.enus,
-    rVal: '',
-    userlessREmail: '',
+    rVal: "",
+    userlessREmail: "",
     showEpisodes: false,
-    statusVal: '',
+    statusVal: ""
   };
 
-  componentWillMount = () =>
-  {
+  componentWillMount = () => {
     scrollFix();
     checklang(this);
   };
 
-  componentDidMount = async () =>
-  {
+  componentDidMount = async () => {
     this.init();
   };
 
-  componentWillReceiveProps = async (nextProps) =>
-  {
+  componentWillReceiveProps = async nextProps => {
     if (
       this.props.mir !== nextProps.mir &&
       this.state.data &&
       this.state.data.Media &&
-      this.state.data.Media.type.includes('ANIME')
+      this.state.data.Media.type.includes("ANIME")
     )
-    {
       await this.executeTwist();
-    }
   };
 
-  componentWillUnmount = () =>
-  {
-    this.props.sendTitleToMir('');
-    document.title = 'Mirai';
+  componentWillUnmount = () => {
+    this.props.sendTitleToMir("");
+    document.title = `Mirai`;
     this.unlisten();
   };
 
-  frame = document.getElementById('previewFrame');
+  frame = document.getElementById("previewFrame");
 
-  unlisten = this.props.history.listen((location) =>
-  {
+  unlisten = this.props.history.listen(location => {
     const id = queryString.parse(location.search);
-    if (location.pathname === '/show')
-    {
-      if ((id.s || id.m) !== this.state.id)
-      {
+    if (location.pathname === "/show")
+      if ((id.s || id.m) !== this.state.id) {
         this.init();
         scrollFix();
       }
-    }
     return false;
   });
 
@@ -675,95 +669,86 @@ class Show extends Component
       {
         data: null,
         loading: true,
-        hue: '#111',
+        hue: "#111",
         hueVib: window.theme.palette.primary.main,
         hueVibN: window.theme.palette.primary.main,
         eps: null,
-        epError: false,
+        epError: false
       },
       async () =>
-        setTimeout(async () =>
-        {
-          const superBar = document.getElementById('superBar');
+        setTimeout(async () => {
+          const superBar = document.getElementById("superBar");
           if (superBar) superBar.style.background = null;
           const id = queryString.parse(this.props.history.location.search);
-          const data = this.props.history.location.search.includes('?s=99999999999')
+          const data = this.props.history.location.search.includes(
+            "?s=99999999999"
+          )
             ? await this.props.firebase
-              .database()
-              .ref('/anime')
-              .child('Cory')
-              .once('value')
-            : this.props.history.location.search.includes('?m=')
+                .database()
+                .ref("/anime")
+                .child("Cory")
+                .once("value")
+            : this.props.history.location.search.includes("?m=")
               ? await Anilist.get(entryQueryM, { id: id.m })
               : await Anilist.get(entryQuery, { id: id.s });
-          try
-          {
-            if (data)
-            {
+          try {
+            if (data) {
               if (
-                this.props.history.location.search.includes('?s=99999999999')
-              )
-              {
+                this.props.history.location.search.includes("?s=99999999999")
+              ) {
                 const cory = await data.val();
                 if (cory)
-                {
                   this.setState(
                     {
                       data: {
-                        Media: cory,
+                        Media: cory
                       },
                       id: cory.id,
-                      fav: this.props.history.location.search.includes('?s=')
+                      fav: this.props.history.location.search.includes("?s=")
                         ? !!(
-                          this.props.profile.favs &&
+                            this.props.profile.favs &&
                             this.props.profile.favs.show &&
                             this.props.profile.favs.show[id.s]
-                        )
+                          )
                         : !!(
-                          this.props.profile.favs &&
+                            this.props.profile.favs &&
                             this.props.profile.favs.manga &&
                             this.props.profile.favs.manga[id.m]
-                        ),
+                          )
                     },
-                    () => this.pasta(),
+                    () => this.pasta()
                   );
-                }
-                else throw new Error('Cory fucked up.');
-              }
-              else
-              {
+                else throw new Error("Cory fucked up.");
+              } else {
                 this.setState(
                   {
                     data: data.data,
                     id: data.data.Media.id,
-                    fav: this.props.history.location.search.includes('?s=')
+                    fav: this.props.history.location.search.includes("?s=")
                       ? !!(
-                        this.props.profile.favs &&
+                          this.props.profile.favs &&
                           this.props.profile.favs.show &&
                           this.props.profile.favs.show[id.s]
-                      )
+                        )
                       : !!(
-                        this.props.profile.favs &&
+                          this.props.profile.favs &&
                           this.props.profile.favs.manga &&
                           this.props.profile.favs.manga[id.m]
-                      ),
+                        )
                   },
-                  () => this.pasta(),
+                  () => this.pasta()
                 );
               }
-            }
-            else throw new Error('Metadata error');
-          }
-          catch (error)
-          {
+            } else throw new Error("Metadata error");
+          } catch (error) {
             this.setState({ error: error.error }, () =>
-              setTimeout(() => this.setState({ error: '' }), 3000));
+              setTimeout(() => this.setState({ error: "" }), 3000)
+            );
           }
-        }, 300),
+        }, 300)
     );
 
-  pasta = async () =>
-  {
+  pasta = async () => {
     const data = this.state.data.Media;
     this.props.sendTitleToMir(data.title.romaji);
     document.title = `Mirai - ${data.title.romaji}`;
@@ -774,38 +759,77 @@ class Show extends Component
 
     const similarReq = {
       tag: data.tags && data.tags.length > 0 ? data.tags[0].name : null,
-      sort: ['POPULARITY_DESC'],
+      sort: ["POPULARITY_DESC"],
       page: 1,
-      isAdult: false,
+      isAdult: false
     };
 
     const similarReq2 = {
       tag: data.tags && data.tags.length > 1 ? data.tags[1].name : null,
-      sort: ['POPULARITY_DESC'],
+      sort: ["POPULARITY_DESC"],
       page: 1,
-      isAdult: false,
+      isAdult: false
     };
 
-    const similars = data.type.includes('MANGA')
+    const similars = data.type.includes("MANGA")
       ? await Anilist.get(bigFuckingQueryM, similarReq)
       : await Anilist.get(bigFuckingQueryS, similarReq);
-    const entity = data.type.includes('ANIME') ? 'show' : 'manga';
+    /* if (data) {
+			let epArray = []
+            const epwiki = await wiki().page(data.title.english);
+            const epwikiMedia = await epwiki.html()
+			if (epwikiMedia) {
+                const s = jquery(epwikiMedia).find('table.wikitable').eq(1).children('tbody').children('tr.vevent').each((e, i) => {
+                    return {
+                        title: jquery(i).text()
+                    }
+                })
+				if (s) console.log(s)
+            }
+        } */
+
+    /*if (
+      data &&
+      !isEmpty(this.props.profile) &&
+      this.props.profile.username &&
+      this.props.profile.willLog && !(this.props.mir && this.props.mir.play &&
+      this.props.mir.play.eps &&
+      this.props.mir.play.meta &&
+      this.props.mir.play.meta.id === this.state.id)
+    ) {
+      const id = guid();
+      this.props.firebase.ref('/users').child(this.props.profile.userID).child('feed')
+        .child(id).update({
+          date: Date.now(),
+          id, 
+          showId: data.id,
+          type: "SHOW",
+          activity: `Checked out ${data.title.romaji}`,
+          bgImg: data.bannerImage && data.bannerImage,
+          coverImg: data.coverImage.large,
+          user: {
+            username: this.props.profile.username,
+            avatar: this.props.profile.avatar,
+            userID: this.props.profile.userID
+          }
+        })
+        .then(() => console.info("Logged!"));
+    }*/
+    const entity = data.type.includes("ANIME") ? "show" : "manga";
     if (
       this.props.profile.completed &&
       this.props.profile.completed[entity] &&
       this.props.profile.completed[entity][data.id]
-    )
-    {
-      this.setState({ statusVal: 'c' });
+    ) {
+      this.setState({ statusVal: "c" });
     }
 
     if (
       this.props.profile.dropped &&
       this.props.profile.dropped[entity] &&
       this.props.profile.dropped[entity][data.id]
-    )
-    {
-      this.setState({ statusVal: 'd' });
+    ) {
+      this.setState({ statusVal: "d" });
     }
 
     if (
@@ -816,151 +840,125 @@ class Show extends Component
         this.props.profile.completed[entity] &&
         this.props.profile.completed[entity][data.id]
       )
-    )
-    {
-      this.setState({ statusVal: 'w' });
+    ) {
+      this.setState({ statusVal: "w" });
     }
 
     if (image)
-    {
-      Colorizer(`https://cors-anywhere.herokuapp.com/${image}`).then(pal =>
-        this.setState(
+      Colorizer(`https://cors-anywhere.herokuapp.com/${image}`).then(pal => {
+        return this.setState(
           {
             hue: pal.DarkMuted && pal.DarkMuted.getHex(),
             hueVib: pal.LightVibrant && pal.LightVibrant.getHex(),
             hueVibN: pal.DarkVibrant && pal.DarkVibrant.getHex(),
-            similars,
+            similars
           },
-          () =>
-          {},
-        ));
-    }
+          () => {}
+        );
+      });
     if (similars) this.setState({ similars });
-    if (data && data.tags && data.tags.length > 1)
-    {
-      const similars2 = data.type.includes('MANGA')
+    if (data && data.tags && data.tags.length > 1) {
+      const similars2 = data.type.includes("MANGA")
         ? await Anilist.get(bigFuckingQueryM, similarReq2)
         : await Anilist.get(bigFuckingQueryS, similarReq2);
 
       if (similars2) this.setState({ similars2 });
     }
     if (this.state.data)
-    {
       this.setState(
         {
-          loading: false,
+          loading: false
         },
-        async () =>
-        {
-          if (data.type.includes('MANGA'))
-          {
+        async () => {
+          if (data.type.includes("MANGA"))
             this.setState({ eps: null, epError: false });
-          }
           else if (
-            data.format.includes('OVA') ||
-            data.format.includes('ONA') ||
-            data.format.includes('SPIN_OFF')
-          )
-          {
+            data.format.includes("OVA") ||
+            data.format.includes("ONA") ||
+            data.format.includes("SPIN_OFF")
+          ) {
             this.setState({ eps: null, epError: true });
-          }
-          else
-          {
+          } else {
             return null;
           }
           return false;
-        },
+        }
       );
-    }
   };
 
-  executeTwist = async (reload) =>
-  {
-    const db = this.props.firebase.ref('anime').child('twist');
-    const dbval = await db.once('value');
-    if (dbval && Object(dbval.val())[this.state.id])
-    {
-      const eps = await db.child(this.state.id).once('value');
-      if (eps)
-      {
+  executeTwist = async reload => {
+    const db = this.props.firebase.ref("anime").child("twist");
+    const dbval = await db.once("value");
+    if (dbval && Object(dbval.val())[this.state.id]) {
+      const eps = await db.child(this.state.id).once("value");
+      if (eps) {
         return Kitsu.addKitsuMetadata(
           this.state.data.Media.title.romaji,
           eps.val(),
-          this.state.data.Media.format,
+          this.state.data.Media.format
         )
           .then(km =>
             this.setState({ eps: km }, () =>
-              console.info('[mirai] Loaded from database')))
+              console.info("[mirai] Loaded from database")
+            )
+          )
           .catch(kmN => this.setState({ eps: kmN }));
-      } throw new Error('owo');
-    }
-    else if (this.props.mir && this.props.mir.twist)
-    {
+      } else throw new Error("owo");
+    } else if (this.props.mir && this.props.mir.twist) {
       if (
         this.props.mir.play &&
         this.props.mir.play.eps &&
         this.props.mir.play.meta &&
         this.props.mir.play.meta.id === this.state.id &&
         !reload
-      )
-      {
+      ) {
         return this.setState({ eps: this.props.mir.play.eps });
       }
-      const correctedtitle = bigfuck(this.state.data.Media.title.romaji.toLowerCase());
+      const correctedtitle = bigfuck(
+        this.state.data.Media.title.romaji.toLowerCase()
+      );
       const meta = Object.values(this.props.mir.twist).filter(s =>
-        s.name.toLowerCase().match(`${correctedtitle}`));
+        s.name.toLowerCase().match(`${correctedtitle}`)
+      );
       // console.log(meta);
-      if (meta.length > 0)
-      {
+      if (meta.length > 0) {
         const eps = await Twist.get(meta[0].link, meta[0].ongoing);
-        try
-        {
+        try {
           if (eps)
-          {
             return Kitsu.addKitsuMetadata(
               this.state.data.Media.title.romaji,
               eps,
-              this.state.data.Media.format,
+              this.state.data.Media.format
             )
               .then(finishedEps =>
-                this.setState({ eps: finishedEps }, async () =>
-                {
-                  if (meta[0].ongoing === false)
-                  {
+                this.setState({ eps: finishedEps }, async () => {
+                  if (meta[0].ongoing === false) {
                     const dbtwist = this.props.firebase
-                      .ref('anime')
-                      .child('twist');
-                    return dbtwist.child(this.state.id).update(finishedEps);
-                    // console.info('[mirai] Uploaded to database');
+                      .ref("anime")
+                      .child("twist");
+                    await dbtwist.child(this.state.id).update(finishedEps);
+                    return console.info("[mirai] Uploaded to database");
                   }
-                  return null;
-                }))
+                })
+              )
               .catch(kmN =>
-                this.setState({ eps: kmN }, async () =>
-                {
-                  if (meta[0].ongoing === false)
-                  {
+                this.setState({ eps: kmN }, async () => {
+                  if (meta[0].ongoing === false) {
                     const dbtwist = this.props.firebase
-                      .ref('anime')
-                      .child('twist');
-                    return dbtwist.child(this.state.id).update(kmN);
+                      .ref("anime")
+                      .child("twist");
+                    await dbtwist.child(this.state.id).update(kmN);
+                    return console.info("[mirai] Uploaded to database");
                   }
-                  return null;
-                }));
-          }
-        }
-        catch (error)
-        {
+                })
+              );
+        } catch (error) {
           return this.setState({ epError: true });
         }
-      }
-      else
-      {
+      } else {
         return this.setState({ epError: true });
       }
-    }
-    else
-    {
+    } else {
       return this.setState({ epError: true });
     }
     return false;
@@ -968,80 +966,67 @@ class Show extends Component
 
   tabChange = (e, val) => this.setState({ tabVal: val });
 
-  play = () =>
-  {
+  play = () => {
     window.scrollTo(0, 0);
     if (
       this.state.data.Media &&
-      this.state.data.Media.type.includes('ANIME') &&
+      this.state.data.Media.type.includes("ANIME") &&
       this.state.eps
-    )
-    {
+    ) {
       this.props
         .sendDataToMir({
           eps: Object.values(this.state.eps),
           meta: this.state.data.Media,
-          id: this.state.data.Media.id,
+          id: this.state.data.Media.id
         })
-        .then(() =>
-        {
+        .then(() => {
           // console.log(this.props);
-          this.setState({ statusVal: 'w' }, () =>
-          {
-            this.addToWatching().then(() => this.props.history.push('/watch'));
+          this.setState({ statusVal: "w" }, () => {
+            this.addToWatching().then(() => this.props.history.push(`/watch`));
           });
         });
-    }
-    else
-    {
+    } else
       this.props.history.push(
         `/read?r=${this.state.data.Media.id}`,
-        this.state.data.Media,
+        this.state.data.Media
       );
-    }
   };
 
-  stream = () =>
-  {
+  stream = () => {
     window.scrollTo(0, 0);
     if (
       this.state.data.Media &&
-      this.state.data.Media.type.includes('ANIME') &&
+      this.state.data.Media.type.includes("ANIME") &&
       this.state.eps
-    )
-    {
+    ) {
       const streamopts = {
         title: this.state.data.Media.title.romaji,
         cover: this.state.data.Media.coverImage.large,
-        eps: this.state.eps,
+        eps: this.state.eps
       };
-      return this.props.history.push('/stream', streamopts);
+      return this.props.history.push("/stream", streamopts);
+    } else {
+      return null;
     }
-    return null;
   };
 
-  openEntity = (link) =>
-  {
+  openEntity = link => {
     this.props.history.push(link);
   };
 
-  atLeave = () =>
-  {
-    if (this.state.data.Media && this.state.data.Media.trailer)
-    {
-      const tbg = document.getElementById('trailerbg');
+  atLeave = () => {
+    if (this.state.data.Media && this.state.data.Media.trailer) {
+      const tbg = document.getElementById("trailerbg");
       tbg.remove();
     }
   };
 
-  like = async () =>
-  {
+  like = async () => {
     const data = this.state.data.Media;
     const name = data.title.romaji;
     const image = data.coverImage.large;
-    const entity = data.type.includes('ANIME') ? 'show' : 'manga';
+    const entity = data.type.includes("ANIME") ? "show" : "manga";
     if (!isEmpty(this.props.profile))
-    {
       this.props.firebase
         .update(
           `users/${this.props.profile.userID}/favs/${entity}/${data.id}`,
@@ -1060,30 +1045,27 @@ class Show extends Component
             rank:
               data.rankings && data.rankings.length > 0
                 ? data.rankings[0]
-                : null,
-          },
+                : null
+          }
         )
-        .then(() =>
-        {
-          this.setState({ fav: true }, () =>
-          {
+        .then(() => {
+          this.setState({ fav: true }, () => {
             if (
               data &&
               !isEmpty(this.props.profile) &&
               this.props.profile.username &&
               this.props.profile.willLog
-            )
-            {
+            ) {
               this.props.firebase
-                .ref('/users')
+                .ref("/users")
                 .child(this.props.profile.userID)
-                .child('feed')
-                .child(`${this.state.id}F`)
+                .child("feed")
+                .child(this.state.id + "F")
                 .update({
                   date: Date.now(),
-                  id: `${this.state.id}F`,
+                  id: this.state.id + "F",
                   showId: this.state.id,
-                  type: 'FAV',
+                  type: "FAV",
                   activity: `Favorited ${data.title.romaji}`,
                   bgImg:
                     this.state.data.Media.bannerImage &&
@@ -1092,52 +1074,45 @@ class Show extends Component
                   user: {
                     username: this.props.profile.username,
                     avatar: this.props.profile.avatar,
-                    userID: this.props.profile.userID,
-                  },
+                    userID: this.props.profile.userID
+                  }
                 });
             }
           });
         });
-    }
   };
 
-  unlike = async () =>
-  {
+  unlike = async () => {
     const data = this.state.data.Media;
-    const entity = data.type.includes('ANIME') ? 'show' : 'manga';
+    const entity = data.type.includes("ANIME") ? "show" : "manga";
     if (!isEmpty(this.props.profile))
-    {
       this.props.firebase
         .remove(`users/${this.props.profile.userID}/favs/${entity}/${data.id}`)
         .then(() =>
-          this.setState({ fav: false }, () =>
-          {
+          this.setState({ fav: false }, () => {
             if (
               data &&
               !isEmpty(this.props.profile) &&
               this.props.profile.username &&
               this.props.profile.willLog
-            )
-            {
+            ) {
               this.props.firebase
-                .ref('/users')
+                .ref("/users")
                 .child(this.props.profile.userID)
-                .child('feed')
-                .child(`${this.state.id}F`)
+                .child("feed")
+                .child(this.state.id + "F")
                 .remove();
             }
-          }));
-    }
+          })
+        );
   };
 
-  RecommendThis = async () =>
-  {
+  RecommendThis = async () => {
     const data = this.state.data.Media;
     const name = data.title.romaji;
     const image = data.coverImage.large;
-    const entity = data.type.includes('ANIME') ? 'show' : 'manga';
+    const entity = data.type.includes("ANIME") ? "show" : "manga";
     if (!isEmpty(this.props.profile))
-    {
       this.props.firebase
         .update(
           `users/${this.props.profile.userID}/recommends/${entity}/${data.id}`,
@@ -1157,30 +1132,27 @@ class Show extends Component
             rank:
               data.rankings && data.rankings.length > 0
                 ? data.rankings[0]
-                : null,
-          },
+                : null
+          }
         )
-        .then(() =>
-        {
-          this.setState({ recommend: true }, () =>
-          {
+        .then(() => {
+          this.setState({ recommend: true }, () => {
             if (
               data &&
               !isEmpty(this.props.profile) &&
               this.props.profile.username &&
               this.props.profile.willLog
-            )
-            {
+            ) {
               this.props.firebase
-                .ref('/users')
+                .ref("/users")
                 .child(this.props.profile.userID)
-                .child('feed')
-                .child(`${this.state.id}R`)
+                .child("feed")
+                .child(this.state.id + "R")
                 .update({
                   date: Date.now(),
-                  id: `${this.state.id}R`,
+                  id: this.state.id + "R",
                   showId: this.state.id,
-                  type: 'RECOMMEND',
+                  type: "RECOMMEND",
                   activity: `Recommended ${data.title.romaji}`,
                   bgImg:
                     this.state.data.Media.bannerImage &&
@@ -1189,52 +1161,47 @@ class Show extends Component
                   user: {
                     username: this.props.profile.username,
                     avatar: this.props.profile.avatar,
-                    userID: this.props.profile.userID,
-                  },
+                    userID: this.props.profile.userID
+                  }
                 });
             }
           });
         });
-    }
   };
 
-  DontRecommendThis = async () =>
-  {
+  DontRecommendThis = async () => {
     const data = this.state.data.Media;
-    const entity = data.type.includes('ANIME') ? 'show' : 'manga';
+    const entity = data.type.includes("ANIME") ? "show" : "manga";
     if (!isEmpty(this.props.profile))
-    {
       this.props.firebase
-        .remove(`users/${this.props.profile.userID}/recommends/${entity}/${data.id}`)
+        .remove(
+          `users/${this.props.profile.userID}/recommends/${entity}/${data.id}`
+        )
         .then(() =>
-          this.setState({ recommend: false }, () =>
-          {
+          this.setState({ recommend: false }, () => {
             if (
               data &&
               !isEmpty(this.props.profile) &&
               this.props.profile.username &&
               this.props.profile.willLog
-            )
-            {
+            ) {
               this.props.firebase
-                .ref('/users')
+                .ref("/users")
                 .child(this.props.profile.userID)
-                .child('feed')
-                .child(`${this.state.id}R`)
+                .child("feed")
+                .child(this.state.id + "R")
                 .remove();
             }
-          }));
-    }
+          })
+        );
   };
 
-  addToLater = async () =>
-  {
+  addToLater = async () => {
     const data = this.state.data.Media;
     const name = data.title.romaji;
     const image = data.coverImage.large;
-    const entity = data.type.includes('ANIME') ? 'show' : 'manga';
+    const entity = data.type.includes("ANIME") ? "show" : "manga";
     if (!isEmpty(this.props.profile))
-    {
       this.props.firebase
         .update(
           `users/${this.props.profile.userID}/later/${entity}/${data.id}`,
@@ -1251,32 +1218,30 @@ class Show extends Component
               : this.state.hue ? this.state.hue : null,
             avgScore: data.averageScore,
             meanScore: data.meanScore,
-            type: data.status.includes('NOT_YET_RELEASED') ? 'TBA' : null,
+            type: data.status.includes("NOT_YET_RELEASED") ? "TBA" : null,
             rank:
               data.rankings && data.rankings.length > 0
                 ? data.rankings[0]
-                : null,
-          },
+                : null
+          }
         )
-        .then(() =>
-        {
+        .then(() => {
           if (
             data &&
             !isEmpty(this.props.profile) &&
             this.props.profile.username &&
             this.props.profile.willLog
-          )
-          {
+          ) {
             this.props.firebase
-              .ref('/users')
+              .ref("/users")
               .child(this.props.profile.userID)
-              .child('feed')
-              .child(`${this.state.id}L`)
+              .child("feed")
+              .child(this.state.id + "L")
               .update({
                 date: Date.now(),
-                id: `${this.state.id}L`,
+                id: this.state.id + "L",
                 showId: this.state.id,
-                type: 'LATER',
+                type: "LATER",
                 activity: `Added ${data.title.romaji} to their later list`,
                 bgImg:
                   this.state.data.Media.bannerImage &&
@@ -1285,161 +1250,144 @@ class Show extends Component
                 user: {
                   username: this.props.profile.username,
                   avatar: this.props.profile.avatar,
-                  userID: this.props.profile.userID,
-                },
+                  userID: this.props.profile.userID
+                }
               });
           }
         });
-    }
   };
 
-  removeFromLater = async () =>
-  {
+  removeFromLater = async () => {
     const data = this.state.data.Media;
-    const entity = data.type.includes('ANIME') ? 'show' : 'manga';
+    const entity = data.type.includes("ANIME") ? "show" : "manga";
     if (!isEmpty(this.props.profile))
-    {
       this.props.firebase
         .remove(`users/${this.props.profile.userID}/later/${entity}/${data.id}`)
-        .then(() =>
-        {
+        .then(() => {
           if (
             data &&
             !isEmpty(this.props.profile) &&
             this.props.profile.username &&
             this.props.profile.willLog
-          )
-          {
+          ) {
             this.props.firebase
-              .ref('/users')
+              .ref("/users")
               .child(this.props.profile.userID)
-              .child('feed')
-              .child(`${this.state.id}L`)
+              .child("feed")
+              .child(this.state.id + "L")
               .remove();
           }
         });
-    }
   };
 
   reportError = () => this.setState({ reportModal: !this.state.reportModal });
 
-  handleStatus = event =>
-    this.setState({ [event.target.name]: event.target.value });
+  handleStatus = event => {
+    return this.setState({ [event.target.name]: event.target.value });
+  };
 
   changerVal = e => this.setState({ rVal: e.target.value });
 
-  rSendMReport = async () =>
-  {
-    if (isEmpty(this.props.profile))
-    {
-      if (this.state.userlessREmail !== '')
-      {
-        return this.props.firebase
+  rSendMReport = async () => {
+    if (isEmpty(this.props.profile)) {
+      if (this.state.userlessREmail !== "")
+        return await this.props.firebase
           .database()
-          .ref('/reports')
-          .child('m')
+          .ref("/reports")
+          .child("m")
           .child(this.state.id)
           .update({
             reporter: this.state.userlessREmail,
-            info: 'Missing content',
+            info: "Missing content"
           });
-      }
-      return null;
+      else return null;
+    } else {
+      return await this.props.firebase
+        .database()
+        .ref("/reports")
+        .child("m")
+        .child(this.state.id)
+        .update({
+          reporter: this.props.profile.userID,
+          info: "Missing content"
+        });
     }
-    return this.props.firebase
-      .database()
-      .ref('/reports')
-      .child('m')
-      .child(this.state.id)
-      .update({
-        reporter: this.props.profile.userID,
-        info: 'Missing content',
-      });
   };
 
-  rSendWReport = async () =>
-  {
-    if (isEmpty(this.props.profile))
-    {
-      if (this.state.userlessREmail !== '')
-      {
-        return this.props.firebase
+  rSendWReport = async () => {
+    if (isEmpty(this.props.profile)) {
+      if (this.state.userlessREmail !== "")
+        return await this.props.firebase
           .database()
-          .ref('/reports')
-          .child('w')
+          .ref("/reports")
+          .child("w")
           .child(this.state.id)
           .update({
             reporter: this.state.userlessREmail,
-            info: 'Wrong info',
+            info: "Wrong info"
           });
-      }
-      return null;
+      else return null;
+    } else {
+      return await this.props.firebase
+        .database()
+        .ref("/reports")
+        .child("w")
+        .child(this.state.id)
+        .update({
+          reporter: this.props.profile.userID,
+          info: "Wrong info"
+        });
     }
-    return this.props.firebase
-      .database()
-      .ref('/reports')
-      .child('w')
-      .child(this.state.id)
-      .update({
-        reporter: this.props.profile.userID,
-        info: 'Wrong info',
-      });
   };
 
-  rSendDReport = async () =>
-  {
-    if (isEmpty(this.props.profile))
-    {
-      if (this.state.userlessREmail !== '')
-      {
-        return this.props.firebase
+  rSendDReport = async () => {
+    if (isEmpty(this.props.profile)) {
+      if (this.state.userlessREmail !== "")
+        return await this.props.firebase
           .database()
-          .ref('/reports')
-          .child('d')
+          .ref("/reports")
+          .child("d")
           .child(this.state.id)
           .update({
             reporter: this.state.userlessREmail,
-            info: 'Copyright issues',
+            info: "Copyright issues"
           });
-      }
-      return null;
+      else return null;
+    } else {
+      return await this.props.firebase
+        .database()
+        .ref("/reports")
+        .child("d")
+        .child(this.state.id)
+        .update({
+          reporter: this.props.profile.userID,
+          info: "Copyright issues"
+        });
     }
-    return this.props.firebase
-      .database()
-      .ref('/reports')
-      .child('d')
-      .child(this.state.id)
-      .update({
-        reporter: this.props.profile.userID,
-        info: 'Copyright issues',
-      });
   };
 
-  showEpisodes = () => this.setState({ showEpisodes: !this.state.showEpisodes });
+  showEpisodes = e => this.setState({ showEpisodes: !this.state.showEpisodes });
 
-  addToCompleted = async () =>
-  {
+  addToCompleted = async () => {
     const data = this.state.data.Media;
     const name = data.title.romaji;
     const image = data.coverImage.large;
-    const entity = data.type.includes('ANIME') ? 'show' : 'manga';
+    const entity = data.type.includes("ANIME") ? "show" : "manga";
     if (
       this.props.profile.dropped &&
       this.props.profile.dropped[entity] &&
       this.props.profile.dropped[entity][data.id]
-    )
-    {
+    ) {
       this.props.firebase
         .database()
-        .ref('users')
+        .ref("users")
         .child(this.props.profile.userID)
-        .child('dropped')
+        .child("dropped")
         .child(entity)
         .child(data.id)
         .remove();
     }
     if (!isEmpty(this.props.profile))
-    {
       this.props.firebase
         .update(
           `users/${this.props.profile.userID}/completed/${entity}/${data.id}`,
@@ -1456,32 +1404,30 @@ class Show extends Component
               : this.state.hue ? this.state.hue : null,
             avgScore: data.averageScore,
             meanScore: data.meanScore,
-            type: data.status.includes('NOT_YET_RELEASED') ? 'TBA' : null,
+            type: data.status.includes("NOT_YET_RELEASED") ? "TBA" : null,
             rank:
               data.rankings && data.rankings.length > 0
                 ? data.rankings[0]
-                : null,
-          },
+                : null
+          }
         )
-        .then(() =>
-        {
+        .then(() => {
           if (
             data &&
             !isEmpty(this.props.profile) &&
             this.props.profile.username &&
             this.props.profile.willLog
-          )
-          {
+          ) {
             this.props.firebase
-              .ref('/users')
+              .ref("/users")
               .child(this.props.profile.userID)
-              .child('feed')
-              .child(`${this.state.id}C`)
+              .child("feed")
+              .child(this.state.id + "C")
               .update({
                 date: Date.now(),
-                id: `${this.state.id}C`,
+                id: this.state.id + "C",
                 showId: this.state.id,
-                type: 'COMPLETED',
+                type: "COMPLETED",
                 format: entity,
                 activity: `Completed ${data.title.romaji}`,
                 bgImg:
@@ -1491,31 +1437,27 @@ class Show extends Component
                 user: {
                   username: this.props.profile.username,
                   avatar: this.props.profile.avatar,
-                  userID: this.props.profile.userID,
-                },
+                  userID: this.props.profile.userID
+                }
               });
           }
         });
-    }
   };
 
-  addToDropped = async () =>
-  {
+  addToDropped = async () => {
     const data = this.state.data.Media;
     const name = data.title.romaji;
     const image = data.coverImage.large;
-    const entity = data.type.includes('ANIME') ? 'show' : 'manga';
+    const entity = data.type.includes("ANIME") ? "show" : "manga";
     // You can't drop something you've completed so...................
     if (
       this.props.profile.completed &&
       this.props.profile.completed[entity] &&
       this.props.profile.completed[entity][data.id]
-    )
-    {
+    ) {
       return null;
     }
     if (!isEmpty(this.props.profile))
-    {
       this.props.firebase
         .update(
           `users/${this.props.profile.userID}/dropped/${entity}/${data.id}`,
@@ -1532,32 +1474,30 @@ class Show extends Component
               : this.state.hue ? this.state.hue : null,
             avgScore: data.averageScore,
             meanScore: data.meanScore,
-            type: data.status.includes('NOT_YET_RELEASED') ? 'TBA' : null,
+            type: data.status.includes("NOT_YET_RELEASED") ? "TBA" : null,
             rank:
               data.rankings && data.rankings.length > 0
                 ? data.rankings[0]
-                : null,
-          },
+                : null
+          }
         )
-        .then(() =>
-        {
+        .then(() => {
           if (
             data &&
             !isEmpty(this.props.profile) &&
             this.props.profile.username &&
             this.props.profile.willLog
-          )
-          {
+          ) {
             this.props.firebase
-              .ref('/users')
+              .ref("/users")
               .child(this.props.profile.userID)
-              .child('feed')
-              .child(`${this.state.id}D`)
+              .child("feed")
+              .child(this.state.id + "D")
               .update({
                 date: Date.now(),
-                id: `${this.state.id}D`,
+                id: this.state.id + "D",
                 showId: this.state.id,
-                type: 'DROPPED',
+                type: "DROPPED",
                 format: entity,
                 activity: `Dropped ${data.title.romaji}`,
                 bgImg:
@@ -1567,52 +1507,47 @@ class Show extends Component
                 user: {
                   username: this.props.profile.username,
                   avatar: this.props.profile.avatar,
-                  userID: this.props.profile.userID,
-                },
+                  userID: this.props.profile.userID
+                }
               });
           }
         });
-      return null;
-    }
-    return null;
   };
 
-  addToWatching = async () =>
-  {
+  addToWatching = async () => {
     const data = this.state.data.Media;
-    const entity = data.type.includes('ANIME') ? 'show' : 'manga';
+    const name = data.title.romaji;
+    const image = data.coverImage.large;
+    const entity = data.type.includes("ANIME") ? "show" : "manga";
     if (
       this.props.profile.dropped &&
       this.props.profile.dropped[entity][data.id]
-    )
-    {
+    ) {
       this.props.firebase
         .database()
-        .ref('users')
+        .ref("users")
         .child(this.props.profile.userID)
-        .child('dropped')
+        .child("dropped")
         .child(entity)
         .child(data.id)
         .remove()
-        .then(() =>
-        {
+        .then(() => {
           if (
             data &&
             !isEmpty(this.props.profile) &&
             this.props.profile.username &&
             this.props.profile.willLog
-          )
-          {
+          ) {
             this.props.firebase
-              .ref('/users')
+              .ref("/users")
               .child(this.props.profile.userID)
-              .child('feed')
-              .child(`${this.state.id}UD`)
+              .child("feed")
+              .child(this.state.id + "UD")
               .update({
                 date: Date.now(),
-                id: `${this.state.id}UD`,
+                id: this.state.id + "UD",
                 showId: this.state.id,
-                type: 'UNDROPPED',
+                type: "UNDROPPED",
                 format: entity,
                 activity: `Undropped ${data.title.romaji}`,
                 bgImg:
@@ -1622,8 +1557,8 @@ class Show extends Component
                 user: {
                   username: this.props.profile.username,
                   avatar: this.props.profile.avatar,
-                  userID: this.props.profile.userID,
-                },
+                  userID: this.props.profile.userID
+                }
               });
           }
         });
@@ -1631,19 +1566,17 @@ class Show extends Component
   };
 
   changeStatusVal = e =>
-    this.setState({ statusVal: e.target.value }, async () =>
-    {
-      switch (this.state.statusVal)
-      {
-        case '':
+    this.setState({ statusVal: e.target.value }, async () => {
+      switch (this.state.statusVal) {
+        case "":
           break;
-        case 'c':
+        case "c":
           await this.addToCompleted();
           break;
-        case 'w':
+        case "w":
           await this.addToWatching();
           break;
-        case 'd':
+        case "d":
           await this.addToDropped();
           break;
         default:
@@ -1651,26 +1584,28 @@ class Show extends Component
       }
     });
 
-  render()
-  {
+  render() {
     const { classes, mir, theme } = this.props;
     const {
       data,
       loading,
+      playerActive,
       hue,
       hueVib,
+      hueVibN,
       similars,
       fav,
       eps,
       epError,
       menuEl,
       similars2,
+      status,
       lang,
       rVal,
       userlessREmail,
       showEpisodes,
       error,
-      statusVal,
+      statusVal
     } = this.state;
     const openMenu = Boolean(menuEl);
 
@@ -1681,8 +1616,8 @@ class Show extends Component
         id="more-menu"
         anchorEl={menuEl}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
+          vertical: "top",
+          horizontal: "left"
         }}
         MenuListProps={{ style: { padding: 0 } }}
         PaperProps={{ style: { background: hue } }}
@@ -1690,8 +1625,7 @@ class Show extends Component
         onClose={() => this.setState({ menuEl: null })}
       >
         <MenuItem
-          onClick={() =>
-{
+          onClick={() => {
             this.setState({ menuEl: null });
             this.reportError();
           }}
@@ -1707,7 +1641,6 @@ class Show extends Component
     );
 
     if (error)
-    {
       return (
         <div className={classes.frame}>
           <TitleHeader
@@ -1718,13 +1651,12 @@ class Show extends Component
           />
         </div>
       );
-    }
 
     return (
       <div className={classes.frame}>
         <LoadingIndicator loading={loading} />
         <div>
-          <TitleHeader color={hue !== '#111' ? hue : null} colortext={hueVib} />
+          <TitleHeader color={hue !== "#111" ? hue : null} colortext={hueVib} />
         </div>
         <Root id="previewFrame" className={classes.root}>
           {!loading && data && data.Media ? (
@@ -1740,7 +1672,7 @@ class Show extends Component
                 <Grid
                   item
                   xs={3}
-                  style={{ maxWidth: 300, margin: 'auto' }}
+                  style={{ maxWidth: 300, margin: "auto" }}
                   className={classes.leftSide}
                 >
                   <div
@@ -1748,9 +1680,9 @@ class Show extends Component
                     className={
                       mir && mir.play && mir.play.meta.id === data.Media.id
                         ? classes.artworkDisabled
-                        : data.Media.type.includes('MANGA')
+                        : data.Media.type.includes("MANGA")
                           ? classes.artwork
-                          : data.Media.status.includes('NOT_YET_RELEASED') ||
+                          : data.Media.status.includes("NOT_YET_RELEASED") ||
                             !eps
                             ? classes.artworkDisabled
                             : classes.artwork
@@ -1758,22 +1690,22 @@ class Show extends Component
                     onClick={
                       mir && mir.play && mir.play.meta.id === data.Media.id
                         ? null
-                        : data.Media.type.includes('MANGA')
+                        : data.Media.type.includes("MANGA")
                           ? null
-                          : data.Media.status.includes('NOT_YET_RELEASED') ||
+                          : data.Media.status.includes("NOT_YET_RELEASED") ||
                             !eps
                             ? null
                             : this.play
                     }
                     style={{
-                      pointerEvents: data.Media.type.includes('MANGA')
-                        ? 'none'
-                        : null,
+                      pointerEvents: data.Media.type.includes("MANGA")
+                        ? "none"
+                        : null
                     }}
                     onMouseOver={e =>
-                      (data.Media.type.includes('MANGA')
+                      data.Media.type.includes("MANGA")
                         ? null
-                        : (e.currentTarget.style.background = hue))
+                        : (e.currentTarget.style.background = hue)
                     }
                   >
                     <img
@@ -1786,7 +1718,7 @@ class Show extends Component
                     <CircularProgress
                       className={classes.loadingArtwork}
                       style={
-                        data.Media.type.includes('MANGA')
+                        data.Media.type.includes("MANGA")
                           ? { opacity: 0 }
                           : eps
                             ? { opacity: 0 }
@@ -1796,11 +1728,11 @@ class Show extends Component
                     <Typography className="artworktitle" variant="display1">
                       {mir && mir.play && mir.play.meta.id === data.Media.id ? (
                         lang.show.playing
-                      ) : data.Media.status.includes('NOT_YET_RELEASED') ? (
-                        'TBA'
-                      ) : data.Media.type.includes('MANGA') ? null : eps ? (
+                      ) : data.Media.status.includes("NOT_YET_RELEASED") ? (
+                        "TBA"
+                      ) : data.Media.type.includes("MANGA") ? null : eps ? (
                         <Button
-                          variant="fab"
+                          variant={"fab"}
                           style={{ background: hue }}
                           className={classes.playArtworkButtonContainer}
                         >
@@ -1814,15 +1746,15 @@ class Show extends Component
                     </Typography>
                   </div>
                   {!isEmpty(user) &&
-                  data.Media.type.includes('ANIME') &&
-                  !data.Media.status.includes('NOT_YET_RELEASED') &&
+                  data.Media.type.includes("ANIME") &&
+                  !data.Media.status.includes("NOT_YET_RELEASED") &&
                   eps &&
                   !epError ? (
                     <Button
                       variant="raised"
                       color="primary"
                       className={classes.streamButton}
-                      style={{ background: hue, color: 'white' }}
+                      style={{ background: hue, color: "white" }}
                       onClick={this.stream}
                     >
                       {lang.show.livestreamButton}
@@ -1831,13 +1763,13 @@ class Show extends Component
                 </Grid>
                 <Grid item xs className={classes.mainFrame}>
                   <div className={classes.smallTitlebar}>
-                    {data.Media.type.includes('ANIME') ? (
+                    {data.Media.type.includes("ANIME") ? (
                       <Typography
                         className={classes.smallTitle}
                         variant="display2"
                       >
-                        {data.Media.title.native}{' '}
-                        {`• ${data.Media.startDate.year}`}{' '}
+                        {data.Media.title.native}{" "}
+                        {`• ${data.Media.startDate.year}`}{" "}
                         {`• ${Math.floor(data.Media.duration / 60)} h ${data
                           .Media.duration % 60} min`}
                       </Typography>
@@ -1846,8 +1778,8 @@ class Show extends Component
                         className={classes.smallTitle}
                         variant="display2"
                       >
-                        {data.Media.title.native}{' '}
-                        {!data.Media.status.includes('RELEASING')
+                        {data.Media.title.native}{" "}
+                        {!data.Media.status.includes("RELEASING")
                           ? `• ${data.Media.startDate.year}` +
                             `• ${data.Media.chapters} ${
                               lang.show.chapters
@@ -1858,16 +1790,16 @@ class Show extends Component
                     <div style={{ flex: 1 }} />
                     <Typography
                       className={classes.smallTitle}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: "pointer" }}
                       onClick={() => window.open(data.Media.siteUrl)}
                       variant="display2"
                     >
                       {lang.show.provider}
                     </Typography>
                   </div>
-                  <div style={{ display: 'flex', width: '100%' }}>
+                  <div style={{ display: "flex", width: "100%" }}>
                     <Typography
-                      style={{ margin: 'auto' }}
+                      style={{ margin: "auto" }}
                       className={classes.bigTitle}
                       variant="display3"
                     >
@@ -1875,7 +1807,7 @@ class Show extends Component
                     </Typography>
                     <div style={{ flex: 1 }} />
                     <Tooltip
-                      style={{ margin: 'auto' }}
+                      style={{ margin: "auto" }}
                       title={lang.show.episodeTooltip}
                     >
                       <Typography
@@ -1883,11 +1815,13 @@ class Show extends Component
                         variant="display1"
                       >
                         {data.Media.status
-                          .replace('RELEASING', 'ONGOING')
-                          .replace(/_/gi, ' ')}{' '}
+                          .replace("RELEASING", "ONGOING")
+                          .replace(/_/gi, " ")}{" "}
                         {data.Media.type} <br />
                         {data.Media.nextAiringEpisode
-                          ? `${timeFormatter(data.Media.nextAiringEpisode.timeUntilAiring)} ${lang.show.episodeWhen} ${
+                          ? `${timeFormatter(
+                              data.Media.nextAiringEpisode.timeUntilAiring
+                            )} ${lang.show.episodeWhen} ${
                               data.Media.nextAiringEpisode.episode
                             } ${lang.show.arrives}`
                           : null}
@@ -1895,48 +1829,62 @@ class Show extends Component
                     </Tooltip>
                   </div>
                   {data.Media.synonyms && data.Media.synonyms.length > 0 ? (
-                    <div style={{ display: 'flex', width: '100%' }}>
+                    <div style={{ display: "flex", width: "100%" }}>
                       <Typography
                         style={{ marginTop: -2 }}
                         className={classes.smallTitle}
                         variant="display1"
                       >
                         {`${lang.show.alsoKnownAs} `}
-                        {data.Media.synonyms.map(s => s).join(', ')}
+                        {data.Media.synonyms.map(s => s).join(", ")}
                       </Typography>
                     </div>
                   ) : null}
-                  <div style={{ display: 'flex', width: '100%' }}>
-                    <div style={{ margin: 'auto' }}>
-                      <div style={{ display: 'flex' }}>
+                  <div style={{ display: "flex", width: "100%" }}>
+                    <div style={{ margin: "auto" }}>
+                      <div style={{ display: "flex" }}>
                         {data.Media.staff &&
-                        data.Media.staff.edges.filter(s => s.role === 'Director')[0] ? (
+                        data.Media.staff.edges.filter(
+                          s => s.role === "Director"
+                        )[0] ? (
                           <Typography className={classes.boldD} variant="body1">
                             {lang.show.director}
                           </Typography>
                         ) : null}
                         {data.Media.staff &&
-                        data.Media.staff.edges.filter(s => s.role === 'Director')[0] ? (
+                        data.Media.staff.edges.filter(
+                          s => s.role === "Director"
+                        )[0] ? (
                           <Typography
                             className={classes.smallD}
                             variant="body1"
                           >
                             {
-                              data.Media.staff.edges.filter(s => s.role === 'Director')[0].node.name.first
-                            }{' '}
-                            {data.Media.staff.edges.filter(s => s.role === 'Director')[0].node.name.last
-                              ? data.Media.staff.edges.filter(s => s.role === 'Director')[0].node.name.last
+                              data.Media.staff.edges.filter(
+                                s => s.role === "Director"
+                              )[0].node.name.first
+                            }{" "}
+                            {data.Media.staff.edges.filter(
+                              s => s.role === "Director"
+                            )[0].node.name.last
+                              ? data.Media.staff.edges.filter(
+                                  s => s.role === "Director"
+                                )[0].node.name.last
                               : null}
                           </Typography>
                         ) : null}
                         {data.Media.staff &&
-                        data.Media.staff.edges.filter(s => s.role === 'Original Creator')[0] ? (
+                        data.Media.staff.edges.filter(
+                          s => s.role === "Original Creator"
+                        )[0] ? (
                           <div className={classes.sepD}>
                             <Typography
                               className={classes.boldD}
                               variant="body1"
                             >
-                              {data.Media.staff.edges.filter(s => s.role === 'Director')[0]
+                              {data.Media.staff.edges.filter(
+                                s => s.role === "Director"
+                              )[0]
                                 ? lang.show.author
                                 : lang.show.authorProper}
                             </Typography>
@@ -1945,10 +1893,16 @@ class Show extends Component
                               variant="body1"
                             >
                               {
-                                data.Media.staff.edges.filter(s => s.role === 'Original Creator')[0].node.name.first
-                              }{' '}
-                              {data.Media.staff.edges.filter(s => s.role === 'Original Creator')[0].node.name.last
-                                ? data.Media.staff.edges.filter(s => s.role === 'Original Creator')[0].node.name.last
+                                data.Media.staff.edges.filter(
+                                  s => s.role === "Original Creator"
+                                )[0].node.name.first
+                              }{" "}
+                              {data.Media.staff.edges.filter(
+                                s => s.role === "Original Creator"
+                              )[0].node.name.last
+                                ? data.Media.staff.edges.filter(
+                                    s => s.role === "Original Creator"
+                                  )[0].node.name.last
                                 : null}
                             </Typography>
                           </div>
@@ -1959,11 +1913,11 @@ class Show extends Component
                     <div className={classes.genreRow}>
                       {data.Media.genres
                         ? data.Media.genres.map((o, index) => (
-                          <Chip
-                            className={classes.tagChip}
-                            key={index}
-                            label={o}
-                          />
+                            <Chip
+                              className={classes.tagChip}
+                              key={index}
+                              label={o}
+                            />
                           ))
                         : null}
                     </div>
@@ -2000,7 +1954,7 @@ class Show extends Component
                             variant="body1"
                             className={classes.commandoTextLabelRow}
                           >
-                            {ran.context} {ran.format.replace(/_/gi, ' ')}{' '}
+                            {ran.context} {ran.format.replace(/_/gi, " ")}{" "}
                             {ran.season} {ran.year}
                           </Typography>
                         </Paper>
@@ -2016,7 +1970,7 @@ class Show extends Component
                       style={{
                         maxHeight: showEpisodes ? 500 : 0,
                         opacity: showEpisodes ? 1 : 0,
-                        padding: showEpisodes ? 24 : 0,
+                        padding: showEpisodes ? 24 : 0
                       }}
                     >
                       <Column>
@@ -2041,7 +1995,7 @@ class Show extends Component
                                     user.episodeProgress[data.Media.id] &&
                                     user.episodeProgress[data.Media.id].ep
                                       ? classes.epCardActive
-                                      : null,
+                                      : null
                                   )}
                                   key={index}
                                   label={ep.ep}
@@ -2055,8 +2009,8 @@ class Show extends Component
                 ) : null}
                 <CommandoBar
                   style={{
-                    borderTop: '1px solid rgba(255,255,255,.1',
-                    borderBottom: 'none',
+                    borderTop: "1px solid rgba(255,255,255,.1",
+                    borderBottom: "none"
                   }}
                 >
                   {data.Media.averageScore ? (
@@ -2092,18 +2046,20 @@ class Show extends Component
                       </Typography>
                     </div>
                   ) : null}
-                  {data.Media.type.includes('MANGA') ||
+                  {data.Media.type.includes("MANGA") ||
                   !data.Media.season ? null : (
                     <Button
                       style={{
-                        textTransform: 'initial',
-                        display: 'flex',
-                        flexDirection: 'column',
+                        textTransform: "initial",
+                        display: "flex",
+                        flexDirection: "column"
                       }}
                       onClick={() =>
-                        window.open(`http://anichart.net/${`${data.Media.season.toLowerCase()}-${
+                        window.open(
+                          `http://anichart.net/${`${data.Media.season.toLowerCase()}-${
                             data.Media.startDate.year
-                          }`}`)
+                          }`}`
+                        )
                       }
                       className={classes.commandoTextBox}
                     >
@@ -2116,9 +2072,9 @@ class Show extends Component
                       </Typography>
                     </Button>
                   )}
-                  {data.Media.type.includes('MANGA') ||
-                  data.Media.format.includes('ONA') ||
-                  data.Media.format.includes('OVA') ? null : !eps &&
+                  {data.Media.type.includes("MANGA") ||
+                  data.Media.format.includes("ONA") ||
+                  data.Media.format.includes("OVA") ? null : !eps &&
                   !epError ? (
                     <CircularProgress
                       style={{ color: hueVib }}
@@ -2128,7 +2084,7 @@ class Show extends Component
                     <FadeIn>
                       <div className={classes.commandoTextBox}>
                         <div
-                          style={{ color: 'white', lineHeight: 0 }}
+                          style={{ color: "white", lineHeight: 0 }}
                           className={classes.commandoText}
                         >
                           <Icon.ErrorOutline />
@@ -2148,7 +2104,7 @@ class Show extends Component
                           variant="title"
                           className={classes.commandoText}
                         >
-                          {eps ? eps.length : '...'}
+                          {eps ? eps.length : "..."}
                         </Typography>
                         <Typography
                           variant="body1"
@@ -2168,12 +2124,12 @@ class Show extends Component
                         variant="title"
                         className={classes.progressTitle}
                       >
-                        Episode {user.episodeProgress[data.Media.id].ep}{' '}
+                        Episode {user.episodeProgress[data.Media.id].ep}{" "}
                         {eps &&
                         eps[user.episodeProgress[data.Media.id].ep - 1].canon
-                          ? ` • ${
+                          ? " • " +
                             eps[user.episodeProgress[data.Media.id].ep - 1]
-                              .canon}`
+                              .canon
                           : null}
                       </Typography>
                       <LinearProgress
@@ -2181,14 +2137,14 @@ class Show extends Component
                         value={user.episodeProgress[data.Media.id].played * 100}
                         classes={{
                           colorPrimary: classes.progressBar,
-                          barColorPrimary: classes.progressBarActive,
+                          barColorPrimary: classes.progressBarActive
                         }}
                       />
                       <Typography
                         variant="body1"
                         className={classes.commandoTextLabel}
                       >
-                        {statusVal.includes('c')
+                        {statusVal.includes("c")
                           ? lang.show.rewatchprogress
                           : lang.show.progress}
                       </Typography>
@@ -2199,10 +2155,12 @@ class Show extends Component
                     <Button
                       color="default"
                       onClick={() =>
-                        window.open(`https://twitter.com/hashtag/${data.Media.hashtag.replace(
-                            '#',
-                            '',
-                          )}`)
+                        window.open(
+                          `https://twitter.com/hashtag/${data.Media.hashtag.replace(
+                            "#",
+                            ""
+                          )}`
+                        )
                       }
                     >
                       <svg
@@ -2213,14 +2171,32 @@ class Show extends Component
                           fill="#FFFFFF"
                           d="M22.46,6C21.69,6.35 20.86,6.58 20,6.69C20.88,6.16 21.56,5.32 21.88,4.31C21.05,4.81 20.13,5.16 19.16,5.36C18.37,4.5 17.26,4 16,4C13.65,4 11.73,5.92 11.73,8.29C11.73,8.63 11.77,8.96 11.84,9.27C8.28,9.09 5.11,7.38 3,4.79C2.63,5.42 2.42,6.16 2.42,6.94C2.42,8.43 3.17,9.75 4.33,10.5C3.62,10.5 2.96,10.3 2.38,10C2.38,10 2.38,10 2.38,10.03C2.38,12.11 3.86,13.85 5.82,14.24C5.46,14.34 5.08,14.39 4.69,14.39C4.42,14.39 4.15,14.36 3.89,14.31C4.43,16 6,17.26 7.89,17.29C6.43,18.45 4.58,19.13 2.56,19.13C2.22,19.13 1.88,19.11 1.54,19.07C3.44,20.29 5.7,21 8.12,21C16,21 20.33,14.46 20.33,8.79C20.33,8.6 20.33,8.42 20.32,8.23C21.16,7.63 21.88,6.87 22.46,6Z"
                         />
-                      </svg>{' '}
+                      </svg>{" "}
                       {data.Media.hashtag}
                     </Button>
                   ) : null}
+                  {/*!isEmpty(user) ? (
+										<FormControl className={classes.selectForm}>
+											<InputLabel htmlFor="status">Status</InputLabel>
+											<Select
+												value={status}
+												onChange={this.handleStatus}
+												inputProps={{
+													name: 'status',
+													id: 'status',
+												}}
+											>
+												<MenuItem value={''}>None</MenuItem>
+												<MenuItem value={'Dropped'}>Dropped</MenuItem>
+												<MenuItem value={'Completed'}>Completed</MenuItem>
+												<MenuItem value={'Active'}>Active</MenuItem>
+											</Select>
+										</FormControl>
+									) : null*/}
                   {!isEmpty(user) ? (
                     <Tooltip
                       title={
-                        data.Media.type.includes('ANIME')
+                        data.Media.type.includes("ANIME")
                           ? user.recommends &&
                             user.recommends.show &&
                             user.recommends.show[this.state.id]
@@ -2237,7 +2213,7 @@ class Show extends Component
                         className={classes.commandoButton}
                         color="default"
                         onClick={
-                          data.Media.type.includes('ANIME')
+                          data.Media.type.includes("ANIME")
                             ? user.recommends &&
                               user.recommends.show &&
                               user.recommends.show[this.state.id]
@@ -2250,7 +2226,7 @@ class Show extends Component
                               : this.RecommendThis
                         }
                       >
-                        {data.Media.type.includes('ANIME') ? (
+                        {data.Media.type.includes("ANIME") ? (
                           user.recommends &&
                           user.recommends.show &&
                           user.recommends.show[this.state.id] ? (
@@ -2271,7 +2247,7 @@ class Show extends Component
                   {!isEmpty(user) ? (
                     <Tooltip
                       title={
-                        data.Media.type.includes('ANIME')
+                        data.Media.type.includes("ANIME")
                           ? user.later &&
                             user.later.show &&
                             user.later.show[this.state.id]
@@ -2288,7 +2264,7 @@ class Show extends Component
                         className={classes.commandoButton}
                         color="default"
                         onClick={
-                          data.Media.type.includes('ANIME')
+                          data.Media.type.includes("ANIME")
                             ? user.later &&
                               user.later.show &&
                               user.later.show[this.state.id]
@@ -2301,7 +2277,7 @@ class Show extends Component
                               : this.addToLater
                         }
                       >
-                        {data.Media.type.includes('ANIME') ? (
+                        {data.Media.type.includes("ANIME") ? (
                           user.later &&
                           user.later.show &&
                           user.later.show[this.state.id] ? (
@@ -2327,7 +2303,7 @@ class Show extends Component
                         className={classes.commandoButton}
                         color="default"
                         onClick={
-                          data.Media.type.includes('ANIME')
+                          data.Media.type.includes("ANIME")
                             ? user.favs &&
                               user.favs.show &&
                               user.favs.show[this.state.id]
@@ -2346,7 +2322,7 @@ class Show extends Component
                   ) : null}
                   {isEmpty(user) ? null : (
                     <IconButton
-                      aria-owns={openMenu ? 'more-menu' : null}
+                      aria-owns={openMenu ? "more-menu" : null}
                       aria-haspopup="true"
                       onClick={e => this.setState({ menuEl: e.currentTarget })}
                       color="default"
@@ -2360,7 +2336,9 @@ class Show extends Component
                     aria-describedby="reports"
                     open={this.state.reportModal}
                     onClose={() => this.setState({ reportModal: false })}
-                    title={`${lang.show.reportModal.title} ${data.Media.title.romaji} ${lang.show.reportModal.errors}`}
+                    title={`${lang.show.reportModal.title}
+												${data.Media.title.romaji}
+												${lang.show.reportModal.errors}`}
                   >
                     <form autoComplete="off">
                       <FormControl fullWidth>
@@ -2371,8 +2349,8 @@ class Show extends Component
                           value={rVal}
                           onChange={this.changerVal}
                           inputProps={{
-                            name: 'rval',
-                            id: 'rVal',
+                            name: "rval",
+                            id: "rVal"
                           }}
                         >
                           <MenuItem value="">
@@ -2386,18 +2364,18 @@ class Show extends Component
                         </Select>
                       </FormControl>
                     </form>
-                    {rVal !== '' ? (
+                    {rVal !== "" ? (
                       <Column>
                         {!isEmpty(user) ? (
-                          rVal === 'm' ? (
+                          rVal === "m" ? (
                             <Button onClick={this.rSendMReport}>
                               Send using Mirai Account
                             </Button>
-                          ) : rVal === 'w' ? (
+                          ) : rVal === "w" ? (
                             <Button onClick={this.rSendWReport}>
                               Send using Mirai Account
                             </Button>
-                          ) : rVal === 'd' ? (
+                          ) : rVal === "d" ? (
                             <Button onClick={this.rSendDReport}>
                               Send using Mirai Account
                             </Button>
@@ -2413,19 +2391,19 @@ class Show extends Component
                                 value={userlessREmail}
                                 onChange={e =>
                                   this.setState({
-                                    userlessREmail: e.target.value,
+                                    userlessREmail: e.target.value
                                   })
                                 }
                               />
-                              {rVal === 'm' ? (
+                              {rVal === "m" ? (
                                 <Button onClick={this.rSendMReport}>
                                   Send
                                 </Button>
-                              ) : rVal === 'w' ? (
+                              ) : rVal === "w" ? (
                                 <Button onClick={this.rSendWReport}>
                                   Send
                                 </Button>
-                              ) : rVal === 'd' ? (
+                              ) : rVal === "d" ? (
                                 <Button onClick={this.rSendDReport}>
                                   Send
                                 </Button>
@@ -2438,7 +2416,7 @@ class Show extends Component
                   </Dialogue>
                 </CommandoBar>
                 <CommandoBar>
-                  {!data.Media.status.includes('NOT_YET_RELEASED') ? (
+                  {!data.Media.status.includes("NOT_YET_RELEASED") ? (
                     <div className={classes.commandoTextBox}>
                       <Typography
                         variant="title"
@@ -2446,27 +2424,35 @@ class Show extends Component
                       >
                         {`${data.Media.startDate.day}. ${moment(
                           data.Media.startDate.month,
-                          'MM',
-                        ).format('MMMM')} ${data.Media.startDate.year}`}
+                          "MM"
+                        ).format("MMMM")} ${data.Media.startDate.year}`}
                       </Typography>
                       <Typography
                         variant="body1"
                         className={classes.commandoTextLabel}
                       >
-                        {data.Media.type.includes('ANIME') &&
-                        data.Media.format.includes('TV')
+                        {data.Media.type.includes("ANIME") &&
+                        data.Media.format.includes("TV")
                           ? lang.show.airingstart
-                          : data.Media.format.includes('MOVIE')
+                          : data.Media.format.includes("MOVIE")
                             ? lang.show.releasedate
-                            : data.Media.format.includes('ONA')
+                            : data.Media.format.includes("ONA")
                               ? lang.show.releasedate
-                              : data.Media.format.includes('OVA')
+                              : data.Media.format.includes("OVA")
                                 ? lang.show.airingstart
                                 : lang.show.publishstart}
                       </Typography>
                     </div>
                   ) : null}
-                  {data.Media.format.includes('MOVIE') ? null : data.Media.format.includes('OVA') ? null : data.Media.format.includes('ONA') ? null : data.Media.status.includes('NOT_YET_RELEASED') ? null : !data.Media.status.includes('RELEASING') &&
+                  {data.Media.format.includes(
+                    "MOVIE"
+                  ) ? null : data.Media.format.includes(
+                    "OVA"
+                  ) ? null : data.Media.format.includes(
+                    "ONA"
+                  ) ? null : data.Media.status.includes(
+                    "NOT_YET_RELEASED"
+                  ) ? null : !data.Media.status.includes("RELEASING") &&
                   data.Media.endDate ? (
                     <div className={classes.commandoTextBox}>
                       <Typography
@@ -2475,14 +2461,14 @@ class Show extends Component
                       >
                         {`${data.Media.endDate.day}. ${moment(
                           data.Media.endDate.month,
-                          'MM',
-                        ).format('MMMM')} ${data.Media.endDate.year}`}
+                          "MM"
+                        ).format("MMMM")} ${data.Media.endDate.year}`}
                       </Typography>
                       <Typography
                         variant="body1"
                         className={classes.commandoTextLabel}
                       >
-                        {data.Media.type.includes('ANIME')
+                        {data.Media.type.includes("ANIME")
                           ? lang.show.airingended
                           : lang.show.publishended}
                       </Typography>
@@ -2513,21 +2499,23 @@ class Show extends Component
                           value={statusVal}
                           onChange={this.changeStatusVal}
                           inputProps={{
-                            name: 'statval',
-                            id: 'statusVal',
+                            name: "statval",
+                            id: "statusVal"
                           }}
                         >
                           <MenuItem value="" />
                           <MenuItem
                             disabled={
-                              statusVal.includes('c')
+                              statusVal.includes("c")
                                 ? true
-                                : !(user.episodeProgress &&
-                                  user.episodeProgress[data.Media.id])
+                                : user.episodeProgress &&
+                                  user.episodeProgress[data.Media.id]
+                                  ? false
+                                  : true
                             }
                             value="w"
                           >
-                            {data.Media.type.includes('MANGA')
+                            {data.Media.type.includes("MANGA")
                               ? lang.show.status.reading
                               : lang.show.status.watching}
                           </MenuItem>
@@ -2536,17 +2524,19 @@ class Show extends Component
                           </MenuItem>
                           <MenuItem
                             disabled={
-                              !!(this.props.profile.completed &&
+                              this.props.profile.completed &&
                               this.props.profile.completed[
-                                data.Media.type.includes('ANIME')
-                                  ? 'show'
-                                  : 'manga'
+                                data.Media.type.includes("ANIME")
+                                  ? "show"
+                                  : "manga"
                               ] &&
                               this.props.profile.completed[
-                                data.Media.type.includes('ANIME')
-                                  ? 'show'
-                                  : 'manga'
-                              ][data.Media.id])
+                                data.Media.type.includes("ANIME")
+                                  ? "show"
+                                  : "manga"
+                              ][data.Media.id]
+                                ? true
+                                : false
                             }
                             value="d"
                           >
@@ -2563,7 +2553,7 @@ class Show extends Component
                     data.Media.characters.edges.length > 0 ? (
                       <SectionTitle
                         title={
-                          data.Media.type.includes('ANIME')
+                          data.Media.type.includes("ANIME")
                             ? lang.show.cast
                             : lang.show.char
                         }
@@ -2576,22 +2566,30 @@ class Show extends Component
                           <PeopleButton
                             key={index}
                             onClick={() =>
-                              this.props.history.push(`/fig?${
+                              this.props.history.push(
+                                `/fig?${
                                   cast.voiceActors &&
                                   cast.voiceActors.length > 0
-                                    ? 's'
-                                    : 'c'
+                                    ? "s"
+                                    : "c"
                                 }=${
                                   cast.voiceActors &&
                                   cast.voiceActors.length > 0
-                                    ? cast.voiceActors.filter(j => j.language === 'JAPANESE')[0].id
+                                    ? cast.voiceActors.filter(
+                                        j => j.language === "JAPANESE"
+                                      )[0].id
                                     : cast.node.id
-                                }`)
+                                }`
+                              )
                             }
                             image={
                               cast.voiceActors && cast.voiceActors.length > 0
-                                ? cast.voiceActors.filter(j => j.language === 'JAPANESE')[0]
-                                  ? cast.voiceActors.filter(j => j.language === 'JAPANESE')[0].image.large
+                                ? cast.voiceActors.filter(
+                                    j => j.language === "JAPANESE"
+                                  )[0]
+                                  ? cast.voiceActors.filter(
+                                      j => j.language === "JAPANESE"
+                                    )[0].image.large
                                   : null
                                 : cast.node.image.large
                             }
@@ -2608,7 +2606,7 @@ class Show extends Component
                               last:
                                 cast.voiceActors && cast.voiceActors.length > 0
                                   ? cast.voiceActors[0].name.last
-                                  : cast.node.name.last,
+                                  : cast.node.name.last
                             }}
                             charImg={cast.node.image.large}
                             charOnClick={() =>
@@ -2647,7 +2645,7 @@ class Show extends Component
                             image={staff.node.image.medium}
                             name={{
                               first: staff.node.name.first,
-                              last: staff.node.name.last,
+                              last: staff.node.name.last
                             }}
                             role={staff.role}
                             onClick={() =>
@@ -2667,11 +2665,13 @@ class Show extends Component
                             title={anime.node.title.romaji}
                             subtitle={`${
                               anime.node.type
-                            } ${anime.relationType.replace(/_/gi, ' ')}`}
+                            } ${anime.relationType.replace(/_/gi, " ")}`}
                             onClick={() =>
-                              this.openEntity(`/show?${
-                                  anime.node.type.includes('ANIME') ? 's' : 'm'
-                                }=${anime.node.id}`)
+                              this.openEntity(
+                                `/show?${
+                                  anime.node.type.includes("ANIME") ? "s" : "m"
+                                }=${anime.node.id}`
+                              )
                             }
                           />
                         ))}
@@ -2683,7 +2683,7 @@ class Show extends Component
                         this.props.mir.twist &&
                         TwistFilter(
                           similars.data.Page.media,
-                          this.props.mir.twist,
+                          this.props.mir.twist
                         )
                           .filter(a => a.id !== data.Media.id)
                           .splice(0, 8)
@@ -2694,9 +2694,11 @@ class Show extends Component
                               title={anime.title.romaji}
                               subtitle="SIMILAR"
                               onClick={() =>
-                                this.openEntity(`/show?${
-                                    anime.type.includes('ANIME') ? 's' : 'm'
-                                  }=${anime.id}`)
+                                this.openEntity(
+                                  `/show?${
+                                    anime.type.includes("ANIME") ? "s" : "m"
+                                  }=${anime.id}`
+                                )
                               }
                             />
                           ))}
@@ -2708,7 +2710,7 @@ class Show extends Component
                         this.props.mir.twist &&
                         TwistFilter(
                           similars2.data.Page.media,
-                          this.props.mir.twist,
+                          this.props.mir.twist
                         )
                           .filter(a => a.id !== data.Media.id)
                           .splice(0, 8)
@@ -2719,9 +2721,11 @@ class Show extends Component
                               title={anime.title.romaji}
                               subtitle="SIMILAR"
                               onClick={() =>
-                                this.openEntity(`/show?${
-                                    anime.type.includes('ANIME') ? 's' : 'm'
-                                  }=${anime.id}`)
+                                this.openEntity(
+                                  `/show?${
+                                    anime.type.includes("ANIME") ? "s" : "m"
+                                  }=${anime.id}`
+                                )
                               }
                             />
                           ))}
@@ -2738,17 +2742,21 @@ class Show extends Component
 }
 export const updateMirTitle = title => ({
   type: MIR_SET_TITLE,
-  title,
+  title
 });
 
 export const loadPlayer = play => ({
   type: MIR_PLAY_SHOW,
-  play,
+  play
 });
 
 const mapPTS = dispatch => ({
   sendTitleToMir: title => dispatch(updateMirTitle(title)),
-  sendDataToMir: async play => dispatch(loadPlayer(play)),
+  sendDataToMir: async play => dispatch(loadPlayer(play))
 });
 
-export default firebaseConnect()(connect(({ firebase: { profile }, mir }) => ({ profile, mir }), mapPTS)(withStyles(styles, { withTheme: true })(Show)));
+export default firebaseConnect()(
+  connect(({ firebase: { profile }, mir }) => ({ profile, mir }), mapPTS)(
+    withStyles(styles, { withTheme: true })(Show)
+  )
+);

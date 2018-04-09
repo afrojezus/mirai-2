@@ -1,68 +1,72 @@
 // TODO: Fix every single eslint-airbnb issue
-import React, { Component } from 'react';
-import { withStyles } from 'material-ui/styles';
-import { connect } from 'react-redux';
-import { firebaseConnect, isEmpty } from 'react-redux-firebase';
-import Typography from 'material-ui/Typography/Typography';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import checklang from "../checklang";
+import strings from "../strings";
+import { withStyles } from "material-ui/styles";
+import { connect } from "react-redux";
+import { firebaseConnect, isEmpty, firebase } from "react-redux-firebase";
+import Typography from "material-ui/Typography/Typography";
+import { history } from "../store";
 import {
   Root,
+  CommandoBar,
   Container,
   LoadingIndicator,
   TitleHeader,
-  Header,
-} from '../components/layouts';
-import Supertable from '../components/supertable';
-import { scrollFix } from '../utils/scrollFix';
-
-import checklang from '../checklang';
-import strings from '../strings.json';
+  Header
+} from "../components/layouts";
+import Supertable from "../components/supertable";
+import { scrollFix } from "../utils/scrollFix";
 
 const style = theme => ({
   column: {
-    display: 'flex',
-    flexFlow: 'column wrap',
+    display: "flex",
+    flexFlow: "column wrap",
     marginBottom: theme.spacing.unit,
-    width: '100%',
+    width: "100%"
   },
   noneMessage: {
     paddingTop: theme.spacing.unit * 3,
     paddingBottom: theme.spacing.unit * 3,
-    color: 'rgba(255,255,255,.8)',
+    color: "rgba(255,255,255,.8)"
   },
   categoryTitle: {
-    fontWeight: 700,
-  },
+    fontWeight: 700
+  }
 });
 
-class Later extends Component
-{
+class Later extends Component {
   state = {
     loading: true,
-    lang: strings.enus,
+    lang: strings.enus
   };
 
-  componentWillMount = () =>
-  {
+  componentWillMount = () => {
     checklang(this);
     scrollFix();
     this.getColors();
   };
 
-  componentDidMount = () => this.setState({ loading: false });
-
-  getColors = () =>
-  {
-    const hue = localStorage.getItem('user-hue');
-    if (hue)
-    {
-      const hues = JSON.parse(hue);
+  getColors = () => {
+    const hue = localStorage.getItem("user-hue");
+    if (hue) {
+      let hues = JSON.parse(hue);
       return this.setState({
         hue: hues.hue,
         hueVib: hues.hueVib,
-        hueVibN: hues.hueVibN,
+        hueVibN: hues.hueVibN
       });
+    } else {
+      return null;
     }
-    return null;
+  };
+
+  componentDidMount = () => this.setState({ loading: false });
+
+  componentWillReceiveProps = nextProps => {
+    if (this.props.profile !== nextProps.profile) {
+    }
   };
 
   userprops = {
@@ -77,7 +81,7 @@ class Later extends Component
       this.props.profile.later &&
       this.props.profile.later.manga
         ? Object.values(this.props.profile.later.manga)
-        : null,
+        : null
   };
 
   render = () => (
@@ -86,7 +90,7 @@ class Later extends Component
       <Root>
         <TitleHeader
           title={this.state.lang.later.later}
-          color={this.state.hue ? this.state.hue : '#000'}
+          color={this.state.hue ? this.state.hue : "#000"}
         />
         <Header color={this.state.hue ? this.state.hue : null} />
         <Container hasHeader>
@@ -140,4 +144,8 @@ class Later extends Component
   );
 }
 
-export default firebaseConnect()(connect(({ firebase: { profile } }) => ({ profile }))(withStyles(style)(Later)));
+export default firebaseConnect()(
+  connect(({ firebase: { profile } }) => ({ profile }))(
+    withStyles(style)(Later)
+  )
+);

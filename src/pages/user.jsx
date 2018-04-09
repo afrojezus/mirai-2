@@ -1,497 +1,500 @@
-import * as M from 'material-ui';
-import * as Icon from 'material-ui-icons';
-import queryString from 'query-string';
-import Component, { React } from 'react';
-import Divider from 'material-ui/Divider';
-import moment from 'moment';
-import { connect } from 'react-redux';
-import { firebaseConnect, isEmpty } from 'react-redux-firebase';
+import React, { Component } from "react";
+import * as M from "material-ui";
+import * as Icon from "material-ui-icons";
+import localForage from "localforage";
+import queryString from "query-string";
+import Colorizer from "../utils/colorizer";
+import SwipableViews from "react-swipeable-views";
+import strings from "../strings.json";
+import checklang from "../checklang";
 // import { virtualize } from 'react-swipeable-views-utils';
-import CardButton, { PeopleButton } from '../components/cardButton';
-import { Feed } from '../components/feed';
+import moment from "moment";
+import { connect } from "react-redux";
+import { firebaseConnect, isEmpty } from "react-redux-firebase";
+import CardButton, { PeopleButton } from "../components/cardButton";
 import {
-  Column,
   CommandoBar,
-  Container,
   Header,
-  ItemContainer,
-  LoadingIndicator,
-  MainCard,
   Root,
-  SectionTitle,
+  Container,
+  LoadingIndicator,
   TitleHeader,
-} from '../components/layouts';
-import { scrollFix } from './../utils/scrollFix';
-import checklang from '../checklang';
-import strings from '../strings.json';
+  MainCard,
+  Column,
+  ItemContainer,
+  SectionTitle
+} from "../components/layouts";
+import { Feed } from "../components/feed";
+import Hidden from "material-ui/Hidden";
+import { scrollFix } from "./../utils/scrollFix";
+import Divider from "material-ui/Divider";
 
 // const VirtualizedSwipableViews = virtualize(SwipableViews);
 
 const style = theme => ({
   root: {
-    height: '100%',
-    width: '100%',
-    position: 'relative',
-    transition: theme.transitions.create(['all']),
+    height: "100%",
+    width: "100%",
+    position: "relative",
+    transition: theme.transitions.create(["all"])
   },
   bgImage: {
-    position: 'fixed',
+    position: "fixed",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     opacity: 0.4,
-    height: '100vh',
-    objectFit: 'cover',
-    width: '100%',
-    zIndex: -1,
+    height: "100vh",
+    objectFit: "cover",
+    width: "100%",
+    zIndex: -1
   },
   content: {
     paddingTop: theme.spacing.unit * 8,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    maxWidth: 1600,
+    marginLeft: "auto",
+    marginRight: "auto",
+    maxWidth: 1600
   },
   header: {
-    position: 'relative',
-    margin: 'auto',
-    paddingTop: theme.spacing.unit * 3,
+    position: "relative",
+    margin: "auto",
+    paddingTop: theme.spacing.unit * 3
   },
   title: {
-    color: 'white',
+    color: "white",
     fontSize: 64,
     fontWeight: 700,
-    textShadow: '0 3px 16px rgba(0,0,0,.4)',
+    textShadow: "0 3px 16px rgba(0,0,0,.4)",
     padding: theme.spacing.unit,
-    textAlign: 'center',
-    margin: 'auto',
+    textAlign: "center",
+    margin: "auto"
   },
   icon: {
-    boxShadow: '0 1px 12px rgba(0,0,0,.2)',
-    color: 'white',
+    boxShadow: "0 1px 12px rgba(0,0,0,.2)",
+    color: "white",
     height: 92,
     width: 92,
     zIndex: -1,
-    background: 'linear-gradient(to top, #9900ff 0%, #ff00ff 70%)',
-    borderRadius: '50%',
-    padding: theme.spacing.unit * 2,
+    background: "linear-gradient(to top, #9900ff 0%, #ff00ff 70%)",
+    borderRadius: "50%",
+    padding: theme.spacing.unit * 2
   },
   fillImg: {
-    height: '100%',
-    width: '100%',
-    objectFit: 'cover',
-    background: 'white',
-    borderRadius: '50%',
+    height: "100%",
+    width: "100%",
+    objectFit: "cover",
+    background: "white",
+    borderRadius: "50%"
   },
   peopleCard: {
-    height: 'auto',
+    height: "auto",
     width: 183,
-    flexGrow: 'initial',
-    flexBasis: 'initial',
+    flexGrow: "initial",
+    flexBasis: "initial",
     margin: theme.spacing.unit / 2,
-    transition: theme.transitions.create(['all']),
-    '&:hover': {
-      transform: 'scale(1.05)',
-      overflow: 'initial',
+    transition: theme.transitions.create(["all"]),
+    "&:hover": {
+      transform: "scale(1.05)",
+      overflow: "initial",
       zIndex: 200,
-      boxShadow: '0 2px 14px rgba(0,55,230,.3)',
-      background: M.colors.blue.A200,
+      boxShadow: `0 2px 14px rgba(0,55,230,.3)`,
+      background: M.colors.blue.A200
     },
-    '&:hover > * > h1': {
-      transform: 'scale(1.1)',
-      textShadow: '0 2px 12px rgba(0,0,0,.7)',
+    "&:hover > * > h1": {
+      transform: "scale(1.1)",
+      textShadow: "0 2px 12px rgba(0,0,0,.7)"
     },
-    position: 'relative',
-    overflow: 'hidden',
+    position: "relative",
+    overflow: "hidden"
   },
   peopleImage: {
     height: 156,
     width: 156,
-    margin: 'auto',
+    margin: "auto",
     zIndex: 1,
-    borderRadius: '50%',
-    boxShadow: '0 2px 12px rgba(0,0,0,.2)',
-    transition: theme.transitions.create(['all']),
-    '&:hover': {
-      boxShadow: '0 3px 16px rgba(0,0,0,.5)',
+    borderRadius: "50%",
+    boxShadow: "0 2px 12px rgba(0,0,0,.2)",
+    transition: theme.transitions.create(["all"]),
+    "&:hover": {
+      boxShadow: "0 3px 16px rgba(0,0,0,.5)"
     },
     top: 0,
-    left: 0,
+    left: 0
   },
   peopleCharImage: {
     height: 64,
     width: 64,
-    margin: 'auto',
+    margin: "auto",
     zIndex: 2,
-    position: 'absolute',
-    borderRadius: '50%',
-    boxShadow: '0 2px 12px rgba(0,0,0,.2)',
-    transition: theme.transitions.create(['all']),
-    '&:hover': {
-      boxShadow: '0 3px 16px rgba(0,0,0,.5)',
-      transform: 'scale(1.2)',
+    position: "absolute",
+    borderRadius: "50%",
+    boxShadow: "0 2px 12px rgba(0,0,0,.2)",
+    transition: theme.transitions.create(["all"]),
+    "&:hover": {
+      boxShadow: "0 3px 16px rgba(0,0,0,.5)",
+      transform: "scale(1.2)"
     },
     right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 7,
+    bottom: theme.spacing.unit * 7
   },
   entityContext: {
-    '&:last-child': {
-      paddingBottom: 12,
-    },
+    "&:last-child": {
+      paddingBottom: 12
+    }
   },
   peopleTitle: {
     fontSize: 14,
     fontWeight: 500,
     padding: theme.spacing.unit,
     paddingBottom: theme.spacing.unit / 2,
-    transition: theme.transitions.create(['transform']),
+    transition: theme.transitions.create(["transform"]),
     bottom: 0,
     zIndex: 5,
-    margin: 'auto',
-    textAlign: 'center',
-    textShadow: '0 1px 12px rgba(0,0,0,.2)',
+    margin: "auto",
+    textAlign: "center",
+    textShadow: "0 1px 12px rgba(0,0,0,.2)"
   },
   peopleSubTitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,.7)',
+    color: "rgba(255,255,255,.7)",
     fontWeight: 600,
-    margin: 'auto',
-    transition: theme.transitions.create(['transform']),
+    margin: "auto",
+    transition: theme.transitions.create(["transform"]),
     zIndex: 5,
-    textShadow: '0 1px 12px rgba(0,0,0,.2)',
-    textAlign: 'center',
-    whiteSpace: 'nowrap',
+    textShadow: "0 1px 12px rgba(0,0,0,.2)",
+    textAlign: "center",
+    whiteSpace: "nowrap"
   },
   entityCard: {
     height: 200,
     width: 183,
-    flexGrow: 'initial',
-    flexBasis: 'initial',
+    flexGrow: "initial",
+    flexBasis: "initial",
     margin: theme.spacing.unit / 2,
-    transition: theme.transitions.create(['all']),
-    '&:hover': {
-      transform: 'scale(1.05)',
-      overflow: 'initial',
+    transition: theme.transitions.create(["all"]),
+    "&:hover": {
+      transform: "scale(1.05)",
+      overflow: "initial",
       zIndex: 200,
-      boxShadow: '0 2px 14px rgba(0,55,230,.3)',
-      background: M.colors.blue.A200,
+      boxShadow: `0 2px 14px rgba(0,55,230,.3)`,
+      background: M.colors.blue.A200
     },
-    '&:hover > div': {
-      boxShadow: 'none',
+    "&:hover > div": {
+      boxShadow: "none"
     },
-    '&:hover > * > h1': {
-      transform: 'scale(1.4)',
+    "&:hover > * > h1": {
+      transform: "scale(1.4)",
       fontWeight: 700,
-      textShadow: '0 2px 12px rgba(0,0,0,.7)',
+      textShadow: "0 2px 12px rgba(0,0,0,.7)"
     },
-    position: 'relative',
-    overflow: 'hidden',
+    position: "relative",
+    overflow: "hidden"
   },
   entityCardDisabled: {
     height: 200,
     width: 183,
-    flexGrow: 'initial',
-    flexBasis: 'initial',
+    flexGrow: "initial",
+    flexBasis: "initial",
     margin: theme.spacing.unit / 2,
-    transition: theme.transitions.create(['all']),
-    filter: 'brightness(.8)',
-    position: 'relative',
-    overflow: 'hidden',
+    transition: theme.transitions.create(["all"]),
+    filter: "brightness(.8)",
+    position: "relative",
+    overflow: "hidden"
   },
   entityImage: {
-    height: '100%',
-    width: '100%',
-    objectFit: 'cover',
-    position: 'absolute',
+    height: "100%",
+    width: "100%",
+    objectFit: "cover",
+    position: "absolute",
     zIndex: -1,
-    transition: theme.transitions.create(['filter']),
-    '&:hover': {
-      filter: 'brightness(0.8)',
+    transition: theme.transitions.create(["filter"]),
+    "&:hover": {
+      filter: "brightness(0.8)"
     },
     top: 0,
-    left: 0,
+    left: 0
   },
   entityTitle: {
     fontSize: 14,
     fontWeight: 500,
-    position: 'absolute',
+    position: "absolute",
     padding: theme.spacing.unit * 2,
-    transition: theme.transitions.create(['transform']),
+    transition: theme.transitions.create(["transform"]),
     bottom: 0,
     zIndex: 5,
     left: 0,
-    textShadow: '0 1px 12px rgba(0,0,0,.2)',
+    textShadow: "0 1px 12px rgba(0,0,0,.2)"
   },
   entitySubTitle: {
     fontSize: 14,
     fontWeight: 600,
-    position: 'absolute',
+    position: "absolute",
     padding: theme.spacing.unit * 2,
-    transition: theme.transitions.create(['transform']),
+    transition: theme.transitions.create(["transform"]),
     top: 0,
     left: 0,
     zIndex: 5,
-    textShadow: '0 1px 12px rgba(0,0,0,.2)',
+    textShadow: "0 1px 12px rgba(0,0,0,.2)"
   },
   itemcontainer: {
     paddingBottom: theme.spacing.unit * 2,
     marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing.unit
   },
   gradientCard: {
-    position: 'relative',
-    background: 'linear-gradient(to top, transparent, rgba(0,0,0,.6))',
+    position: "relative",
+    background: "linear-gradient(to top, transparent, rgba(0,0,0,.6))",
     height: 183,
-    width: '100%',
+    width: "100%"
   },
   sectDivide: {
-    marginTop: theme.spacing.unit * 2,
+    marginTop: theme.spacing.unit * 2
   },
   progressCon: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
     maxWidth: 400,
-    margin: 'auto',
+    margin: "auto"
   },
   progressTitle: {
-    display: 'flex',
+    display: "flex",
     fontSize: 12,
-    margin: 'auto',
-    textAlign: 'center',
+    margin: "auto",
+    textAlign: "center"
   },
   progressBar: {
-    background: 'rgba(255,255,255,.3)',
-    margin: theme.spacing.unit / 2,
+    background: "rgba(255,255,255,.3)",
+    margin: theme.spacing.unit / 2
   },
   progressBarActive: {
-    background: 'white',
+    background: "white"
   },
   commandoBar: {
-    width: '100%',
-    display: 'inline-flex',
-    boxSizing: 'border-box',
-    background: '#222',
-    boxShadow: '0 3px 18px rgba(0,0,0,.1)',
+    width: "100%",
+    display: "inline-flex",
+    boxSizing: "border-box",
+    background: "#222",
+    boxShadow: "0 3px 18px rgba(0,0,0,.1)"
   },
   commandoText: {
-    margin: 'auto',
-    textAlign: 'center',
+    margin: "auto",
+    textAlign: "center"
   },
   commandoTextBox: {
     paddingLeft: theme.spacing.unit,
     paddingRight: theme.spacing.unit,
-    margin: 'auto',
+    margin: "auto"
   },
   commandoTextLabel: {
     fontSize: 10,
-    textAlign: 'center',
-    color: 'rgba(255,255,255,.8)',
+    textAlign: "center",
+    color: "rgba(255,255,255,.8)"
   },
   smallTitlebar: {
-    display: 'flex',
+    display: "flex"
   },
   secTitle: {
     padding: theme.spacing.unit,
     fontWeight: 700,
     fontSize: 22,
-    zIndex: 'inherit',
-    paddingBottom: theme.spacing.unit * 2,
+    zIndex: "inherit",
+    paddingBottom: theme.spacing.unit * 2
   },
   secTitleSmall: {
     padding: theme.spacing.unit,
     fontSize: 16,
-    zIndex: 'inherit',
-    color: 'rgba(255,255,255,.5)',
-    paddingBottom: theme.spacing.unit * 2,
+    zIndex: "inherit",
+    color: "rgba(255,255,255,.5)",
+    paddingBottom: theme.spacing.unit * 2
   },
   backToolbar: {
-    marginTop: theme.spacing.unit * 8,
+    marginTop: theme.spacing.unit * 8
   },
   bigBar: {
-    width: '100%',
-    height: 'auto',
-    boxShadow: '0 2px 24px rgba(0,0,0,.2)',
-    background: '#111',
+    width: "100%",
+    height: "auto",
+    boxShadow: "0 2px 24px rgba(0,0,0,.2)",
+    background: "#111",
     marginTop: theme.spacing.unit * 8,
-    position: 'relative',
-    overflow: 'hidden',
+    position: "relative",
+    overflow: "hidden",
     paddingBottom: theme.spacing.unit * 4,
     marginBottom: theme.spacing.unit * 8,
-    transition: theme.transitions.create(['all']),
-    [theme.breakpoints.down('md')]: {
-      marginTop: 0,
-    },
+    transition: theme.transitions.create(["all"]),
+    [theme.breakpoints.down("md")]: {
+      marginTop: 0
+    }
   },
   glassEffect: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     opacity: 0.4,
-    height: '100vh',
-    objectFit: 'cover',
-    width: '100%',
-    transform: 'scale(20)',
+    height: "100vh",
+    objectFit: "cover",
+    width: "100%",
+    transform: "scale(20)"
   },
   rootInactive: {
     opacity: 0,
-    pointerEvents: 'none',
-    transition: theme.transitions.create(['all']),
+    pointerEvents: "none",
+    transition: theme.transitions.create(["all"])
   },
   container: {
-    marginLeft: 'auto',
-    marginRight: 'auto',
+    marginLeft: "auto",
+    marginRight: "auto",
     maxWidth: 1200,
-    [theme.breakpoints.up('md')]: {
-      maxWidth: 'calc(100% - 64px)',
-      paddingTop: 24,
+    [theme.breakpoints.up("md")]: {
+      maxWidth: "calc(100% - 64px)",
+      paddingTop: 24
     },
-    margin: 'auto',
+    margin: "auto"
   },
   frame: {
-    height: '100%',
-    width: '100%',
-    position: 'relative',
-    transition: theme.transitions.create(['all']),
+    height: "100%",
+    width: "100%",
+    position: "relative",
+    transition: theme.transitions.create(["all"])
   },
   grDImage: {
-    position: 'fixed',
+    position: "fixed",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     opacity: 1,
-    height: '100vh',
-    width: '100%',
+    height: "100vh",
+    width: "100%",
     zIndex: -1,
-    overflow: 'hidden',
-    transition: theme.transitions.create(['all']),
+    overflow: "hidden",
+    transition: theme.transitions.create(["all"])
   },
   mainFrame: {
-    marginLeft: 24,
+    marginLeft: 24
   },
   bigTitle: {
     fontWeight: 700,
     fontSize: 82,
-    color: 'white',
-    textShadow: '0 2px 12px rgba(0,0,0,.2)',
+    color: "white",
+    textShadow: "0 2px 12px rgba(0,0,0,.2)"
   },
   smallTitle: {
     fontWeight: 600,
-    color: 'white',
+    color: "white",
     fontSize: 40,
-    textShadow: '0 2px 12px rgba(0,0,0,.17)',
+    textShadow: "0 2px 12px rgba(0,0,0,.17)"
   },
   tagBox: {
-    marginTop: theme.spacing.unit,
+    marginTop: theme.spacing.unit
   },
   tagTitle: {
     fontSize: 16,
     fontWeight: 600,
-    color: 'white',
-    textShadow: '0 2px 12px rgba(0,0,0,.17)',
-    marginBottom: theme.spacing.unit,
+    color: "white",
+    textShadow: "0 2px 12px rgba(0,0,0,.17)",
+    marginBottom: theme.spacing.unit
   },
   desc: {
     marginTop: theme.spacing.unit * 4,
-    color: 'white',
-    textShadow: '0 0 12px rgba(0,0,0,.1)',
+    color: "white",
+    textShadow: "0 0 12px rgba(0,0,0,.1)",
     marginBottom: theme.spacing.unit * 6,
-    fontSize: theme.typography.pxToRem(16),
+    fontSize: theme.typography.pxToRem(16)
   },
   boldD: {
     marginTop: theme.spacing.unit,
-    color: 'white',
-    textShadow: '0 0 12px rgba(0,0,0,.1)',
+    color: "white",
+    textShadow: "0 0 12px rgba(0,0,0,.1)",
     marginBottom: theme.spacing.unit,
-    fontWeight: 600,
+    fontWeight: 600
   },
   smallD: {
     marginLeft: theme.spacing.unit,
     marginTop: theme.spacing.unit,
-    color: 'white',
-    textShadow: '0 0 12px rgba(0,0,0,.1)',
-    marginBottom: theme.spacing.unit,
+    color: "white",
+    textShadow: "0 0 12px rgba(0,0,0,.1)",
+    marginBottom: theme.spacing.unit
   },
   sepD: {
-    display: 'flex',
-    marginLeft: theme.spacing.unit,
+    display: "flex",
+    marginLeft: theme.spacing.unit
   },
   artworkimg: {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    background: 'white',
-    transition: theme.transitions.create(['all']),
-    zIndex: -1,
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    background: "white",
+    transition: theme.transitions.create(["all"]),
+    zIndex: -1
   },
   artwork: {
     width: 250,
     height: 250,
-    overflow: 'hidden',
-    margin: 'auto',
-    transition: theme.transitions.create(['all']),
-    position: 'relative',
+    overflow: "hidden",
+    margin: "auto",
+    transition: theme.transitions.create(["all"]),
+    position: "relative",
     zIndex: 500,
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down("md")]: {
       height: 256,
       width: 256,
-      margin: theme.spacing.unit * 2,
+      margin: theme.spacing.unit * 2
     },
-    filter: 'drop-shadow(0 4px 12px rgba(0,0,0,.2))',
+    filter: "drop-shadow(0 4px 12px rgba(0,0,0,.2))"
   },
   loading: {
-    height: '100%',
-    width: '100%',
+    height: "100%",
+    width: "100%",
     zIndex: -5,
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%,-50%)',
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%,-50%)",
     padding: 0,
-    margin: 'auto',
-    transition: theme.transitions.create(['all']),
+    margin: "auto",
+    transition: theme.transitions.create(["all"])
   },
   tabLabel: {
     opacity: 0.5,
     fontSize: 16,
-    color: 'white',
-    textTransform: 'initial',
+    color: "white",
+    textTransform: "initial"
   },
   tabLabelActive: {
     fontWeight: 700,
     fontSize: 16,
-    color: 'white',
-    textTransform: 'initial',
+    color: "white",
+    textTransform: "initial"
   },
   tabLine: {
-    filter: 'drop-shadow(0 1px 12px rgba(0,0,255,.2))',
+    filter: "drop-shadow(0 1px 12px rgba(0,0,255,.2))",
     height: 2,
-    background: 'white',
+    background: "white"
   },
   tab: {
-    height: 64,
+    height: 64
   },
   feed: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing.unit
   },
   roleTitle: {
     fontSize: theme.typography.pxToRem(18),
     borderRadius: 2,
-    border: '2px solid rgba(255,255,255,1)',
+    border: "2px solid rgba(255,255,255,1)",
     padding: theme.spacing.unit / 2,
-    boxSizing: 'border-box',
-    textTransform: 'uppercase',
-    color: 'white',
+    boxSizing: "border-box",
+    textTransform: "uppercase",
+    color: "white",
     fontWeight: 700,
-    float: 'right',
-  },
+    float: "right"
+  }
 });
 
-class User extends Component
-{
+class User extends Component {
   state = {
     loading: true,
     data: null,
@@ -499,56 +502,110 @@ class User extends Component
     lang: strings.enus,
     userFeeds: null,
     menuEl: null,
-    hue: '#111',
-    hueVib: '#111',
-    hueVibN: '#111',
+    hue: "#111",
+    hueVib: "#111",
+    hueVibN: "#111"
   };
 
-  componentWillMount = async () =>
-  {
+  componentWillMount = async () => {
     checklang(this);
     scrollFix();
     if (!isEmpty(this.props.profile)) return this.init();
     return false;
   };
 
-  componentDidMount = async () =>
-  {
+  componentDidMount = async () => {
     await this.handleProfile();
   };
 
-  componentWillUnmount = () =>
-  {
+  handleProfile = async () => {
+    const profile = this.props.profile;
+    if (profile.userID) {
+      if (profile.role !== undefined) return null;
+      return this.props.firebase
+        .database()
+        .ref("/users")
+        .child(profile.userID)
+        .update({ role: "Normal" })
+        .then(() => this.setState({ loading: false }));
+    } else {
+      return null;
+    }
+  };
+
+  componentWillUnmount = () => {
     this.unlisten();
   };
 
-  getColors = () =>
-  {
-    const hue = localStorage.getItem('user-hue');
-    if (hue)
-    {
-      const hues = JSON.parse(hue);
+  unlisten = this.props.history.listen(location => {
+    const id = queryString.parse(location.search);
+    if (location.pathname === "/user") {
+      if (id.u !== this.state.id) return this.init();
+      else if (location.search === "") return this.init();
+    }
+    return false;
+  });
+
+  init = () =>
+    this.setState({ loading: true, data: null, id: null }, () => {
+      const id = queryString.parse(this.props.location.search);
+      if (this.props.location.search) {
+        if (id !== this.props.profile.userID) {
+          this.props.firebase
+            .database()
+            .ref("users")
+            .child(id.u)
+            .on("value", val =>
+              this.setState(
+                { data: val.val(), id: val.val().userID },
+                async () =>
+                  this.vibrance().then(() => this.setState({ loading: false }))
+              )
+            );
+        } else {
+          this.vibrance().then(() => this.setState({ loading: false }));
+        }
+      } else {
+        this.vibrance().then(() => this.setState({ loading: false }));
+      }
+    });
+
+  vibrance = async () => {
+    const image = this.state.data
+      ? this.state.data.avatar
+      : this.props.profile
+        ? this.props.profile.headers
+          ? this.props.profile.headers
+          : this.props.profile.avatar
+        : null;
+    await this.getFeeds(
+      this.state.data ? this.state.data.userID : this.props.profile.userID
+    );
+    return this.getColors();
+  };
+
+  getColors = () => {
+    const hue = localStorage.getItem("user-hue");
+    if (hue) {
+      let hues = JSON.parse(hue);
       return this.setState({
         hue: hues.hue,
         hueVib: hues.hueVib,
-        hueVibN: hues.hueVibN,
+        hueVibN: hues.hueVibN
       });
+    } else {
+      return null;
     }
-    return null;
   };
 
-  getFeeds = async () =>
-  {
+  getFeeds = async id => {
     const db = this.props.firebase
       .database()
-      .ref('/social')
-      .child('byusers');
-    try
-    {
-      return db.on('value', (allVal) =>
-      {
-        if (!allVal)
-        {
+      .ref("/social")
+      .child("byusers");
+    try {
+      return db.on("value", allVal => {
+        if (!allVal) {
           return;
         }
         const v = allVal.val();
@@ -557,211 +614,134 @@ class User extends Component
           ? this.state.data.userID
           : !isEmpty(this.props.profile) ? this.props.profile.userID : null;
 
-        if (!thisUser)
-        {
+        if (!thisUser) {
           return;
+        } else {
+          let userFeeds = Object.values(v).filter(s => s.user.id === thisUser);
+          this.setState({ userFeeds });
         }
-
-        const userFeeds = Object.values(v).filter(s => s.user.id === thisUser);
-        this.setState({ userFeeds });
       });
-    }
-    catch (error)
-    {
+    } catch (error) {
       return console.error(error);
     }
   };
 
-  vibrance = async () =>
-  {
-    await this.getFeeds(this.state.data ? this.state.data.userID : this.props.profile.userID);
-    return this.getColors();
-  };
-
-  init = () =>
-    this.setState({ loading: true, data: null, id: null }, () =>
-    {
-      const id = queryString.parse(this.props.location.search);
-      if (this.props.location.search)
-      {
-        if (id !== this.props.profile.userID)
-        {
-          this.props.firebase
-            .database()
-            .ref('users')
-            .child(id.u)
-            .on('value', val =>
-              this.setState(
-                { data: val.val(), id: val.val().userID },
-                async () =>
-                  this.vibrance().then(() => this.setState({ loading: false })),
-              ));
-        }
-        else
-        {
-          this.vibrance().then(() => this.setState({ loading: false }));
-        }
-      }
-      else
-      {
-        this.vibrance().then(() => this.setState({ loading: false }));
-      }
-    });
-
-  unlisten = this.props.history.listen((location) =>
-  {
-    const id = queryString.parse(location.search);
-    if (location.pathname === '/user')
-    {
-      if (id.u !== this.state.id) return this.init();
-      else if (location.search === '') return this.init();
-    }
-    return false;
-  });
-
-  handleProfile = async () =>
-  {
-    const { profile } = this.props;
-    if (profile.userID)
-    {
-      if (profile.role !== undefined) return null;
-      return this.props.firebase
-        .database()
-        .ref('/users')
-        .child(profile.userID)
-        .update({ role: 'Normal' })
-        .then(() => this.setState({ loading: false }));
-    }
-    return null;
-  };
-
-  addFriend = async () =>
-  {
+  addFriend = async () => {
     const you = this.props.profile;
     const them = this.props.firebase
       .database()
-      .ref('/users')
+      .ref("/users")
       .child(this.state.data.userID);
     const theirnotif = await them
-      .child('notifications')
+      .child("notifications")
       .child(Date.now())
       .set({
         id: Date.now(),
         date: Date.now(),
-        title: 'Friend request',
+        title: `Friend request`,
         desc: `${you.username} wants to be your friend.`,
-        options: ['accept', 'ignore'],
+        options: ["accept", "ignore"],
         avatar: you.avatar,
         ignored: false,
         userid: you.userID,
-        type: 'fr',
-        username: you.username,
+        type: "fr",
+        username: you.username
       });
     const theirreq = await them
-      .child('requests')
-      .child('friend')
+      .child("requests")
+      .child("friend")
       .child(you.userID)
       .set({
-        pending: true,
+        pending: true
       });
 
     return !!(theirnotif && theirreq);
   };
 
-  removeFriend = async () =>
-  {
+  removeFriend = async () => {
     const you = this.props.profile;
     const them = this.props.firebase
       .database()
-      .ref('/users')
+      .ref("/users")
       .child(this.state.data.userID);
 
     const theirlist = await them
-      .child('friends')
+      .child("friends")
       .child(you.userID)
       .remove();
     const theirreq = await them
-      .child('requests')
-      .child('friend')
+      .child("requests")
+      .child("friend")
       .child(you.userID)
       .remove();
 
     const yourlist = await this.props.firebase
       .database()
-      .ref('/users')
+      .ref("/users")
       .child(you.userID)
-      .child('friends')
+      .child("friends")
       .child(this.state.data.userID)
       .remove();
 
-    if (theirlist && theirreq && yourlist)
-    {
+    if (theirlist && theirreq && yourlist) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   };
 
-  banUser = async () =>
-  {
+  banUser = async () => {
     const { firebase } = this.props;
-    if (!this.state.data)
-    {
+    if (!this.state.data) {
       return null;
-    }
-    else if (this.state.data.role === 'banned')
-    {
-      return firebase
+    } else if (this.state.data.role === "banned") {
+      return await firebase
         .database()
-        .ref('/users')
+        .ref("/users")
         .child(this.state.data.userID)
-        .update({ role: 'Normal' });
-    }
-    return firebase
-      .database()
-      .ref('/users')
-      .child(this.state.data.userID)
-      .update({ role: 'banned' });
-  };
-
-  giveAdmin = async () =>
-  {
-    const { firebase } = this.props;
-    if (!this.state.data)
-    {
-      return null;
-    }
-    else if (this.state.data.role === 'admin')
-    {
-      return firebase
+        .update({ role: "Normal" });
+    } else {
+      return await firebase
         .database()
-        .ref('/users')
+        .ref("/users")
         .child(this.state.data.userID)
-        .update({ role: 'Normal' });
+        .update({ role: "banned" });
     }
-    return firebase
-      .database()
-      .ref('/users')
-      .child(this.state.data.userID)
-      .update({ role: 'admin' });
   };
 
-  reportUser = async () =>
-  {
+  giveAdmin = async () => {
     const { firebase } = this.props;
-    if (!this.state.data)
-    {
+    if (!this.state.data) {
+      return null;
+    } else if (this.state.data.role === "admin") {
+      return await firebase
+        .database()
+        .ref("/users")
+        .child(this.state.data.userID)
+        .update({ role: "Normal" });
+    } else {
+      return await firebase
+        .database()
+        .ref("/users")
+        .child(this.state.data.userID)
+        .update({ role: "admin" });
+    }
+  };
+
+  reportUser = async () => {
+    const { firebase } = this.props;
+    if (!this.state.data) {
       return null;
     }
-    return firebase
+    return await firebase
       .database()
-      .ref('/users')
+      .ref("/users")
       .child(this.state.data.userID)
-      .child('reports')
+      .child("reports")
       .push({ reported: true });
   };
 
-  render()
-  {
+  render() {
     const { classes } = this.props;
     const user = this.props.profile;
     const {
@@ -772,21 +752,19 @@ class User extends Component
       tabVal,
       lang,
       userFeeds,
-      menuEl,
+      menuEl
     } = this.state;
     const openMenu = Boolean(menuEl);
     if (isEmpty(user))
-    {
       return (
         <div>
-          <TitleHeader color="#000" title={lang.user.nouserfound} />
+          <TitleHeader color={"#000"} title={lang.user.nouserfound} />
         </div>
       );
-    }
     return (
       <div>
         <LoadingIndicator loading={loading} />
-        <TitleHeader color={hue || null} />
+        <TitleHeader color={hue ? hue : null} />
         <Root>
           <Header image={data ? data.headers : user.headers} color={hueVibN} />
           <Container spacing={0}>
@@ -803,24 +781,24 @@ class User extends Component
                     classes={{ img: classes.fillImg }}
                     imgProps={{
                       style: { opacity: 0 },
-                      onLoad: e => (e.currentTarget.style.opacity = null), // eslint-disable-line
+                      onLoad: e => (e.currentTarget.style.opacity = null)
                     }}
                   />
                 </div>
               </M.Grid>
-              <M.Grid item xs style={{ margin: 'auto' }}>
+              <M.Grid item xs style={{ margin: "auto" }}>
                 <M.Typography className={classes.roleTitle} variant="display3">
                   {data ? data.role : user.role}
                 </M.Typography>
                 <M.Typography className={classes.bigTitle} variant="display3">
-                  {data ? data.username : user.username}{' '}
+                  {data ? data.username : user.username}{" "}
                   {!isEmpty(user) &&
                   user.friends &&
                   data &&
                   user.friends[data.userID] ? (
                     <M.Tooltip
                       title={lang.user.bothfriends}
-                      style={{ letterSpacing: 'initial' }}
+                      style={{ letterSpacing: "initial" }}
                     >
                       <Icon.SupervisorAccount />
                     </M.Tooltip>
@@ -833,7 +811,7 @@ class User extends Component
                   variant="body1"
                   className={classes.desc}
                   dangerouslySetInnerHTML={{
-                    __html: data ? data.motto : user.motto,
+                    __html: data ? data.motto : user.motto
                   }}
                 />
               </M.Grid>
@@ -851,7 +829,7 @@ class User extends Component
                     classes={{
                       root: classes.tab,
                       label:
-                        tabVal === 0 ? classes.tabLabelActive : classes.tabLabel,
+                        tabVal === 0 ? classes.tabLabelActive : classes.tabLabel
                     }}
                   />
                   <M.Tab
@@ -859,7 +837,7 @@ class User extends Component
                     classes={{
                       root: classes.tab,
                       label:
-                        tabVal === 1 ? classes.tabLabelActive : classes.tabLabel,
+                        tabVal === 1 ? classes.tabLabelActive : classes.tabLabel
                     }}
                   />
                   <M.Tab
@@ -867,7 +845,7 @@ class User extends Component
                     classes={{
                       root: classes.tab,
                       label:
-                        tabVal === 2 ? classes.tabLabelActive : classes.tabLabel,
+                        tabVal === 2 ? classes.tabLabelActive : classes.tabLabel
                     }}
                   />
                   <M.Tab
@@ -875,7 +853,7 @@ class User extends Component
                     classes={{
                       root: classes.tab,
                       label:
-                        tabVal === 3 ? classes.tabLabelActive : classes.tabLabel,
+                        tabVal === 3 ? classes.tabLabelActive : classes.tabLabel
                     }}
                   />
                   <M.Tab
@@ -883,7 +861,7 @@ class User extends Component
                     classes={{
                       root: classes.tab,
                       label:
-                        tabVal === 4 ? classes.tabLabelActive : classes.tabLabel,
+                        tabVal === 4 ? classes.tabLabelActive : classes.tabLabel
                     }}
                   />
                 </M.Tabs>
@@ -911,10 +889,10 @@ class User extends Component
                       : lang.user.addfriend}
                   </M.Button>
                 ) : null}
-                {!data && !isEmpty(user) && user.role === 'Normal' ? null : (
+                {!data && !isEmpty(user) && user.role === "Normal" ? null : (
                   <M.IconButton
                     color="default"
-                    aria-owns={openMenu ? 'more-menu' : null}
+                    aria-owns={openMenu ? "more-menu" : null}
                     aria-haspopup="true"
                     onClick={e => this.setState({ menuEl: e.currentTarget })}
                   >
@@ -925,8 +903,8 @@ class User extends Component
                   id="more-menu"
                   anchorEl={menuEl}
                   transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
+                    vertical: "top",
+                    horizontal: "left"
                   }}
                   MenuListProps={{ style: { padding: 0 } }}
                   PaperProps={{ style: { background: hue } }}
@@ -938,16 +916,16 @@ class User extends Component
                       Report user
                     </M.MenuItem>
                   )}
-                  {!isEmpty(user) && user.role === 'dev' ? (
+                  {!isEmpty(user) && user.role === "dev" ? (
                     <M.MenuItem onClick={this.giveAdmin}>
-                      {data && data.role === 'admin' && user.role === 'dev'
-                        ? 'Remove admin privileges'
-                        : 'Make user admin'}
+                      {data && data.role === "admin" && user.role === "dev"
+                        ? "Remove admin privileges"
+                        : "Make user admin"}
                     </M.MenuItem>
                   ) : null}
                   {!isEmpty(user) &&
-                  user.role === 'Normal' ? null : user.role === 'dev' ||
-                  'Admin' ? (
+                  user.role === "Normal" ? null : user.role === "dev" ||
+                  "Admin" ? (
                     <M.MenuItem onClick={this.banUser}>Ban user</M.MenuItem>
                   ) : null}
                 </M.Menu>
@@ -964,7 +942,9 @@ class User extends Component
                               key={index}
                               name={{ first: friend.username }}
                               onClick={() =>
-                                this.props.history.push(`/user?u=${friend.userID}`)
+                                this.props.history.push(
+                                  `/user?u=${friend.userID}`
+                                )
                               }
                               image={friend.avatar}
                             />
@@ -982,7 +962,9 @@ class User extends Component
                             key={index}
                             name={{ first: friend.username }}
                             onClick={() =>
-                              this.props.history.push(`/user?u=${friend.userID}`)
+                              this.props.history.push(
+                                `/user?u=${friend.userID}`
+                              )
                             }
                             image={friend.avatar}
                           />
@@ -1011,7 +993,7 @@ class User extends Component
                               user={{
                                 avatar: feed.user.avatar,
                                 id: feed.user.userID,
-                                username: feed.user.username,
+                                username: feed.user.username
                               }}
                               color={hue}
                               showId={feed.showId}
@@ -1028,85 +1010,79 @@ class User extends Component
                     ) : !isEmpty(user) && user.feed ? (
                       Object.values(user.feed)
                         .sort((a, b) => b.date - a.date)
-                        .map((feed, index) =>
-{
+                        .map((feed, index) => {
                           if (feed.user.username === undefined)
                             // It's an update.
-                            {
- return (
-   <Feed
-     key={index}
-     ftitle={feed.name}
-     context="MIRAI UPDATE"
-     text={feed.context}
-     date={feed.date}
-     avatar={feed.user.image}
-     id={feed.id}
-     user={feed.user}
-     mirUpdate
-     noActions
-     color={hue}
-   />
+                            return (
+                              <Feed
+                                key={index}
+                                ftitle={feed.name}
+                                context={"MIRAI UPDATE"}
+                                text={feed.context}
+                                date={feed.date}
+                                avatar={feed.user.image}
+                                id={feed.id}
+                                user={feed.user}
+                                mirUpdate
+                                noActions
+                                color={hue}
+                              />
                             );
- }
-                          else if (feed.context === 'INTRO')
+                          else if (feed.context === "INTRO")
                             // It's an intro feed
-                            {
- return (
-   <Feed
-     key={index}
-     ftitle={feed.user.username}
-     context={feed.context}
-     text={feed.text}
-     date={feed.date}
-     avatar={feed.user.avatar}
-     image={feed.image}
-     id={feed.id}
-     user={feed.user}
-     noDelete
-     noActions
-     color={hue}
-   />
+                            return (
+                              <Feed
+                                key={index}
+                                ftitle={feed.user.username}
+                                context={feed.context}
+                                text={feed.text}
+                                date={feed.date}
+                                avatar={feed.user.avatar}
+                                image={feed.image}
+                                id={feed.id}
+                                user={feed.user}
+                                noDelete
+                                noActions
+                                color={hue}
+                              />
                             );
-}
                           else if (feed.type)
                             // It's an activity feed
-                            {
- return (
-   <Feed
-     key={index}
-     ftitle={feed.user.username}
-     context={feed.activity}
-     date={feed.date}
-     avatar={feed.user.avatar}
-     id={feed.id}
-     image={feed.coverImg}
-     user={{
+                            return (
+                              <Feed
+                                key={index}
+                                ftitle={feed.user.username}
+                                context={feed.activity}
+                                date={feed.date}
+                                avatar={feed.user.avatar}
+                                id={feed.id}
+                                image={feed.coverImg}
+                                user={{
                                   avatar: feed.user.avatar,
                                   id: feed.user.userID,
-                                  username: feed.user.username,
+                                  username: feed.user.username
                                 }}
-     color={hue}
-     showId={feed.showId}
-     activity
-     noActions
-   />
-                            );
-} // It's an user-made feed
-                          return (
-                            <Feed
-                              key={index}
-                              ftitle={feed.user.username}
-                              context={feed.context}
-                              text={feed.text}
-                              date={feed.date}
-                              avatar={feed.user.avatar}
-                              image={feed.image}
-                              id={feed.id}
-                              user={feed.user}
-                              color={hue}
-                              reposts={feed.reposts}
-                            />
+                                color={hue}
+                                showId={feed.showId}
+                                activity
+                                noActions
+                              />
+                            ); // It's an user-made feed
+                          else
+                            return (
+                              <Feed
+                                key={index}
+                                ftitle={feed.user.username}
+                                context={feed.context}
+                                text={feed.text}
+                                date={feed.date}
+                                avatar={feed.user.avatar}
+                                image={feed.image}
+                                id={feed.id}
+                                user={feed.user}
+                                color={hue}
+                                reposts={feed.reposts}
+                              />
                             );
                         })
                     ) : (
@@ -1312,9 +1288,11 @@ class User extends Component
                               key={show.id}
                             >
                               <M.Card
-                                style={{ background: 'transparent' }}
+                                style={{ background: "transparent" }}
                                 onClick={() =>
-                                  this.props.history.push(`/studio?s=${show.id}`)
+                                  this.props.history.push(
+                                    `/studio?s=${show.id}`
+                                  )
                                 }
                               >
                                 <div className={classes.gradientCard}>
@@ -1353,7 +1331,7 @@ class User extends Component
                             key={show.id}
                           >
                             <M.Card
-                              style={{ background: 'transparent' }}
+                              style={{ background: "transparent" }}
                               onClick={() =>
                                 this.props.history.push(`/tag?s=${show.id}`)
                               }
@@ -1391,9 +1369,13 @@ class User extends Component
                 <Container>
                   <ItemContainer>
                     {userFeeds &&
-                    Object.values(userFeeds).filter(u => (u.user.id === data ? data.id : user.userID)).length > 0 ? (
+                    Object.values(userFeeds).filter(
+                      u => (u.user.id === data ? data.id : user.userID)
+                    ).length > 0 ? (
                       Object.values(userFeeds)
-                        .filter(u => (u.user.id === data ? data.id : user.userID))
+                        .filter(
+                          u => (u.user.id === data ? data.id : user.userID)
+                        )
                         .sort((a, b) => b.date - a.date)
                         .map((feed, index) => (
                           <Feed
@@ -1431,12 +1413,16 @@ class User extends Component
                         data.episodeProgress ? (
                           Object.values(data.episodeProgress)
                             .filter(s => s.recentlyWatched)
-                            .sort((a, b) => b.recentlyWatched - a.recentlyWatched)
+                            .sort(
+                              (a, b) => b.recentlyWatched - a.recentlyWatched
+                            )
                             .map(show => (
                               <CardButton
                                 key={show.showId}
                                 onClick={() =>
-                                  this.props.history.push(`/show?s=${show.showId}`)
+                                  this.props.history.push(
+                                    `/show?s=${show.showId}`
+                                  )
                                 }
                                 title={show.title}
                                 image={show.showArtwork}
@@ -1456,7 +1442,9 @@ class User extends Component
                             <CardButton
                               key={show.showId}
                               onClick={() =>
-                                this.props.history.push(`/show?s=${show.showId}`)
+                                this.props.history.push(
+                                  `/show?s=${show.showId}`
+                                )
                               }
                               title={show.title}
                               image={show.showArtwork}
@@ -1485,7 +1473,9 @@ class User extends Component
                                 }
                                 title={show.name}
                                 image={show.image}
-                                subtitle={`Added ${moment(show.date).from(Date.now())}`}
+                                subtitle={`Added ${moment(show.date).from(
+                                  Date.now()
+                                )}`}
                               />
                             ))
                         ) : (
@@ -1504,7 +1494,9 @@ class User extends Component
                               }
                               title={show.name}
                               image={show.image}
-                              subtitle={`Added ${moment(show.date).from(Date.now())}`}
+                              subtitle={`Added ${moment(show.date).from(
+                                Date.now()
+                              )}`}
                             />
                           ))
                       ) : (
@@ -1529,7 +1521,9 @@ class User extends Component
                                 }
                                 title={show.name}
                                 image={show.image}
-                                subtitle={`Completed ${moment(show.date).from(Date.now())}`}
+                                subtitle={`Completed ${moment(show.date).from(
+                                  Date.now()
+                                )}`}
                               />
                             ))
                         ) : (
@@ -1548,7 +1542,9 @@ class User extends Component
                               onClick={() => this.props.history.push(show.link)}
                               title={show.name}
                               image={show.image}
-                              subtitle={`Completed ${moment(show.date).from(Date.now())}`}
+                              subtitle={`Completed ${moment(show.date).from(
+                                Date.now()
+                              )}`}
                             />
                           ))
                       ) : (
@@ -1573,7 +1569,9 @@ class User extends Component
                                 }
                                 title={show.name}
                                 image={show.image}
-                                subtitle={`Dropped ${moment(show.date).from(Date.now())}`}
+                                subtitle={`Dropped ${moment(show.date).from(
+                                  Date.now()
+                                )}`}
                               />
                             ))
                         ) : (
@@ -1592,7 +1590,9 @@ class User extends Component
                               onClick={() => this.props.history.push(show.link)}
                               title={show.name}
                               image={show.image}
-                              subtitle={`Dropped ${moment(show.date).from(Date.now())}`}
+                              subtitle={`Dropped ${moment(show.date).from(
+                                Date.now()
+                              )}`}
                             />
                           ))
                       ) : (
@@ -1623,7 +1623,9 @@ class User extends Component
                                 }
                                 title={show.name}
                                 image={show.image}
-                                subtitle={`Added ${moment(show.date).from(Date.now())}`}
+                                subtitle={`Added ${moment(show.date).from(
+                                  Date.now()
+                                )}`}
                               />
                             ))
                         ) : (
@@ -1642,7 +1644,9 @@ class User extends Component
                               }
                               title={show.name}
                               image={show.image}
-                              subtitle={`Added ${moment(show.date).from(Date.now())}`}
+                              subtitle={`Added ${moment(show.date).from(
+                                Date.now()
+                              )}`}
                             />
                           ))
                       ) : (
@@ -1667,7 +1671,9 @@ class User extends Component
                                 }
                                 title={show.name}
                                 image={show.image}
-                                subtitle={`Completed ${moment(show.date).from(Date.now())}`}
+                                subtitle={`Completed ${moment(show.date).from(
+                                  Date.now()
+                                )}`}
                               />
                             ))
                         ) : (
@@ -1686,7 +1692,9 @@ class User extends Component
                               onClick={() => this.props.history.push(show.link)}
                               title={show.name}
                               image={show.image}
-                              subtitle={`Completed ${moment(show.date).from(Date.now())}`}
+                              subtitle={`Completed ${moment(show.date).from(
+                                Date.now()
+                              )}`}
                             />
                           ))
                       ) : (
@@ -1711,7 +1719,9 @@ class User extends Component
                                 }
                                 title={show.name}
                                 image={show.image}
-                                subtitle={`Dropped ${moment(show.date).from(Date.now())}`}
+                                subtitle={`Dropped ${moment(show.date).from(
+                                  Date.now()
+                                )}`}
                               />
                             ))
                         ) : (
@@ -1730,7 +1740,9 @@ class User extends Component
                               onClick={() => this.props.history.push(show.link)}
                               title={show.name}
                               image={show.image}
-                              subtitle={`Dropped ${moment(show.date).from(Date.now())}`}
+                              subtitle={`Dropped ${moment(show.date).from(
+                                Date.now()
+                              )}`}
                             />
                           ))
                       ) : (
@@ -1765,7 +1777,9 @@ class User extends Component
                                 }
                                 title={show.name}
                                 image={show.image}
-                                subtitle={`Added ${moment(show.date).from(Date.now())}`}
+                                subtitle={`Added ${moment(show.date).from(
+                                  Date.now()
+                                )}`}
                               />
                             ))
                         ) : (
@@ -1785,7 +1799,9 @@ class User extends Component
                               }
                               title={show.name}
                               image={show.image}
-                              subtitle={`Added ${moment(show.date).from(Date.now())}`}
+                              subtitle={`Added ${moment(show.date).from(
+                                Date.now()
+                              )}`}
                             />
                           ))
                       ) : (
@@ -1815,7 +1831,9 @@ class User extends Component
                                 }
                                 title={show.name}
                                 image={show.image}
-                                subtitle={`Added ${moment(show.date).from(Date.now())}`}
+                                subtitle={`Added ${moment(show.date).from(
+                                  Date.now()
+                                )}`}
                               />
                             ))
                         ) : (
@@ -1835,7 +1853,9 @@ class User extends Component
                               }
                               title={show.name}
                               image={show.image}
-                              subtitle={`Added ${moment(show.date).from(Date.now())}`}
+                              subtitle={`Added ${moment(show.date).from(
+                                Date.now()
+                              )}`}
                             />
                           ))
                       ) : (
@@ -1856,4 +1876,8 @@ class User extends Component
   }
 }
 
-export default firebaseConnect()(connect(({ firebase: { profile } }) => ({ profile }))(M.withStyles(style)(User)));
+export default firebaseConnect()(
+  connect(({ firebase: { profile } }) => ({ profile }))(
+    M.withStyles(style)(User)
+  )
+);
