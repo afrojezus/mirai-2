@@ -1,4 +1,4 @@
-export default `query(
+export const searchQuery = `query(
   $id: Int
   $page: Int
   $season: MediaSeason

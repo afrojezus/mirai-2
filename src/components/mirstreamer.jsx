@@ -20,7 +20,7 @@ import Toolbar from 'material-ui/Toolbar/Toolbar';
 import Tooltip from 'material-ui/Tooltip/Tooltip';
 import Typography from 'material-ui/Typography/Typography';
 import queryString from 'query-string';
-import Component, { React } from 'react';
+import React from 'react';
 import ReactPlayer from 'react-player';
 import { connect } from 'react-redux';
 import { firebaseConnect, isEmpty } from 'react-redux-firebase';
@@ -269,7 +269,7 @@ const style = theme => ({
   },
 });
 
-class MirStreamer extends Component
+class MirStreamer extends React.Component
 {
   static defaultProps = {
     history,

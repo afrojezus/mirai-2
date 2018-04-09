@@ -19,7 +19,7 @@ import withStyles from 'material-ui/styles/withStyles';
 import Toolbar from 'material-ui/Toolbar/Toolbar';
 import Tooltip from 'material-ui/Tooltip/Tooltip';
 import Typography from 'material-ui/Typography/Typography';
-import Component, { React } from 'react';
+import React, { Component } from 'react';
 import ReactPlayer from 'react-player';
 import { connect } from 'react-redux';
 import { firebaseConnect, isEmpty } from 'react-redux-firebase';

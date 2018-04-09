@@ -1,76 +1,76 @@
 // TODO: Fix every single eslint-airbnb issue
-import React, { Component } from "react";
-import * as M from "material-ui";
-import * as Icon from "material-ui-icons";
-import Dropzone from "react-dropzone";
-import localForage from "localforage";
-import { connect } from "react-redux";
-import { firebaseConnect } from "react-redux-firebase";
-import { clientID } from "../utils/segoku/config.json";
-import AniList from "../anilist-api";
+import React, { Component } from 'react';
+import * as M from 'material-ui';
+import * as Icon from 'material-ui-icons';
+import Dropzone from 'react-dropzone';
+import localForage from 'localforage';
+import { connect } from 'react-redux';
+import { firebaseConnect } from 'react-redux-firebase';
+import { clientID } from '../utils/segoku/config.json';
+import AniList from '../anilist-api';
 import {
   TitleHeader,
   Header,
   Column,
   Row,
   Dialogue,
-} from "../components/layouts";
+} from '../components/layouts';
 
-import strings from "../strings.json";
-import { scrollFix } from "./../utils/scrollFix";
-import colorizer from "../utils/colorizer";
+import strings from '../strings.json';
+import { scrollFix } from './../utils/scrollFix';
+import colorizer from '../utils/colorizer';
 
-const style = (theme) => ({
+const style = theme => ({
   root: {
-    height: "100%",
-    width: "100%",
-    position: "relative",
-    transition: theme.transitions.create(["all"]),
+    height: '100%',
+    width: '100%',
+    position: 'relative',
+    transition: theme.transitions.create(['all']),
   },
   bgImage: {
-    position: "fixed",
+    position: 'fixed',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     opacity: 0.4,
-    height: "100vh",
-    objectFit: "cover",
-    width: "100%",
+    height: '100vh',
+    objectFit: 'cover',
+    width: '100%',
     zIndex: -1,
     background: M.colors.blue[700],
   },
   content: {
-    marginLeft: "auto",
-    marginRight: "auto",
+    marginLeft: 'auto',
+    marginRight: 'auto',
     padding: 24,
     maxWidth: 1500,
     paddingTop: theme.spacing.unit * 12,
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
   },
   header: {
-    position: "relative",
+    position: 'relative',
   },
   title: {
-    color: "white",
+    color: 'white',
     fontWeight: 600,
-    textShadow: "0 3px 16px rgba(0,0,0,.4)",
+    textShadow: '0 3px 16px rgba(0,0,0,.4)',
     padding: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 8,
   },
   icon: {
-    boxShadow: "0 1px 12px rgba(0,0,0,.2)",
-    color: "white",
+    boxShadow: '0 1px 12px rgba(0,0,0,.2)',
+    color: 'white',
     height: 92,
     width: 92,
     zIndex: -1,
-    background: "linear-gradient(to top, #0044aa 0%, #0066ff 70%)",
-    borderRadius: "50%",
+    background: 'linear-gradient(to top, #0044aa 0%, #0066ff 70%)',
+    borderRadius: '50%',
     padding: theme.spacing.unit * 2,
   },
   panel: {
-    width: "100%",
+    width: '100%',
   },
   divide: {
     margin: theme.spacing.unit,
@@ -79,113 +79,116 @@ const style = (theme) => ({
     padding: theme.spacing.unit,
   },
   ava: {
-    height: "100%",
-    width: "100%",
-    position: "absolute",
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
     top: 0,
     left: 0,
-    objectFit: "cover",
-    transition: theme.transitions.create(["all"]),
+    objectFit: 'cover',
+    transition: theme.transitions.create(['all']),
   },
   bg: {
-    height: "100%",
-    width: "100%",
-    position: "absolute",
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
     top: 0,
     left: 0,
-    objectFit: "cover",
-    transition: theme.transitions.create(["all"]),
+    objectFit: 'cover',
+    transition: theme.transitions.create(['all']),
   },
   dropzone: {
     height: 256,
     width: 256,
-    position: "relative",
-    borderRadius: "50%",
-    margin: "auto",
-    border: "2px solid white",
-    "&:hover > div": {
-      filter: "brightness(0.5)",
+    position: 'relative',
+    borderRadius: '50%',
+    margin: 'auto',
+    border: '2px solid white',
+    '&:hover > div': {
+      filter: 'brightness(0.5)',
     },
-    "&:hover > svg": {
+    '&:hover > svg': {
       opacity: 1,
     },
-    transition: theme.transitions.create(["all"]),
+    transition: theme.transitions.create(['all']),
     zIndex: 1000,
-    cursor: "pointer",
+    cursor: 'pointer',
   },
   dropzoneBg: {
     height: 256,
     width: 480,
-    position: "relative",
-    margin: "auto",
-    border: "2px solid white",
-    "&:hover > img": {
-      filter: "brightness(0.5)",
+    position: 'relative',
+    margin: 'auto',
+    border: '2px solid white',
+    '&:hover > img': {
+      filter: 'brightness(0.5)',
     },
-    "&:hover > svg": {
+    '&:hover > svg': {
       opacity: 1,
     },
     zIndex: 1000,
-    transition: theme.transitions.create(["all"]),
-    cursor: "pointer",
+    transition: theme.transitions.create(['all']),
+    cursor: 'pointer',
   },
   column: {
-    flexBasis: "33.3%",
+    flexBasis: '33.3%',
   },
   avaImg: {
-    height: "100%",
-    width: "100%",
-    objectFit: "cover",
-    borderRadius: "50%",
+    height: '100%',
+    width: '100%',
+    objectFit: 'cover',
+    borderRadius: '50%',
   },
   pictureIcon: {
-    top: "50%",
-    left: "50%",
-    position: "absolute",
-    transform: "translate(-50%,-50%)",
-    color: "white",
+    top: '50%',
+    left: '50%',
+    position: 'absolute',
+    transform: 'translate(-50%,-50%)',
+    color: 'white',
     fontSize: 48,
     opacity: 0,
-    transition: theme.transitions.create(["all"]),
+    transition: theme.transitions.create(['all']),
   },
 });
 
-class Settings extends Component {
+class Settings extends Component
+{
   state = {
     ava: null,
     bg: null,
-    nick: "",
-    user: "",
-    email: "",
-    pass: "",
-    motto: "",
+    nick: '',
+    user: '',
+    email: '',
+    pass: '',
+    motto: '',
     avaLoading: false,
     bgLoading: false,
     loading: true,
-    theme: "Mirai",
-    langCode: "en-us",
+    theme: 'Mirai',
+    langCode: 'en-us',
     lang: strings.enus,
-    langVal: "",
+    langVal: '',
     deleteDialog: false,
     hasEnteredTwist: false,
-    ALToken: "",
+    ALToken: '',
   };
 
-  componentWillMount = () => {
+  componentWillMount = () =>
+  {
     scrollFix();
     this.getColors();
-    const lang = localStorage.getItem("language");
-    switch (lang) {
-      case "en-us":
-        this.setState({ lang: strings.enus, langCode: "en-us" });
+    const lang = localStorage.getItem('language');
+    switch (lang)
+    {
+      case 'en-us':
+        this.setState({ lang: strings.enus, langCode: 'en-us' });
         break;
 
-      case "nb-no":
-        this.setState({ lang: strings.nbno, langCode: "nb-no" });
+      case 'nb-no':
+        this.setState({ lang: strings.nbno, langCode: 'nb-no' });
         break;
 
-      case "jp":
-        this.setState({ lang: strings.jp, langCode: "jp" });
+      case 'jp':
+        this.setState({ lang: strings.jp, langCode: 'jp' });
         break;
 
       default:
@@ -193,127 +196,143 @@ class Settings extends Component {
     }
   };
 
-  enableTwist = () => {
-    AniList.auth(this.state.ALToken);
-    this.setState({ hasEnteredTwist: false }, () => {});
-  };
 
-  triggerTwist = () => {
-    window.open(
-      `https://anilist.co/api/v2/oauth/authorize?client_id=${clientID}&response_type=token`,
-    );
-    this.setState({ hasEnteredTwist: true });
-  };
+  componentDidMount = () =>
+    setTimeout(() => this.setState({ loading: false }), 300);
 
-  removeTwist = () => localStorage.removeItem("ALTOKEN");
-
-  getColors = () => {
-    const hue = localStorage.getItem("user-hue");
-    if (hue) {
-      let hues = JSON.parse(hue);
+  getColors = () =>
+  {
+    const hue = localStorage.getItem('user-hue');
+    if (hue)
+    {
+      const hues = JSON.parse(hue);
       return this.setState({
         hue: hues.hue,
         hueVib: hues.hueVib,
         hueVibN: hues.hueVibN,
       });
-    } else {
-      return null;
     }
+    return null;
   };
 
-  componentDidMount = () =>
-    setTimeout(() => this.setState({ loading: false }), 300);
+  enableTwist = () =>
+  {
+    AniList.auth(this.state.ALToken);
+    this.setState({ hasEnteredTwist: false }, () =>
+    {});
+  };
 
-  changeLangVal = (event) => {
+  triggerTwist = () =>
+  {
+    window.open(`https://anilist.co/api/v2/oauth/authorize?client_id=${clientID}&response_type=token`);
+    this.setState({ hasEnteredTwist: true });
+  };
+
+  removeTwist = () => localStorage.removeItem('ALTOKEN');
+
+  changeLangVal = (event) =>
+  {
     this.setState({
       langVal: event.target.value,
       langCode: event.target.value,
     });
   };
 
-  changeLang = (value) =>
-    this.setState({ langCode: value, langVal: null }, () => {
-      localStorage.setItem("language", this.state.langCode);
+  changeLang = value =>
+    this.setState({ langCode: value, langVal: null }, () =>
+    {
+      localStorage.setItem('language', this.state.langCode);
       window.location.reload();
     });
 
-  handleAva = (accept) =>
-    accept.forEach((file) => this.setState({ ava: file }, () => {}));
+  handleAva = accept =>
+    accept.forEach(file => this.setState({ ava: file }, () =>
+    {}));
 
   changeAva = () =>
-    this.setState({ avaLoading: true }, async () => {
+    this.setState({ avaLoading: true }, async () =>
+    {
       const ava = this.props.firebase
         .storage()
-        .ref("userData")
-        .child("avatar")
+        .ref('userData')
+        .child('avatar')
         .child(this.state.ava.name)
         .put(this.state.ava);
 
       ava.on(
-        "state_changed",
-        () => {},
-        (error) => console.error(error),
-        () => {
+        'state_changed',
+        () =>
+        {},
+        error => console.error(error),
+        () =>
+        {
           // console.log(ava);
           this.props.firebase
             .updateProfile({
               avatar: ava.snapshot.downloadURL,
             })
-            .then(() => {
-              console.info("Avatar updated.");
+            .then(() =>
+            {
+              console.info('Avatar updated.');
               this.setState({ avaLoading: false, ava: null });
             });
         },
       );
     });
 
-  handleBg = (accept) =>
-    accept.forEach((file) => this.setState({ bg: file }, () => {}));
+  handleBg = accept =>
+    accept.forEach(file => this.setState({ bg: file }, () =>
+    {}));
 
   changeBg = () =>
-    this.setState({ bgLoading: true }, async () => {
+    this.setState({ bgLoading: true }, async () =>
+    {
       const bg = this.props.firebase
         .storage()
-        .ref("userData")
-        .child("header")
+        .ref('userData')
+        .child('header')
         .child(this.state.bg.name)
         .put(this.state.bg);
 
       bg.on(
-        "state_changed",
-        () => {},
-        (error) =>
+        'state_changed',
+        () =>
+        {},
+        error =>
           this.setState({ bgLoading: false, bg: null }, () =>
-            console.error(error),
-          ),
-        () => {
+            console.error(error)),
+        () =>
+        {
           // console.log(bg);
           this.props.firebase
             .updateProfile({ headers: bg.snapshot.downloadURL })
-            .then(() => {
+            .then(() =>
+            {
               colorizer(this.props.profile.headers)
-                .then((pal) => {
-                  let hues = {
+                .then((pal) =>
+                {
+                  const hues = {
                     hue: pal.DarkMuted && pal.DarkMuted.getHex(),
                     hueVib: pal.LightVibrant && pal.LightVibrant.getHex(),
                     hueVibN: pal.DarkVibrant && pal.DarkVibrant.getHex(),
                     hueAccent: pal.Vibrant && pal.Vibrant.getHex(),
                   };
-                  console.info("Background updated.");
-                  localStorage.setItem("user-hue", JSON.stringify(hues));
+                  console.info('Background updated.');
+                  localStorage.setItem('user-hue', JSON.stringify(hues));
                   return this.setState({ bgLoading: false, bg: null }, () =>
-                    window.location.reload(),
-                  );
+                    window.location.reload());
                 })
-                .catch((error) => {
+                .catch((error) =>
+                {
                   console.error(error);
-                  console.info("Background updated, but with errors.");
+                  console.info('Background updated, but with errors.');
                   return this.setState({ bgLoading: false, bg: null });
                 });
             })
-            .catch((error) => {
+            .catch((error) =>
+            {
               console.error(error);
-              console.info("Background upload failed.");
+              console.info('Background upload failed.');
               return this.setState({ bgLoading: false, bg: null });
             });
         },
@@ -323,37 +342,42 @@ class Settings extends Component {
   changeNick = async () =>
     this.props.firebase
       .updateProfile({ nick: this.state.nick })
-      .then(() => console.info("Nickname updated."));
+      .then(() => console.info('Nickname updated.'));
 
   changeUsername = async () =>
     this.props.firebase
       .updateProfile({
         username: this.state.user,
       })
-      .then(() => console.info("Username updated."));
+      .then(() => console.info('Username updated.'));
 
   changeMotto = async () =>
     this.props.firebase
       .updateProfile({ motto: this.state.motto })
-      .then(() => console.info("Motto updated."));
+      .then(() => console.info('Motto updated.'));
 
-  changeEmail = async () => {};
+  changeEmail = async () =>
+  {};
 
-  changePass = () => {};
+  changePass = () =>
+  {};
 
-  changeContriSetting = async (e, check) => {
+  changeContriSetting = async () =>
+  {
     const set = this.props.profile.noMine;
     if (set) this.props.firebase.updateProfile({ noMine: false });
     else this.props.firebase.updateProfile({ noMine: true });
   };
 
-  changeLogSetting = async (e, check) => {
+  changeLogSetting = async () =>
+  {
     const set = this.props.profile.willLog;
     if (set) this.props.firebase.updateProfile({ willLog: false });
     else this.props.firebase.updateProfile({ willLog: true });
   };
 
-  changeLogPrivate = async (e, check) => {
+  changeLogPrivate = async () =>
+  {
     const set = this.props.profile.privateLog;
     if (set) this.props.firebase.updateProfile({ privateLog: false });
     else this.props.firebase.updateProfile({ privateLog: true });
@@ -361,33 +385,38 @@ class Settings extends Component {
 
   deleteLogg = async () =>
     this.props.firebase
-      .ref("users")
+      .ref('users')
       .child(this.props.profile.userID)
-      .child("feed")
+      .child('feed')
       .remove();
 
-  deleteMyAccount = async () => {
+  deleteMyAccount = async () =>
+  {
     const db = this.props.firebase
-      .ref("users")
+      .ref('users')
       .child(this.props.profile.userID);
-    try {
+    try
+    {
       await db.remove();
       return this.props.firebase
         .logout()
         .then(async () =>
-          localForage.removeItem("user", async () => {
-            localStorage.removeItem("user-hue");
-            this.props.history.push("/setup");
-            await localForage.removeItem("player-state");
-          }),
-        )
-        .catch((err) => console.error(err.message));
-    } catch (error) {
+          localForage.removeItem('user', async () =>
+          {
+            localStorage.removeItem('user-hue');
+            this.props.history.push('/setup');
+            await localForage.removeItem('player-state');
+          }))
+        .catch(err => console.error(err.message));
+    }
+    catch (error)
+    {
       return console.error(error);
     }
   };
 
-  render() {
+  render()
+  {
     const { classes, theme } = this.props;
     const {
       langCode,
@@ -402,11 +431,8 @@ class Settings extends Component {
     if (!user) return null;
     return (
       <div>
-        <TitleHeader
-          title={lang.settings.settings}
-          color={hue ? hue : "#000"}
-        />
-        <Header color={hue ? hue : null} />
+        <TitleHeader title={lang.settings.settings} color={hue || '#000'} />
+        <Header color={hue || null} />
         <div className={classes.root}>
           <M.Grid
             container
@@ -414,13 +440,15 @@ class Settings extends Component {
             style={{
               marginTop: window.mobilecheck() ? 0 : theme.spacing.unit * 16,
             }}
-            className={classes.content}>
+            className={classes.content}
+          >
             <M.Typography variant="headline" className={classes.headline}>
               {lang.settings.aesthetics}
             </M.Typography>
             <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}>
+              style={{ background: hue || null }}
+              className={classes.panel}
+            >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -442,19 +470,19 @@ class Settings extends Component {
                         <M.MenuItem value="en-us">
                           <span role="img" aria-label="English">
                             🇬🇧
-                          </span>{" "}
+                          </span>{' '}
                           English
                         </M.MenuItem>
                         <M.MenuItem value="nb-no">
                           <span role="img" aria-label="Norsk Bokmål">
                             🇳🇴
-                          </span>{" "}
+                          </span>{' '}
                           Norsk Bokmål
                         </M.MenuItem>
                         <M.MenuItem value="jp">
                           <span role="img" aria-label="Norsk Bokmål">
                             🇯🇵
-                          </span>{" "}
+                          </span>{' '}
                           日本語
                         </M.MenuItem>
                       </M.Select>
@@ -467,25 +495,28 @@ class Settings extends Component {
                   <M.Button
                     onClick={() =>
                       this.setState({
-                        langCode: localStorage.getItem("language"),
+                        langCode: localStorage.getItem('language'),
                         langVal: null,
                       })
-                    }>
+                    }
+                  >
                     {lang.settings.cancel}
                   </M.Button>
                 ) : null}
                 {langVal ? (
                   <M.Button
                     onClick={() => this.changeLang(langVal)}
-                    color="primary">
+                    color="primary"
+                  >
                     {lang.settings.accept}
                   </M.Button>
                 ) : null}
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
             <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}>
+              style={{ background: hue || null }}
+              className={classes.panel}
+            >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -505,7 +536,8 @@ class Settings extends Component {
                   <Dropzone
                     className={classes.dropzone}
                     multiple={false}
-                    onDrop={this.handleAva}>
+                    onDrop={this.handleAva}
+                  >
                     <M.Avatar
                       classes={{ img: classes.avaImg }}
                       className={classes.ava}
@@ -526,7 +558,8 @@ class Settings extends Component {
                 {this.state.ava ? (
                   <M.Button
                     onClick={this.state.avaLoading ? null : this.changeAva}
-                    color="primary">
+                    color="primary"
+                  >
                     {this.state.avaLoading ? (
                       <M.CircularProgress />
                     ) : (
@@ -537,8 +570,9 @@ class Settings extends Component {
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
             <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}>
+              style={{ background: hue || null }}
+              className={classes.panel}
+            >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -553,14 +587,15 @@ class Settings extends Component {
                   />
                 </div>
               </M.ExpansionPanelSummary>
-              <M.ExpansionPanelDetails style={{ display: "block" }}>
+              <M.ExpansionPanelDetails style={{ display: 'block' }}>
                 <M.Typography variant="body1">
                   {lang.settings.bgdesc}
                 </M.Typography>
                 <Dropzone
                   className={classes.dropzoneBg}
                   multiple={false}
-                  onDrop={this.handleBg}>
+                  onDrop={this.handleBg}
+                >
                   <img
                     alt=""
                     className={classes.bg}
@@ -578,7 +613,8 @@ class Settings extends Component {
                 {this.state.bg ? (
                   <M.Button
                     onClick={this.state.bgLoading ? null : this.changeBg}
-                    color="primary">
+                    color="primary"
+                  >
                     {this.state.bgLoading ? (
                       <M.CircularProgress />
                     ) : (
@@ -589,8 +625,9 @@ class Settings extends Component {
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
             <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}>
+              style={{ background: hue || null }}
+              className={classes.panel}
+            >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -610,7 +647,7 @@ class Settings extends Component {
                   </M.Typography>
                   <M.TextField
                     value={this.state.nick}
-                    onChange={(e) => this.setState({ nick: e.target.value })}
+                    onChange={e => this.setState({ nick: e.target.value })}
                     helperText={lang.settings.nickplaceholder}
                     fullWidth
                     margin="normal"
@@ -618,12 +655,12 @@ class Settings extends Component {
                 </Column>
               </M.ExpansionPanelDetails>
               <M.ExpansionPanelActions>
-                {this.state.nick !== "" ? (
-                  <M.Button onClick={() => this.setState({ nick: "" })}>
+                {this.state.nick !== '' ? (
+                  <M.Button onClick={() => this.setState({ nick: '' })}>
                     {lang.settings.cancel}
                   </M.Button>
                 ) : null}
-                {this.state.nick !== "" ? (
+                {this.state.nick !== '' ? (
                   <M.Button onClick={this.changeNick} color="primary">
                     {lang.settings.nickaccept}
                   </M.Button>
@@ -631,8 +668,9 @@ class Settings extends Component {
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
             <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}>
+              style={{ background: hue || null }}
+              className={classes.panel}
+            >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -652,7 +690,7 @@ class Settings extends Component {
                   </M.Typography>
                   <M.TextField
                     value={this.state.user}
-                    onChange={(e) => this.setState({ user: e.target.value })}
+                    onChange={e => this.setState({ user: e.target.value })}
                     helperText={lang.settings.usernameplaceholder}
                     fullWidth
                     margin="normal"
@@ -660,12 +698,12 @@ class Settings extends Component {
                 </Column>
               </M.ExpansionPanelDetails>
               <M.ExpansionPanelActions>
-                {this.state.user !== "" ? (
-                  <M.Button onClick={() => this.setState({ user: "" })}>
+                {this.state.user !== '' ? (
+                  <M.Button onClick={() => this.setState({ user: '' })}>
                     {lang.settings.cancel}
                   </M.Button>
                 ) : null}
-                {this.state.user !== "" ? (
+                {this.state.user !== '' ? (
                   <M.Button onClick={this.changeUsername} color="primary">
                     {lang.settings.useraccept}
                   </M.Button>
@@ -673,8 +711,9 @@ class Settings extends Component {
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
             <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}>
+              style={{ background: hue || null }}
+              className={classes.panel}
+            >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -690,19 +729,19 @@ class Settings extends Component {
               <M.ExpansionPanelDetails>
                 <M.TextField
                   value={this.state.motto}
-                  onChange={(e) => this.setState({ motto: e.target.value })}
+                  onChange={e => this.setState({ motto: e.target.value })}
                   helperText={lang.settings.mottoplaceholder}
                   fullWidth
                   margin="normal"
                 />
               </M.ExpansionPanelDetails>
               <M.ExpansionPanelActions>
-                {this.state.motto !== "" ? (
-                  <M.Button onClick={() => this.setState({ motto: "" })}>
+                {this.state.motto !== '' ? (
+                  <M.Button onClick={() => this.setState({ motto: '' })}>
                     {lang.settings.cancel}
                   </M.Button>
                 ) : null}
-                {this.state.motto !== "" ? (
+                {this.state.motto !== '' ? (
                   <M.Button onClick={this.changeMotto} color="primary">
                     {lang.settings.mottoaccept}
                   </M.Button>
@@ -714,8 +753,9 @@ class Settings extends Component {
               {lang.settings.account}
             </M.Typography>
             <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}>
+              style={{ background: hue || null }}
+              className={classes.panel}
+            >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -785,15 +825,16 @@ class Settings extends Component {
               {lang.settings.sync}
             </M.Typography>
             <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}>
+              style={{ background: hue || null }}
+              className={classes.panel}
+            >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">AniList</M.Typography>
                 </div>
                 <div className={classes.column}>
                   <M.Typography className={classes.secondaryHeading}>
-                    {localStorage.getItem("ALTOKEN")
+                    {localStorage.getItem('ALTOKEN')
                       ? lang.settings.on
                       : lang.settings.off}
                   </M.Typography>
@@ -807,20 +848,22 @@ class Settings extends Component {
               <M.ExpansionPanelActions>
                 <M.Button
                   onClick={
-                    localStorage.getItem("ALTOKEN")
+                    localStorage.getItem('ALTOKEN')
                       ? this.removeTwist
                       : this.triggerTwist
-                  }>
-                  {localStorage.getItem("ALTOKEN")
-                    ? "Disconnect from AniList"
-                    : "Connect with AniList"}
+                  }
+                >
+                  {localStorage.getItem('ALTOKEN')
+                    ? 'Disconnect from AniList'
+                    : 'Connect with AniList'}
                 </M.Button>
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
             <M.ExpansionPanel
               disabled
-              style={{ background: hue ? hue : null, display: "none" }}
-              className={classes.panel}>
+              style={{ background: hue || null, display: 'none' }}
+              className={classes.panel}
+            >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">MyAnimeList</M.Typography>
@@ -859,8 +902,9 @@ class Settings extends Component {
             </M.ExpansionPanel>
             <M.ExpansionPanel
               disabled
-              style={{ background: hue ? hue : null, display: "none" }}
-              className={classes.panel}>
+              style={{ background: hue || null, display: 'none' }}
+              className={classes.panel}
+            >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">Discord</M.Typography>
@@ -903,8 +947,9 @@ class Settings extends Component {
             </M.Typography>
             <M.ExpansionPanel
               disabled
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}>
+              style={{ background: hue || null }}
+              className={classes.panel}
+            >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -946,13 +991,15 @@ class Settings extends Component {
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
             <div
-              style={{ display: "flex", marginTop: theme.spacing.unit * 12 }}>
+              style={{ display: 'flex', marginTop: theme.spacing.unit * 12 }}
+            >
               <div style={{ flex: 1 }} />
               <M.Button
                 variant="raised"
                 color="secondary"
-                style={{ background: "red" }}
-                onClick={() => this.setState({ deleteDialog: true })}>
+                style={{ background: 'red' }}
+                onClick={() => this.setState({ deleteDialog: true })}
+              >
                 Delete my account
               </M.Button>
             </div>
@@ -961,11 +1008,12 @@ class Settings extends Component {
         <Dialogue
           open={deleteDialog}
           onClose={() => this.setState({ deleteDialog: false })}
-          title="Are you sure you want to delete your account?">
+          title="Are you sure you want to delete your account?"
+        >
           <M.Typography variant="body1">
             This action cannot be undone.
           </M.Typography>
-          <div style={{ display: "flex", marginTop: theme.spacing.unit * 4 }}>
+          <div style={{ display: 'flex', marginTop: theme.spacing.unit * 4 }}>
             <M.Button onClick={() => this.setState({ deleteDialog: false })}>
               Nope
             </M.Button>
@@ -973,8 +1021,9 @@ class Settings extends Component {
             <M.Button
               variant="raised"
               color="secondary"
-              style={{ background: "red" }}
-              onClick={this.deleteMyAccount}>
+              style={{ background: 'red' }}
+              onClick={this.deleteMyAccount}
+            >
               Yes
             </M.Button>
           </div>
@@ -982,27 +1031,29 @@ class Settings extends Component {
         <Dialogue
           open={hasEnteredTwist}
           onClose={() => this.setState({ hasEnteredTwist: false })}
-          title="Enter the code you got from AniList">
+          title="Enter the code you got from AniList"
+        >
           <Column>
             <M.Typography variant="body1">
               This will enable Mirai to use your AniList account for syncing.
             </M.Typography>
             <M.TextField
               value={ALToken}
-              onChange={(e) => this.setState({ ALToken: e.target.value })}
+              onChange={e => this.setState({ ALToken: e.target.value })}
               placeholder="Enter your code here"
             />
           </Column>
-          <div style={{ display: "flex", marginTop: theme.spacing.unit * 4 }}>
+          <div style={{ display: 'flex', marginTop: theme.spacing.unit * 4 }}>
             <M.Button onClick={() => this.setState({ hasEnteredTwist: false })}>
               Actually nevermind
             </M.Button>
             <div style={{ flex: 1 }} />
             <M.Button
-              disabled={ALToken.length > 0 ? false : true}
+              disabled={!(ALToken.length > 0)}
               variant="raised"
               color="primary"
-              onClick={this.enableTwist}>
+              onClick={this.enableTwist}
+            >
               Apply
             </M.Button>
           </div>
@@ -1012,8 +1063,4 @@ class Settings extends Component {
   }
 }
 
-export default firebaseConnect()(
-  connect(({ firebase: { profile } }) => ({ profile }))(
-    M.withStyles(style, { withTheme: true })(Settings),
-  ),
-);
+export default firebaseConnect()(connect(({ firebase: { profile } }) => ({ profile }))(M.withStyles(style, { withTheme: true })(Settings)));

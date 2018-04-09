@@ -1,26 +1,22 @@
-import React, { Component } from "react";
-import { withStyles } from "material-ui/styles";
-import { connect } from "react-redux";
-import { firebaseConnect, isEmpty } from "react-redux-firebase";
-import Typography from "material-ui/Typography/Typography";
-import orange from "material-ui/colors/orange";
-import Grid from "material-ui/Grid";
-import grey from "material-ui/colors/grey";
-import SuperTable from "../components/supertable";
-import SwipeableViews from "react-swipeable-views";
-import queryString from "query-string";
-import Tab from "material-ui/Tabs/Tab";
-import Tabs from "material-ui/Tabs/Tabs";
-import CardButton from "../components/cardButton";
-import SuperComment from "../components/supercomment";
-import Hidden from "material-ui/Hidden/Hidden";
-import { scrollFix } from "./../utils/scrollFix";
-import moment from "moment";
-import strings from "../strings.json";
-import Filter from "../utils/filter";
+import React, { Component } from 'react';
+import { withStyles } from 'material-ui/styles';
+import { connect } from 'react-redux';
+import { firebaseConnect, isEmpty } from 'react-redux-firebase';
+import Typography from 'material-ui/Typography/Typography';
+import queryString from 'query-string';
+import Tab from 'material-ui/Tabs/Tab';
+import Tabs from 'material-ui/Tabs/Tabs';
+import Hidden from 'material-ui/Hidden/Hidden';
+import moment from 'moment';
+import Divider from 'material-ui/Divider';
+import strings from '../strings.json';
+import Filter from '../utils/filter';
+import { scrollFix } from './../utils/scrollFix';
+import CardButton from '../components/cardButton';
+import SuperComment from '../components/supercomment';
+import SuperTable from '../components/supertable';
 import {
   Root,
-  CommandoBar,
   Container,
   LoadingIndicator,
   TitleHeader,
@@ -31,55 +27,54 @@ import {
   SectionSubTitle,
   ItemContainer,
   Dialogue,
-} from "../components/layouts";
-import checklang from "../checklang";
-import Anilist from "../anilist-api";
-import { bigFuckingQueryM, bigFuckingQuery } from "../anilist-api/queries";
-import Divider from "material-ui/Divider";
-import localforage from "localforage";
+} from '../components/layouts';
+import checklang from '../checklang';
+import Anilist from '../anilist-api';
+import { bigFuckingQueryM, bigFuckingQuery } from '../anilist-api/queries';
 
-const style = (theme) => ({
+const style = theme => ({
   tabLabel: {
     opacity: 0.5,
     fontSize: 16,
-    color: "white",
-    textTransform: "initial",
+    color: 'white',
+    textTransform: 'initial',
   },
   tabLabelActive: {
     fontWeight: 700,
     fontSize: 16,
     opacity: 1,
-    color: "white",
-    textTransform: "initial",
+    color: 'white',
+    textTransform: 'initial',
   },
   tabLine: {
-    filter: "drop-shadow(0 1px 12px rgba(0,0,255,.2))",
+    filter: 'drop-shadow(0 1px 12px rgba(0,0,255,.2))',
     height: 2,
-    background: "white",
+    background: 'white',
   },
   tab: {
     height: 64,
   },
   feedTitle: {
     fontWeight: 700,
-    textShadow: "0 2px 24px rgba(0,0,0,.07)",
+    textShadow: '0 2px 24px rgba(0,0,0,.07)',
     marginBottom: theme.spacing.unit * 3,
     zIndex: 20,
-    color: "white",
+    color: 'white',
   },
   infoBox: {
-    display: "flex",
+    display: 'flex',
     marginBottom: theme.spacing.unit * 2,
   },
   feedContext: {
     fontSize: theme.typography.pxToRem(16),
   },
   divider: {
-    margin: "8px 0",
+    margin: '8px 0',
   },
 });
 
-class Rankings extends Component {
+class Rankings extends Component
+{
   state = {
     loading: true,
     index: 0,
@@ -93,122 +88,137 @@ class Rankings extends Component {
     memes: null,
     selectedRow: null,
     showMore: false,
-    selectedTitle: "",
-    selectedDesc: "",
+    selectedTitle: '',
+    selectedDesc: '',
   };
 
-  unlisten = this.props.history.listen((location, action) => {
-    const id = queryString.parse(location.search);
-    if (id.c !== this.state.id && id.c !== undefined)
-      return this.props.firebase
-        .database()
-        .ref("/rankings")
-        .child("collections")
-        .child(id.c)
-        .on("value", (val) =>
-          this.setState({ collection: val.val(), index: 3 }),
-        );
-    return this.setState({ collection: null });
-  });
-
-  componentWillUnmount = () => {
-    this.unlisten();
-  };
-
-  componentWillMount = () => {
+  componentWillMount = () =>
+  {
     checklang(this);
     this.getColors();
     scrollFix();
   };
 
-  getColors = () => {
-    const hue = localStorage.getItem("user-hue");
-    if (hue) {
-      let hues = JSON.parse(hue);
+  componentDidMount = async () =>
+  {
+    await this.getFriendsRecommend();
+    this.getCollections();
+    this.fetchOngoing();
+    if (this.props.history.location.search)
+    {
+      const id = queryString.parse(this.props.history.location.search);
+      this.props.firebase
+        .database()
+        .ref('/rankings')
+        .child('collections')
+        .child(id.c)
+        .on('value', val =>
+          this.setState({ collection: val.val(), index: 3, loading: false }));
+    }
+  };
+
+  componentWillUnmount = () =>
+  {
+    this.unlisten();
+  };
+
+  getColors = () =>
+  {
+    const hue = localStorage.getItem('user-hue');
+    if (hue)
+    {
+      const hues = JSON.parse(hue);
       return this.setState({
         hue: hues.hue,
         hueVib: hues.hueVib,
         hueVibN: hues.hueVibN,
       });
-    } else {
+    }
+    return null;
+  };
+
+  getFriendsRecommend = async () =>
+  {
+    const you = this.props.profile;
+    if (isEmpty(you))
+    {
       return null;
     }
-  };
-
-  componentDidMount = async () => {
-    await this.getFriendsRecommend();
-    this.getCollections();
-    this.fetchOngoing();
-    if (this.props.history.location.search) {
-      const id = queryString.parse(this.props.history.location.search);
-      this.props.firebase
-        .database()
-        .ref("/rankings")
-        .child("collections")
-        .child(id.c)
-        .on("value", (val) =>
-          this.setState({ collection: val.val(), index: 3, loading: false }),
-        );
+    if (!isEmpty(you) && !you.friends)
+    {
+      return null;
     }
+    return null;
   };
 
-  fetchOngoing = async () => {
+  getCollections = () =>
+    this.props.firebase
+      .ref('rankings')
+      .child('collections')
+      .on('value', mentionables =>
+        this.setState({
+          rankingMentionable: Object.values(mentionables.val()),
+        }));
+
+  fetchOngoing = async () =>
+  {
     const topScore = await Anilist.get(bigFuckingQuery, {
       page: 1,
       isAdult: false,
-      sort: ["SCORE_DESC"],
+      sort: ['SCORE_DESC'],
     });
 
     const topPopularity = await Anilist.get(bigFuckingQuery, {
       page: 1,
       isAdult: false,
-      sort: ["POPULARITY_DESC"],
+      sort: ['POPULARITY_DESC'],
     });
 
     const actions = await Anilist.get(bigFuckingQuery, {
       page: 1,
       isAdult: false,
-      sort: ["SCORE_DESC"],
-      genre: "Action",
+      sort: ['SCORE_DESC'],
+      genre: 'Action',
     });
 
     const cgcts = await Anilist.get(bigFuckingQuery, {
       page: 1,
       isAdult: false,
-      sort: ["SCORE_DESC"],
-      tag: "Cute Girls Doing Cute Things",
+      sort: ['SCORE_DESC'],
+      tag: 'Cute Girls Doing Cute Things',
     });
 
     const dramas = await Anilist.get(bigFuckingQuery, {
       page: 1,
       isAdult: false,
-      sort: ["SCORE_DESC"],
-      genre: "Drama",
+      sort: ['SCORE_DESC'],
+      genre: 'Drama',
     });
 
     const memes = await Anilist.get(bigFuckingQuery, {
       page: 1,
       isAdult: false,
-      sort: ["SCORE_DESC"],
-      genre: "Comedy",
-      tag: "Parody",
+      sort: ['SCORE_DESC'],
+      genre: 'Comedy',
+      tag: 'Parody',
     });
 
     const ongoing = await Anilist.get(bigFuckingQuery, {
       page: 1,
       isAdult: false,
-      sort: ["POPULARITY_DESC"],
-      status: "RELEASING",
+      sort: ['POPULARITY_DESC'],
+      status: 'RELEASING',
     });
 
     const ongoingM = await Anilist.get(bigFuckingQueryM, {
       page: 1,
       isAdult: false,
-      sort: ["POPULARITY_DESC"],
-      status: "RELEASING",
+      sort: ['POPULARITY_DESC'],
+      status: 'RELEASING',
     });
 
-    try {
+    try
+    {
       if (
         ongoing &&
         ongoingM &&
@@ -219,6 +229,7 @@ class Rankings extends Component {
         cgcts &&
         memes
       )
+      {
         return this.setState({
           ongoing,
           ongoingM,
@@ -230,48 +241,35 @@ class Rankings extends Component {
           memes,
           loading: false,
         });
-    } catch (error) {
+      }
+    }
+    catch (error)
+    {
       console.error(error);
     }
     return null;
   };
 
-  getCollections = () =>
-    this.props.firebase
-      .ref("rankings")
-      .child("collections")
-      .on("value", (mentionables) =>
-        this.setState({
-          rankingMentionable: Object.values(mentionables.val()),
-        }),
-      );
+  unlisten = this.props.history.listen((location) =>
+  {
+    const id = queryString.parse(location.search);
+    if (id.c !== this.state.id && id.c !== undefined)
+    {
+      return this.props.firebase
+        .database()
+        .ref('/rankings')
+        .child('collections')
+        .child(id.c)
+        .on('value', val => this.setState({ collection: val.val(), index: 3 }));
+    }
+    return this.setState({ collection: null });
+  });
 
-  getFriendsRecommend = async () => {
-    const you = this.props.profile;
-    if (isEmpty(you)) {
-      return null;
-    }
-    if (!isEmpty(you) && !you.friends) {
-      return null;
-    }
-    const db = this.props.firebase.database().ref("/users");
-    try {
-      return db.on("value", (value) => {
-        const allUsers = value.val();
-        const yourUsers = Object.values(you.friends);
-        const yourUsersArray = yourUsers.map((s) => {
-          return s.userID;
-        });
-        const allUsersArray = Object.values(allUsers);
-      });
-    } catch (error) {
-      return console.error(error);
-    }
-  };
-
-  selectThis = (type) => {
-    switch (type) {
-      case "oA":
+  selectThis = (type) =>
+  {
+    switch (type)
+    {
+      case 'oA':
         this.setState({
           selectedRow: this.state.ongoing,
           showMore: true,
@@ -283,22 +281,22 @@ class Rankings extends Component {
             this.props.mir.twist &&
             this.props.mir.twist.length > 0
               ? `${Filter(
-                  this.state.ongoing.data.Page.media,
-                  this.props.mir.twist,
-                ).filter((s) => s.nextAiringEpisode).length - 1} ${
-                  this.state.lang.home.ongoingAnimeEstimate
-                }`
+                this.state.ongoing.data.Page.media,
+                this.props.mir.twist,
+              ).filter(s => s.nextAiringEpisode).length - 1} ${
+                this.state.lang.home.ongoingAnimeEstimate
+              }`
               : null,
         });
         break;
-      case "oM":
+      case 'oM':
         this.setState({
           selectedRow: this.state.ongoingM,
           showMore: true,
           selectedTitle: this.state.lang.home.ongoingMangaTitle,
         });
         break;
-      case "tc":
+      case 'tc':
         this.setState({
           selectedRow: this.state.topScore,
           showMore: true,
@@ -306,7 +304,7 @@ class Rankings extends Component {
           selectedDesc: this.state.lang.explore.topRatedDesc,
         });
         break;
-      case "tp":
+      case 'tp':
         this.setState({
           selectedRow: this.state.topPopularity,
           showMore: true,
@@ -319,7 +317,8 @@ class Rankings extends Component {
     }
   };
 
-  render() {
+  render()
+  {
     const { classes } = this.props;
     const {
       index,
@@ -346,7 +345,7 @@ class Rankings extends Component {
         <LoadingIndicator loading={this.state.loading} />
         {hue ? <TitleHeader color={hue} /> : null}
         <Header
-          color={hue ? hue : "#111"}
+          color={hue || '#111'}
           image={collection && index === 3 ? collection.bg : null}
         />
         <Dialogue
@@ -355,13 +354,14 @@ class Rankings extends Component {
             this.setState({
               showMore: false,
               selectedRow: null,
-              selectedTitle: "",
-              selectedDesc: "",
+              selectedTitle: '',
+              selectedDesc: '',
             })
           }
           title={selectedTitle}
-          actions={"close"}>
-          {selectedDesc !== "" ? (
+          actions="close"
+        >
+          {selectedDesc !== '' ? (
             <Typography variant="headline">{selectedDesc}</Typography>
           ) : null}
 
@@ -369,28 +369,28 @@ class Rankings extends Component {
             style={{
               maxWidth: 1600,
               maxHeight: window.innerHeight / 1.5,
-              overflowY: "auto",
-              overflowX: "hidden",
-            }}>
+              overflowY: 'auto',
+              overflowX: 'hidden',
+            }}
+          >
             {selectedRow &&
               this.props.mir.twist &&
               this.props.mir.twist.length > 0 &&
-              Filter(selectedRow.data.Page.media, this.props.mir.twist).map(
-                (action, index) => (
-                  <CardButton
-                    key={index}
-                    onClick={() =>
-                      this.props.history.push(
-                        `/show?${action.type.includes("ANIME") ? "s" : "m"}=${
-                          action.id
-                        }`,
-                      )
-                    }
-                    image={action.coverImage.large}
-                    title={action.title.romaji}
-                  />
-                ),
-              )}
+              Filter(selectedRow.data.Page.media, this.props.mir.twist).map((
+                action,
+                index, // eslint-disable-line no-shadow
+              ) => (
+                <CardButton
+                  key={index}
+                  onClick={() =>
+                    this.props.history.push(`/show?${action.type.includes('ANIME') ? 's' : 'm'}=${
+                        action.id
+                      }`)
+                  }
+                  image={action.coverImage.large}
+                  title={action.title.romaji}
+                />
+              ))}
           </ItemContainer>
         </Dialogue>
         <CommandoBarTop title={lang.explore.title}>
@@ -404,7 +404,8 @@ class Rankings extends Component {
             }
             indicatorClassName={classes.tabLine}
             centered
-            fullWidth>
+            fullWidth
+          >
             <Tab
               label={lang.explore.title}
               classes={{
@@ -426,7 +427,7 @@ class Rankings extends Component {
               }}
             />
             <Tab
-              style={{ display: "none" }}
+              style={{ display: 'none' }}
               disabled
               label={lang.explore.hCorner}
               classes={{
@@ -448,8 +449,8 @@ class Rankings extends Component {
               }}
             />
             <Tab
-              style={{ display: "none" }}
-              disabled={true}
+              style={{ display: 'none' }}
+              disabled
               label={lang.explore.friendsTitle}
               classes={{
                 root: classes.tab,
@@ -475,7 +476,7 @@ class Rankings extends Component {
                   noPad
                   title={lang.explore.topRatedTitle}
                   button={lang.explore.showAll}
-                  buttonClick={() => this.selectThis("tc")}
+                  buttonClick={() => this.selectThis('tc')}
                 />
                 <SectionSubTitle title={lang.explore.topRatedDesc} />
                 {topScore &&
@@ -500,7 +501,7 @@ class Rankings extends Component {
                   noPad
                   title={lang.explore.topPopularTitle}
                   button={lang.explore.showAll}
-                  buttonClick={() => this.selectThis("tp")}
+                  buttonClick={() => this.selectThis('tp')}
                 />
                 <SectionSubTitle title={lang.explore.topPopularDesc} />
                 {topPopularity &&
@@ -525,7 +526,7 @@ class Rankings extends Component {
                   noPad
                   title={lang.home.ongoingAnimeTitle}
                   button={lang.explore.showAll}
-                  buttonClick={() => this.selectThis("oA")}
+                  buttonClick={() => this.selectThis('oA')}
                 />
                 <SectionSubTitle
                   title={
@@ -537,7 +538,7 @@ class Rankings extends Component {
                       ? `${Filter(
                           ongoing.data.Page.media,
                           this.props.mir.twist,
-                        ).filter((s) => s.nextAiringEpisode).length - 1} ${
+                        ).filter(s => s.nextAiringEpisode).length - 1} ${
                           lang.home.ongoingAnimeEstimate
                         }`
                       : null
@@ -550,12 +551,10 @@ class Rankings extends Component {
                 this.props.mir.twist.length > 0 ? (
                   <SuperTable
                     data={Filter(ongoing.data.Page.media, this.props.mir.twist)
-                      .filter((s) => s.nextAiringEpisode)
-                      .sort(
-                        (a, b) =>
+                      .filter(s => s.nextAiringEpisode)
+                      .sort((a, b) =>
                           a.nextAiringEpisode.timeUntilAiring -
-                          b.nextAiringEpisode.timeUntilAiring,
-                      )}
+                          b.nextAiringEpisode.timeUntilAiring)}
                     type="s"
                     typeof="ongoing"
                     limit={12}
@@ -568,7 +567,7 @@ class Rankings extends Component {
                   noPad
                   title={lang.home.ongoingMangaTitle}
                   button={lang.explore.showAll}
-                  buttonClick={() => this.selectThis("oM")}
+                  buttonClick={() => this.selectThis('oM')}
                 />
                 {ongoingM && ongoingM.data ? (
                   <SuperTable
@@ -586,7 +585,7 @@ class Rankings extends Component {
           {index === 1 ? (
             <Container>
               <Column>
-                <Typography variant={"display3"} className={classes.feedTitle}>
+                <Typography variant="display3" className={classes.feedTitle}>
                   {lang.explore.recommendationsTitle}
                 </Typography>
                 <SectionTitle noPad title={lang.explore.action.title} />
@@ -595,18 +594,19 @@ class Rankings extends Component {
                   {actions &&
                     this.props.mir.twist &&
                     this.props.mir.twist.length > 0 &&
-                    Filter(actions.data.Page.media, this.props.mir.twist).map(
-                      (action, index) => (
-                        <CardButton
-                          key={index}
-                          onClick={() =>
-                            this.props.history.push(`/show?s=${action.id}`)
-                          }
-                          image={action.coverImage.large}
-                          title={action.title.romaji}
-                        />
-                      ),
-                    )}
+                    Filter(actions.data.Page.media, this.props.mir.twist).map((
+                      action,
+                      index, // eslint-disable-line no-shadow
+                    ) => (
+                      <CardButton
+                        key={index}
+                        onClick={() =>
+                          this.props.history.push(`/show?s=${action.id}`)
+                        }
+                        image={action.coverImage.large}
+                        title={action.title.romaji}
+                      />
+                    ))}
                 </ItemContainer>
                 <Divider className={classes.divider} />
                 <SectionTitle noPad title={lang.explore.cgct.title} />
@@ -615,18 +615,19 @@ class Rankings extends Component {
                   {cgcts &&
                     this.props.mir.twist &&
                     this.props.mir.twist.length > 0 &&
-                    Filter(cgcts.data.Page.media, this.props.mir.twist).map(
-                      (action, index) => (
-                        <CardButton
-                          key={index}
-                          onClick={() =>
-                            this.props.history.push(`/show?s=${action.id}`)
-                          }
-                          image={action.coverImage.large}
-                          title={action.title.romaji}
-                        />
-                      ),
-                    )}
+                    Filter(cgcts.data.Page.media, this.props.mir.twist).map((
+                      action,
+                      index, // eslint-disable-line no-shadow
+                    ) => (
+                      <CardButton
+                        key={index}
+                        onClick={() =>
+                          this.props.history.push(`/show?s=${action.id}`)
+                        }
+                        image={action.coverImage.large}
+                        title={action.title.romaji}
+                      />
+                    ))}
                 </ItemContainer>
                 <Divider className={classes.divider} />
                 <SectionTitle noPad title={lang.explore.drama.title} />
@@ -635,18 +636,19 @@ class Rankings extends Component {
                   {dramas &&
                     this.props.mir.twist &&
                     this.props.mir.twist.length > 0 &&
-                    Filter(dramas.data.Page.media, this.props.mir.twist).map(
-                      (action, index) => (
-                        <CardButton
-                          key={index}
-                          onClick={() =>
-                            this.props.history.push(`/show?s=${action.id}`)
-                          }
-                          image={action.coverImage.large}
-                          title={action.title.romaji}
-                        />
-                      ),
-                    )}
+                    Filter(dramas.data.Page.media, this.props.mir.twist).map((
+                      action,
+                      index, // eslint-disable-line no-shadow
+                    ) => (
+                      <CardButton
+                        key={index}
+                        onClick={() =>
+                          this.props.history.push(`/show?s=${action.id}`)
+                        }
+                        image={action.coverImage.large}
+                        title={action.title.romaji}
+                      />
+                    ))}
                 </ItemContainer>
                 <Divider className={classes.divider} />
                 <SectionTitle noPad title={lang.explore.meme.title} />
@@ -655,18 +657,16 @@ class Rankings extends Component {
                   {memes &&
                     this.props.mir.twist &&
                     this.props.mir.twist.length > 0 &&
-                    Filter(memes.data.Page.media, this.props.mir.twist).map(
-                      (action, index) => (
-                        <CardButton
-                          key={index}
-                          onClick={() =>
+                    Filter(memes.data.Page.media, this.props.mir.twist).map((action, index) => ( // eslint-disable-line no-shadow
+                      <CardButton
+                        key={index}
+                        onClick={() =>
                             this.props.history.push(`/show?s=${action.id}`)
                           }
-                          image={action.coverImage.large}
-                          title={action.title.romaji}
-                        />
-                      ),
-                    )}
+                        image={action.coverImage.large}
+                        title={action.title.romaji}
+                      />
+                      ))}
                 </ItemContainer>
               </Column>
             </Container>
@@ -674,7 +674,7 @@ class Rankings extends Component {
           {index === 2 ? (
             <Container>
               <Column>
-                <Typography variant={"display3"} className={classes.feedTitle}>
+                <Typography variant="display3" className={classes.feedTitle}>
                   Zones
                 </Typography>
                 <SectionTitle
@@ -700,7 +700,7 @@ class Rankings extends Component {
                     </Column>
                   </div>
                   <Container>
-                    {Object.values(collection.data).map((anime, index) => (
+                    {Object.values(collection.data).map((anime, index) => ( // eslint-disable-line no-shadow
                       <CardButton
                         key={index}
                         onClick={() =>
@@ -711,7 +711,7 @@ class Rankings extends Component {
                       />
                     ))}
                   </Container>
-                  <Typography variant="title" style={{ margin: "16px 0" }}>
+                  <Typography variant="title" style={{ margin: '16px 0' }}>
                     What do you think of this collection?
                   </Typography>
                   <SuperComment
@@ -752,7 +752,7 @@ class Rankings extends Component {
                 {friendRecommends && friendRecommends.show ? (
                   Object.values(friendRecommends)
                     .sort((a, b) => b.date - a.date)
-                    .map((show) => (
+                    .map(show => (
                       <CardButton
                         key={show.id}
                         onClick={() =>
@@ -775,8 +775,4 @@ class Rankings extends Component {
   }
 }
 
-export default firebaseConnect()(
-  connect(({ firebase: { profile }, mir }) => ({ profile, mir }))(
-    withStyles(style)(Rankings),
-  ),
-);
+export default firebaseConnect()(connect(({ firebase: { profile }, mir }) => ({ profile, mir }))(withStyles(style)(Rankings)));

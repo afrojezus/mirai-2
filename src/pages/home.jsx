@@ -1,25 +1,24 @@
-import React, { Component } from "react";
-import { withStyles } from "material-ui/styles";
-import * as ICON from "material-ui-icons";
-import Typography from "material-ui/Typography";
-import localForage from "localforage";
-import Grid from "material-ui/Grid";
-import IconButton from "material-ui/IconButton";
-import checkLang from "../checklang";
-import strings from "../strings.json";
-import { firebaseConnect, isEmpty } from "react-redux-firebase";
-import { blue, grey } from "material-ui/colors";
-import { connect } from "react-redux";
-import Filter from "../utils/filter";
-import { scrollFix } from "./../utils/scrollFix";
-import CardButton from "../components/cardButton";
-import AdSense from "react-adsense";
-import Card, {
-  CardHeader,
-  CardActions,
-  CardContent,
-  CardMedia,
-} from "material-ui/Card";
+import React, { Component } from 'react';
+import { withStyles } from 'material-ui/styles';
+import * as ICON from 'material-ui-icons';
+import Typography from 'material-ui/Typography';
+import Grid from 'material-ui/Grid';
+import { firebaseConnect, isEmpty } from 'react-redux-firebase';
+import { blue, grey } from 'material-ui/colors';
+import { connect } from 'react-redux';
+import AdSense from 'react-adsense';
+import Card, { CardHeader } from 'material-ui/Card';
+import Avatar from 'material-ui/Avatar';
+import Divider from 'material-ui/Divider';
+import Hidden from 'material-ui/Hidden';
+import Select from 'material-ui/Select';
+import { ListItemText } from 'material-ui/List';
+import { MenuItem } from 'material-ui/Menu';
+import checkLang from '../checklang';
+import strings from '../strings.json';
+import Filter from '../utils/filter';
+import { scrollFix } from './../utils/scrollFix';
+import CardButton from '../components/cardButton';
 import {
   Container,
   Root,
@@ -28,85 +27,78 @@ import {
   TitleHeader,
   ItemContainer,
   SectionTitle,
-  SectionSubTitle,
   Dialogue,
   Column,
-} from "../components/layouts";
-import SuperTable from "../components/supertable";
-import Anilist from "../anilist-api";
-import { bigFuckingQuery, bigFuckingQueryM } from "../anilist-api/queries";
-import Hidden from "material-ui/Hidden";
-import { FeedMaker, Feed } from "../components/feed";
-import Select from "material-ui/Select";
-import { MenuItem } from "material-ui/Menu";
-import { SearchBox } from "../components/superbar";
-import Avatar from "material-ui/Avatar";
-import Divider from "material-ui/Divider";
-import List, { ListItem, ListItemText } from "material-ui/List";
+} from '../components/layouts';
+import SuperTable from '../components/supertable';
+import Anilist from '../anilist-api';
+import { bigFuckingQuery } from '../anilist-api/queries';
+import { FeedMaker, Feed } from '../components/feed';
+import { SearchBox } from '../components/superbar';
 
-const styles = (theme) => ({
+const styles = theme => ({
   root: {
     paddingTop: theme.spacing.unit * 8,
   },
   container: {
-    marginLeft: "auto",
-    marginRight: "auto",
+    marginLeft: 'auto',
+    marginRight: 'auto',
     padding: 24,
     maxWidth: 1600,
-    paddingLeft: "env(safe-area-inset-left)",
-    paddingRight: "env(safe-area-inset-right)",
+    paddingLeft: 'env(safe-area-inset-left)',
+    paddingRight: 'env(safe-area-inset-right)',
   },
   itemContainer: {
     margin: theme.spacing.unit,
   },
   bgImage: {
-    position: "fixed",
+    position: 'fixed',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     opacity: 0.1,
-    height: "100vh",
-    objectFit: "cover",
-    width: "100%",
+    height: '100vh',
+    objectFit: 'cover',
+    width: '100%',
     zIndex: -1,
-    transition: theme.transitions.create(["all"]),
+    transition: theme.transitions.create(['all']),
   },
   topHeader: {
-    width: "100%",
+    width: '100%',
     maxHeight: 520,
-    position: "relative",
-    margin: "auto",
-    transition: theme.transitions.create(["all"]),
+    position: 'relative',
+    margin: 'auto',
+    transition: theme.transitions.create(['all']),
   },
   topHeaderBig: {
-    width: "100%",
+    width: '100%',
     maxHeight: 520,
-    position: "relative",
-    margin: "auto",
-    transition: theme.transitions.create(["all"]),
-    background: "black",
+    position: 'relative',
+    margin: 'auto',
+    transition: theme.transitions.create(['all']),
+    background: 'black',
     paddingTop: theme.spacing.unit * 12,
   },
   cardBg: {
-    objectFit: "cover",
-    height: "100%",
-    width: "100%",
-    position: "absolute",
+    objectFit: 'cover',
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
     textIndent: -999,
     top: 0,
     left: 0,
     zIndex: 0,
   },
   cardContent: {
-    textAlign: "center",
-    height: "100%",
+    textAlign: 'center',
+    height: '100%',
     zIndex: 2,
-    display: "flex",
+    display: 'flex',
     background: grey[800],
   },
   divide: {
-    width: "100%",
+    width: '100%',
     marginTop: 24,
     marginBottom: 24,
   },
@@ -114,7 +106,7 @@ const styles = (theme) => ({
     flex: 1,
   },
   headline: {
-    margin: "auto",
+    margin: 'auto',
   },
   headlineTitle: {
     marginBottom: 24,
@@ -122,83 +114,83 @@ const styles = (theme) => ({
     fontWeight: 800,
   },
   fullWidth: {
-    width: "100%",
+    width: '100%',
   },
   entityCard: {
     height: 200,
     width: 183,
-    flexGrow: "initial",
-    flexBasis: "initial",
+    flexGrow: 'initial',
+    flexBasis: 'initial',
     margin: theme.spacing.unit / 2,
-    transition: theme.transitions.create(["all"]),
-    "&:hover": {
-      transform: "scale(1.05)",
-      overflow: "initial",
+    transition: theme.transitions.create(['all']),
+    '&:hover': {
+      transform: 'scale(1.05)',
+      overflow: 'initial',
       zIndex: 200,
-      boxShadow: `0 2px 14px rgba(0,55,230,.3)`,
+      boxShadow: '0 2px 14px rgba(0,55,230,.3)',
       background: blue.A200,
     },
-    "&:hover > div": {
-      boxShadow: "none",
+    '&:hover > div': {
+      boxShadow: 'none',
     },
-    "&:hover > * > h1": {
-      transform: "scale(1.4)",
+    '&:hover > * > h1': {
+      transform: 'scale(1.4)',
       fontWeight: 700,
-      textShadow: "0 2px 12px rgba(0,0,0,.7)",
+      textShadow: '0 2px 12px rgba(0,0,0,.7)',
     },
-    position: "relative",
-    overflow: "hidden",
+    position: 'relative',
+    overflow: 'hidden',
   },
   entityCardDisabled: {
     height: 200,
     width: 183,
-    flexGrow: "initial",
-    flexBasis: "initial",
+    flexGrow: 'initial',
+    flexBasis: 'initial',
     margin: theme.spacing.unit / 2,
-    transition: theme.transitions.create(["all"]),
-    filter: "brightness(.8)",
-    position: "relative",
-    overflow: "hidden",
+    transition: theme.transitions.create(['all']),
+    filter: 'brightness(.8)',
+    position: 'relative',
+    overflow: 'hidden',
   },
   entityImage: {
-    height: "100%",
-    width: "100%",
-    objectFit: "cover",
-    position: "absolute",
+    height: '100%',
+    width: '100%',
+    objectFit: 'cover',
+    position: 'absolute',
     zIndex: -1,
-    transition: theme.transitions.create(["filter"]),
-    "&:hover": {
-      filter: "brightness(0.8)",
+    transition: theme.transitions.create(['filter']),
+    '&:hover': {
+      filter: 'brightness(0.8)',
     },
     top: 0,
     left: 0,
   },
   entityContext: {
-    "&:last-child": {
+    '&:last-child': {
       paddingBottom: 12,
     },
   },
   entityTitle: {
     fontSize: 14,
     fontWeight: 500,
-    position: "absolute",
+    position: 'absolute',
     padding: theme.spacing.unit * 2,
-    transition: theme.transitions.create(["transform"]),
+    transition: theme.transitions.create(['transform']),
     bottom: 0,
     zIndex: 5,
     left: 0,
-    textShadow: "0 1px 12px rgba(0,0,0,.2)",
+    textShadow: '0 1px 12px rgba(0,0,0,.2)',
   },
   entitySubTitle: {
     fontSize: 14,
     fontWeight: 600,
-    position: "absolute",
+    position: 'absolute',
     padding: theme.spacing.unit * 2,
-    transition: theme.transitions.create(["transform"]),
+    transition: theme.transitions.create(['transform']),
     top: 0,
     left: 0,
     zIndex: 5,
-    textShadow: "0 1px 12px rgba(0,0,0,.2)",
+    textShadow: '0 1px 12px rgba(0,0,0,.2)',
   },
   itemcontainer: {
     paddingBottom: theme.spacing.unit * 2,
@@ -206,195 +198,195 @@ const styles = (theme) => ({
     marginRight: theme.spacing.unit,
   },
   gradientCard: {
-    position: "relative",
-    background: "linear-gradient(to top, transparent, rgba(0,0,0,.6))",
+    position: 'relative',
+    background: 'linear-gradient(to top, transparent, rgba(0,0,0,.6))',
     height: 183,
-    width: "100%",
+    width: '100%',
   },
   likeCount: {},
   cardColor: {},
   snackBar: {
-    position: "fixed",
+    position: 'fixed',
     marginTop: 64,
   },
   avatar: {
     marginLeft: -theme.spacing.unit * 4,
     height: 82,
     width: 82,
-    boxShadow: "0 3px 16px rgba(0,0,0,.5)",
+    boxShadow: '0 3px 16px rgba(0,0,0,.5)',
   },
   frame: {
-    transition: theme.transitions.create(["all"]),
+    transition: theme.transitions.create(['all']),
   },
   loading: {
-    height: "100%",
-    width: "100%",
+    height: '100%',
+    width: '100%',
     zIndex: -5,
-    position: "fixed",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%,-50%)",
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%,-50%)',
     padding: 0,
-    margin: "auto",
-    transition: theme.transitions.create(["all"]),
+    margin: 'auto',
+    transition: theme.transitions.create(['all']),
   },
   bigCard: {
     margin: theme.spacing.unit * 3,
     padding: theme.spacing.unit * 2,
-    display: "flex",
-    boxShadow: "0 2px 18px rgba(0,0,0,.4)",
-    background: "rgba(255,255,255,0)",
-    height: "100%",
-    minHeight: "300px !important",
-    width: "100%",
+    display: 'flex',
+    boxShadow: '0 2px 18px rgba(0,0,0,.4)',
+    background: 'rgba(255,255,255,0)',
+    height: '100%',
+    minHeight: '300px !important',
+    width: '100%',
 
-    boxSizing: "border-box",
-    transition: theme.transitions.create(["all"]),
-    "&:last-child": {
+    boxSizing: 'border-box',
+    transition: theme.transitions.create(['all']),
+    '&:last-child': {
       marginRight: theme.spacing.unit * 9,
     },
-    "&:first-child": {
+    '&:first-child': {
       marginLeft: theme.spacing.unit * 9,
     },
-    position: "relative",
-    "&:hover": {
-      background: `rgba(0,55,230,.3)`,
+    position: 'relative',
+    '&:hover': {
+      background: 'rgba(0,55,230,.3)',
     },
-    "&:hover > div:nth-of-type(2) > img": {
+    '&:hover > div:nth-of-type(2) > img': {
       zIndex: 200,
-      boxShadow: `0 2px 14px rgba(0,55,230,.3)`,
+      boxShadow: '0 2px 14px rgba(0,55,230,.3)',
       borderColor: blue.A200,
     },
   },
   bigCardIcon: {
-    background: "white",
+    background: 'white',
     zIndex: 4,
     width: 156,
     height: 228,
-    boxShadow: "0 3px 24px rgba(0,0,0,.6)",
-    objectFit: "cover",
+    boxShadow: '0 3px 24px rgba(0,0,0,.6)',
+    objectFit: 'cover',
     marginRight: theme.spacing.unit * 2,
-    transition: theme.transitions.create(["all"]),
-    border: "8px solid transparent",
-    "&:hover": {
-      filter: "brightness(0.8)",
+    transition: theme.transitions.create(['all']),
+    border: '8px solid transparent',
+    '&:hover': {
+      filter: 'brightness(0.8)',
     },
   },
   bigCardImage: {
-    position: "absolute",
-    height: "100%",
-    width: "100%",
-    objectFit: "cover",
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+    objectFit: 'cover',
     top: 0,
     left: 0,
-    display: "inline-block",
-    background: "linear-gradient(to top, rgba(0,0,0,.7), transparent)",
+    display: 'inline-block',
+    background: 'linear-gradient(to top, rgba(0,0,0,.7), transparent)',
   },
   bigCardImageImg: {
-    position: "relative",
-    height: "100%",
-    width: "100%",
-    objectFit: "cover",
+    position: 'relative',
+    height: '100%',
+    width: '100%',
+    objectFit: 'cover',
     top: 0,
     left: 0,
     zIndex: -1,
-    display: "block",
+    display: 'block',
   },
   bigCardRow: {
-    display: "flex",
+    display: 'flex',
     zIndex: 3,
-    position: "absolute",
-    width: "100%",
+    position: 'absolute',
+    width: '100%',
     bottom: -theme.spacing.unit * 2,
     left: -theme.spacing.unit * 2,
   },
   bigCardTitle: {
     zIndex: 3,
-    color: "white",
+    color: 'white',
     fontWeight: 700,
     fontSize: 32,
-    textShadow: "0 3px 20px rgba(0,0,0,.87)",
+    textShadow: '0 3px 20px rgba(0,0,0,.87)',
   },
   bigCardText: {
-    display: "flex",
-    flexDirection: "column",
-    margin: "auto 0",
+    display: 'flex',
+    flexDirection: 'column',
+    margin: 'auto 0',
   },
   bigCardSmallTitle: {
     zIndex: 3,
-    color: "white",
+    color: 'white',
     fontWeight: 400,
     marginTop: theme.spacing.unit,
     lineHeight: 1,
     fontSize: 18,
-    textShadow: "0 3px 20px rgba(0,0,0,.7)",
+    textShadow: '0 3px 20px rgba(0,0,0,.7)',
   },
   bigCardVerySmallTitle: {
     zIndex: 3,
-    color: "white",
+    color: 'white',
     fontWeight: 700,
     fontSize: 14,
-    textShadow: "0 3px 20px rgba(0,0,0,.7)",
+    textShadow: '0 3px 20px rgba(0,0,0,.7)',
     marginBottom: theme.spacing.unit,
-    textTransform: "uppercase",
+    textTransform: 'uppercase',
   },
   searchBar: {
-    background: "rgba(255,255,255,.05)",
-    border: "1px solid rgba(255,255,255,.1)",
-    boxShadow: "none",
+    background: 'rgba(255,255,255,.05)',
+    border: '1px solid rgba(255,255,255,.1)',
+    boxShadow: 'none',
     maxWidth: 1970,
     minWidth: 300,
-    display: "flex",
-    transition: theme.transitions.create(["all"]),
-    "&:hover": {
-      background: "rgba(255,255,255,.08)",
-      border: "1px solid rgba(255,255,255,.15)",
+    display: 'flex',
+    transition: theme.transitions.create(['all']),
+    '&:hover': {
+      background: 'rgba(255,255,255,.08)',
+      border: '1px solid rgba(255,255,255,.15)',
     },
-    "&:focus": {
-      background: "rgba(255,255,255,.08)",
-      border: "1px solid rgba(255,255,255,.15)",
+    '&:focus': {
+      background: 'rgba(255,255,255,.08)',
+      border: '1px solid rgba(255,255,255,.15)',
     },
-    margin: "auto",
+    margin: 'auto',
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
   },
   searchInput: {
-    boxSizing: "border-box",
+    boxSizing: 'border-box',
     padding: theme.spacing.unit,
   },
   searchIcon: {
     paddingLeft: theme.spacing.unit * 2,
     paddingRight: theme.spacing.unit * 2,
-    margin: "auto 0",
-    width: "auto",
-    color: "white",
+    margin: 'auto 0',
+    width: 'auto',
+    color: 'white',
   },
   profileCardImg: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     height: 80,
-    objectFit: "cover",
-    width: "100%",
+    objectFit: 'cover',
+    width: '100%',
     opacity: 0.4,
     zIndex: -1,
-    transition: theme.transitions.create(["all"]),
-    pointerEvent: "none",
+    transition: theme.transitions.create(['all']),
+    pointerEvent: 'none',
   },
   userAvatar: {
     zIndex: 5,
     boxShadow: theme.shadows[6],
-    borderRadius: "50%",
+    borderRadius: '50%',
   },
   userNick: {
     zIndex: 5,
-    textShadow: "0 2px 30px rgba(0,0,0,3)",
+    textShadow: '0 2px 30px rgba(0,0,0,3)',
   },
   userTitle: {
     zIndex: 5,
-    textShadow: "0 2px 30px rgba(0,0,0,3)",
+    textShadow: '0 2px 30px rgba(0,0,0,3)',
   },
   secTitleText: {
     fontWeight: 700,
@@ -402,7 +394,8 @@ const styles = (theme) => ({
   },
 });
 
-class Home extends Component {
+class Home extends Component
+{
   state = {
     feeds: null,
     anchorEl: null,
@@ -410,49 +403,62 @@ class Home extends Component {
     loading: true,
     ongoing: null,
     rankingMentionable: null,
-    hue: "#111",
-    hueVib: "#111",
-    hueVibN: "#111",
+    hue: '#111',
+    hueVib: '#111',
+    hueVibN: '#111',
     lang: strings.enus,
     filterFeedVal: 0,
     randomID: 1,
     selectedRow: null,
     showMore: false,
-    selectedTitle: "",
-    selectedDesc: "",
+    selectedTitle: '',
+    selectedDesc: '',
   };
 
-  componentWillMount = () => {
+  componentWillMount = () =>
+  {
     checkLang(this);
     scrollFix();
   };
 
-  componentDidMount = () => {
+  componentDidMount = () =>
+  {
     this.feedsObserve();
     this.getColors();
     this.getRandomID();
     this.fetchOngoing();
   };
-  componentWillUnmount = () => {};
+  componentWillUnmount = () =>
+  {};
 
-  getColors = () => {
-    const hue = localStorage.getItem("user-hue");
-    if (hue) {
-      let hues = JSON.parse(hue);
+  getColors = () =>
+  {
+    const hue = localStorage.getItem('user-hue');
+    if (hue)
+    {
+      const hues = JSON.parse(hue);
       return this.setState({
         hue: hues.hue,
         hueVib: hues.hueVib,
         hueVibN: hues.hueVibN,
       });
-    } else {
-      return null;
     }
+    return null;
   };
 
-  feedsObserve = () => {
-    return this.props.firebase.ref("social").on("value", (feed) => {
-      return this.props.firebase.ref("users").on("value", (usersR) => {
-        if (!feed) {
+  getRandomID = () =>
+    this.props.firebase
+      .database()
+      .ref('anime')
+      .child('twist')
+      .on('value', val => this.setState({ randomID: val.val() }));
+
+  feedsObserve = () =>
+    this.props.firebase.ref('social').on('value', feed =>
+      this.props.firebase.ref('users').on('value', (usersR) =>
+      {
+        if (!feed)
+        {
           return null;
         }
 
@@ -462,20 +468,19 @@ class Home extends Component {
         const usersync = usersR.val();
         // Get activity feed from users
         const users = Object.values(usersync)
-          .filter((a) => !a.privateLog)
-          .filter((x) => x.feed)
-          .map((f) => f.feed);
-        const userFeedArray = users.map((s) => Object.values(s));
+          .filter(a => !a.privateLog)
+          .filter(x => x.feed)
+          .map(f => f.feed);
+        const userFeedArray = users.map(s => Object.values(s));
         // THIS SHIT IS GIVING ME HEADACHES.
-        let userFeeds = [];
-        userFeedArray.map((a) => a.map((s) => userFeeds.push(s)));
+        const userFeeds = [];
+        userFeedArray.map(a => a.map(s => userFeeds.push(s)));
         // Make sure there ain't duplicates
-        const activities = Object.values(userFeeds).filter((a) =>
-          userFeeds.map((s) => !s.activity),
-        );
+        const activities = Object.values(userFeeds).filter(() =>
+          userFeeds.map(s => !s.activity));
 
         // Group them together in one fuckfeed
-        let feeds = [
+        const feeds = [
           ...Object.values(feedsync.byusers),
           ...feedsync.public_feed,
           ...activities,
@@ -483,31 +488,25 @@ class Home extends Component {
 
         feeds.sort((a, b) => b.date - a.date);
 
-        return this.setState({ feeds: feeds });
-      });
-    });
-  };
+        return this.setState({ feeds });
+      }));
 
-  openEntity = (link) => this.props.changePage(link);
+  openEntity = link => this.props.changePage(link);
 
   easterEggOne = () => this.setState({ es: !this.state.es });
 
-  filterFeed = (e) => this.setState({ filterFeedVal: e.target.value });
+  filterFeed = e => this.setState({ filterFeedVal: e.target.value });
 
-  getRandomID = () =>
-    this.props.firebase
-      .database()
-      .ref("anime")
-      .child("twist")
-      .on("value", (val) => this.setState({ randomID: val.val() }));
-
-  componentDidCatch(error, info) {
-    console.log(error, info);
+  componentDidCatch(error, info)
+  {
+    this.setState({ error: info, errorCode: error });
   }
 
-  selectThis = (type) => {
-    switch (type) {
-      case "oA":
+  selectThis = (type) =>
+  {
+    switch (type)
+    {
+      case 'oA':
         this.setState({
           selectedRow: this.state.ongoing,
           showMore: true,
@@ -519,22 +518,22 @@ class Home extends Component {
             this.props.mir.twist &&
             this.props.mir.twist.length > 0
               ? `${Filter(
-                  this.state.ongoing.data.Page.media,
-                  this.props.mir.twist,
-                ).filter((s) => s.nextAiringEpisode).length - 1} ${
-                  this.state.lang.home.ongoingAnimeEstimate
-                }`
+                this.state.ongoing.data.Page.media,
+                this.props.mir.twist,
+              ).filter(s => s.nextAiringEpisode).length - 1} ${
+                this.state.lang.home.ongoingAnimeEstimate
+              }`
               : null,
         });
         break;
-      case "oM":
+      case 'oM':
         this.setState({
           selectedRow: this.state.ongoingM,
           showMore: true,
           selectedTitle: this.state.lang.home.ongoingMangaTitle,
         });
         break;
-      case "tc":
+      case 'tc':
         this.setState({
           selectedRow: this.state.topScore,
           showMore: true,
@@ -542,7 +541,7 @@ class Home extends Component {
           selectedDesc: this.state.lang.explore.topRatedDesc,
         });
         break;
-      case "tp":
+      case 'tp':
         this.setState({
           selectedRow: this.state.topPopularity,
           showMore: true,
@@ -555,40 +554,42 @@ class Home extends Component {
     }
   };
 
-  fetchOngoing = async () => {
+  fetchOngoing = async () =>
+  {
     const ongoing = await Anilist.get(bigFuckingQuery, {
       page: 1,
       isAdult: false,
-      sort: ["POPULARITY_DESC"],
-      status: "RELEASING",
+      sort: ['POPULARITY_DESC'],
+      status: 'RELEASING',
     });
 
-    try {
+    try
+    {
       if (ongoing)
+      {
         return this.setState({
           ongoing,
           loading: false,
         });
-    } catch (error) {
+      }
+    }
+    catch (error)
+    {
       console.error(error);
     }
     return null;
   };
 
-  render() {
+  render()
+  {
     const { classes } = this.props;
     const {
       feeds,
       loading,
       ongoing,
-      ongoingM,
-      rankingMentionable,
       hue,
-      hueVibN,
       lang,
       filterFeedVal,
-      searchVal,
-      searchResult,
       randomID,
       showMore,
       selectedRow,
@@ -608,7 +609,7 @@ class Home extends Component {
             title={lang.home.welcomeanon}
             subtitle={lang.home.welcomeSubtitle}
             miraiLogo
-            color={"#000"}
+            color="#000"
           />
         ) : null}
         <Dialogue
@@ -617,13 +618,14 @@ class Home extends Component {
             this.setState({
               showMore: false,
               selectedRow: null,
-              selectedTitle: "",
-              selectedDesc: "",
+              selectedTitle: '',
+              selectedDesc: '',
             })
           }
           title={selectedTitle}
-          actions={"close"}>
-          {selectedDesc !== "" ? (
+          actions="close"
+        >
+          {selectedDesc !== '' ? (
             <Typography variant="headline">{selectedDesc}</Typography>
           ) : null}
 
@@ -631,24 +633,23 @@ class Home extends Component {
             style={{
               maxWidth: 1600,
               maxHeight: window.innerHeight / 1.5,
-              overflowY: "auto",
-              overflowX: "hidden",
-            }}>
+              overflowY: 'auto',
+              overflowX: 'hidden',
+            }}
+          >
             {selectedRow &&
               this.props.mir.twist &&
               this.props.mir.twist.length > 0 &&
-              Filter(selectedRow.data.Page.media, this.props.mir.twist).map(
-                (action, index) => (
-                  <CardButton
-                    key={index}
-                    onClick={() =>
+              Filter(selectedRow.data.Page.media, this.props.mir.twist).map((action, index) => (
+                <CardButton
+                  key={index}
+                  onClick={() =>
                       this.props.history.push(`/show?s=${action.id}`)
                     }
-                    image={action.coverImage.large}
-                    title={action.title.romaji}
-                  />
-                ),
-              )}
+                  image={action.coverImage.large}
+                  title={action.title.romaji}
+                />
+                ))}
           </ItemContainer>
         </Dialogue>
         <div className={classes.frame}>
@@ -668,13 +669,13 @@ class Home extends Component {
                         ? `${Filter(
                             ongoing.data.Page.media,
                             this.props.mir.twist,
-                          ).filter((s) => s.nextAiringEpisode).length - 1} ${
+                          ).filter(s => s.nextAiringEpisode).length - 1} ${
                             lang.home.ongoingAnimeEstimate
                           }`
                         : null
                     }
                     button={lang.explore.showAll}
-                    buttonClick={() => this.selectThis("oA")}
+                    buttonClick={() => this.selectThis('oA')}
                   />
                   {ongoing &&
                   ongoing.data &&
@@ -686,12 +687,10 @@ class Home extends Component {
                         ongoing.data.Page.media,
                         this.props.mir.twist,
                       )
-                        .filter((s) => s.nextAiringEpisode)
-                        .sort(
-                          (a, b) =>
+                        .filter(s => s.nextAiringEpisode)
+                        .sort((a, b) =>
                             a.nextAiringEpisode.timeUntilAiring -
-                            b.nextAiringEpisode.timeUntilAiring,
-                        )}
+                            b.nextAiringEpisode.timeUntilAiring)}
                       type="s"
                       typeof="ongoing"
                       limit={12}
@@ -707,18 +706,19 @@ class Home extends Component {
                     <Card
                       style={{
                         background: hue,
-                        border: "1px solid rgba(255,255,255,.1)",
-                        position: "relative",
+                        border: '1px solid rgba(255,255,255,.1)',
+                        position: 'relative',
                         marginBottom: 16,
                       }}
-                      elevation={4}>
+                      elevation={4}
+                    >
                       <CardHeader
-                        onClick={() => this.props.history.push("/user")}
+                        onClick={() => this.props.history.push('/user')}
                         title={user.username}
                         subheader={user.nick}
                         avatar={<Avatar src={user.avatar} />}
                         style={{
-                          cursor: "pointer",
+                          cursor: 'pointer',
                           background: `url(${user.headers})`,
                         }}
                         classes={{
@@ -729,21 +729,22 @@ class Home extends Component {
                       />
                       <Divider />
                       <MenuItem
-                        onClick={() => this.props.history.push("/user")}>
-                        <ICON.People style={{ marginRight: 16 }} />{" "}
+                        onClick={() => this.props.history.push('/user')}
+                      >
+                        <ICON.People style={{ marginRight: 16 }} />{' '}
                         {lang.user.friends}
                       </MenuItem>
                       <MenuItem
-                        onClick={() => this.props.history.push("/later")}>
-                        <ICON.WatchLater style={{ marginRight: 16 }} />{" "}
+                        onClick={() => this.props.history.push('/later')}
+                      >
+                        <ICON.WatchLater style={{ marginRight: 16 }} />{' '}
                         {lang.superbar.later}
                       </MenuItem>
                       <MenuItem
                         onClick={() =>
-                          this.props.history.push(
-                            `/show?s=${Object.keys(randomID)[0]}`,
-                          )
-                        }>
+                          this.props.history.push(`/show?s=${Object.keys(randomID)[0]}`)
+                        }
+                      >
                         <ICON.Star style={{ marginRight: 16 }} />
                         {lang.home.random}
                       </MenuItem>
@@ -751,14 +752,15 @@ class Home extends Component {
                     <Card
                       style={{
                         background: hue,
-                        border: "1px solid rgba(255,255,255,.1)",
-                        display: "none",
+                        border: '1px solid rgba(255,255,255,.1)',
+                        display: 'none',
                       }}
-                      elevation={4}>
+                      elevation={4}
+                    >
                       <AdSense.Google
                         client="ca-pub-5718203937607584"
                         slot="1622822370"
-                        style={{ width: "100%", height: 300 }}
+                        style={{ width: '100%', height: 300 }}
                       />
                     </Card>
                   </Grid>
@@ -796,12 +798,13 @@ class Home extends Component {
                             ? `${Filter(
                                 ongoing.data.Page.media,
                                 this.props.mir.twist,
-                              ).filter((s) => s.nextAiringEpisode).length -
-                                1} ${lang.home.ongoingAnimeEstimate}`
+                              ).filter(s => s.nextAiringEpisode).length - 1} ${
+                                lang.home.ongoingAnimeEstimate
+                              }`
                             : null
                         }
                         button={lang.explore.showAll}
-                        buttonClick={() => this.selectThis("oA")}
+                        buttonClick={() => this.selectThis('oA')}
                       />
                     </Column>
                     {ongoing &&
@@ -814,12 +817,10 @@ class Home extends Component {
                           ongoing.data.Page.media,
                           this.props.mir.twist,
                         )
-                          .filter((s) => s.nextAiringEpisode)
-                          .sort(
-                            (a, b) =>
+                          .filter(s => s.nextAiringEpisode)
+                          .sort((a, b) =>
                               a.nextAiringEpisode.timeUntilAiring -
-                              b.nextAiringEpisode.timeUntilAiring,
-                          )}
+                              b.nextAiringEpisode.timeUntilAiring)}
                         type="s"
                         typeof="ongoing"
                         limit={12}
@@ -842,31 +843,29 @@ class Home extends Component {
                   </form>
                 </Container>
                 {feeds &&
-                feeds.filter(
-                  (o) =>
-                    filterFeedVal === 0
+                feeds.filter(o =>
+                    (filterFeedVal === 0
                       ? o
                       : filterFeedVal === 1
                         ? o && !o.type
-                        : filterFeedVal === 2 ? o && o.type : null,
-                ).length > 0 ? (
+                        : filterFeedVal === 2 ? o && o.type : null)).length > 0 ? (
                   feeds
-                    .filter(
-                      (o) =>
-                        filterFeedVal === 0
+                    .filter(o =>
+                        (filterFeedVal === 0
                           ? o
                           : filterFeedVal === 1
                             ? o && !o.type
-                            : filterFeedVal === 2 ? o && o.type : null,
-                    )
-                    .map((feed, index) => {
+                            : filterFeedVal === 2 ? o && o.type : null))
+                    .map((feed, index) =>
+{
                       if (feed.user && feed.user.username === undefined)
+{
                         // It's an update.
                         return (
                           <Feed
                             key={index}
                             ftitle={feed.name}
-                            context={"MIRAI UPDATE"}
+                            context="MIRAI UPDATE"
                             text={feed.context}
                             date={feed.date}
                             avatar={feed.user.image}
@@ -877,7 +876,9 @@ class Home extends Component {
                             color={hue}
                           />
                         );
-                      else if (feed.context === "INTRO")
+                      }
+ else if (feed.context === 'INTRO')
+{
                         // It's an intro feed
                         return (
                           <Feed
@@ -895,7 +896,9 @@ class Home extends Component {
                             color={hue}
                           />
                         );
-                      else if (feed.type)
+                      }
+ else if (feed.type)
+{
                         // It's an activity feed
                         return (
                           <Feed
@@ -917,24 +920,24 @@ class Home extends Component {
                             activity
                             noActions
                           />
-                        ); // It's an user-made feed
-                      else
-                        return (
-                          <Feed
-                            key={index}
-                            ftitle={feed.user.username}
-                            context={feed.context}
-                            text={feed.text}
-                            date={feed.date}
-                            avatar={feed.user.avatar}
-                            image={feed.image}
-                            id={feed.id}
-                            user={feed.user}
-                            color={hue}
-                            likes={feed.likes}
-                            reposts={feed.reposts}
-                          />
                         );
+                      } // It's an user-made feed
+                      return (
+                        <Feed
+                          key={index}
+                          ftitle={feed.user.username}
+                          context={feed.context}
+                          text={feed.text}
+                          date={feed.date}
+                          avatar={feed.user.avatar}
+                          image={feed.image}
+                          id={feed.id}
+                          user={feed.user}
+                          color={hue}
+                          likes={feed.likes}
+                          reposts={feed.reposts}
+                        />
+                      );
                     })
                 ) : (
                   <Container style={{ padding: 8 }}>
@@ -946,14 +949,16 @@ class Home extends Component {
                 <Grid
                   item
                   xs={window.mobilecheck() ? 12 : 3}
-                  style={{ padding: 16 }}>
+                  style={{ padding: 16 }}
+                >
                   <Card
                     style={{
                       background: hue,
-                      border: "1px solid rgba(255,255,255,.1)",
+                      border: '1px solid rgba(255,255,255,.1)',
                       marginBottom: 16,
                     }}
-                    elevation={4}>
+                    elevation={4}
+                  >
                     <CardHeader
                       title={lang.home.animefavTitle}
                       classes={{ title: classes.secTitleText }}
@@ -965,20 +970,21 @@ class Home extends Component {
                     user.favs.show ? (
                       Object.values(user.favs.show)
                         .sort((a, b) => a.name - b.name)
-                        .map((anime) => (
+                        .map(anime => (
                           <MenuItem
                             style={{ paddingLeft: 0 }}
                             key={anime.id}
                             onClick={() =>
                               this.props.history.push(`/show?s=${anime.id}`)
-                            }>
+                            }
+                          >
                             <Avatar
                               src={anime.image}
                               style={{
                                 borderRadius: 0,
-                                height: "auto",
+                                height: 'auto',
                                 width: 60,
-                                background: "white",
+                                background: 'white',
                               }}
                             />
                             <ListItemText primary={anime.name} />
@@ -995,9 +1001,10 @@ class Home extends Component {
                   <Card
                     style={{
                       background: hue,
-                      border: "1px solid rgba(255,255,255,.1)",
+                      border: '1px solid rgba(255,255,255,.1)',
                     }}
-                    elevation={4}>
+                    elevation={4}
+                  >
                     <CardHeader
                       title={lang.home.mangafavTitle}
                       classes={{ title: classes.secTitleText }}
@@ -1009,20 +1016,21 @@ class Home extends Component {
                     user.favs.manga ? (
                       Object.values(user.favs.manga)
                         .sort((a, b) => a.name - b.name)
-                        .map((anime) => (
+                        .map(anime => (
                           <MenuItem
                             style={{ paddingLeft: 0 }}
                             key={anime.id}
                             onClick={() =>
                               this.props.history.push(`/show?m=${anime.id}`)
-                            }>
+                            }
+                          >
                             <Avatar
                               src={anime.image}
                               style={{
                                 borderRadius: 0,
-                                height: "auto",
+                                height: 'auto',
                                 width: 60,
-                                background: "white",
+                                background: 'white',
                               }}
                             />
                             <ListItemText primary={anime.name} />
@@ -1048,10 +1056,8 @@ class Home extends Component {
   }
 }
 
-export default firebaseConnect()(
-  connect(({ firebase: { auth, profile }, mir }) => ({
-    auth,
-    profile,
-    mir,
-  }))(withStyles(styles)(Home)),
-);
+export default firebaseConnect()(connect(({ firebase: { auth, profile }, mir }) => ({
+  auth,
+  profile,
+  mir,
+}))(withStyles(styles)(Home)));

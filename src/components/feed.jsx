@@ -18,7 +18,7 @@ import Tooltip from 'material-ui/Tooltip/Tooltip';
 import Typography from 'material-ui/Typography';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import Component, { React } from 'react';
+import React, { Component } from 'react';
 import FadeIn from 'react-fade-in';
 import { connect } from 'react-redux';
 import { firebaseConnect, isEmpty } from 'react-redux-firebase';
