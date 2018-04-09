@@ -2,7 +2,7 @@
 
 import React from "react";
 import { MuiThemeProvider, createMuiTheme } from "material-ui/styles";
-import Reboot from "material-ui/Reboot";
+import CssBaseline from "material-ui/CssBaseline";
 import { blue } from "material-ui/colors/index";
 
 // If the user has opted a background, apply the hues as accent color etc.
@@ -99,8 +99,7 @@ function withRoot(Component) {
     // thanks to React context.
     return (
       <MuiThemeProvider theme={theme}>
-        {/* Reboot kickstart an elegant, consistent, and simple baseline to build upon. */}
-        <Reboot />
+        <CssBaseline />
         <Component {...props} />
       </MuiThemeProvider>
     );

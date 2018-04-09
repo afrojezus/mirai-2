@@ -19,11 +19,13 @@
   },
   "exclude": [
     "node_modules",
+    "node_modules/**",
     "build",
     "scripts",
     "acceptance-tests",
     "webpack",
     "jest",
-    "src/kitsu-api/kitsu"
+    "src/kitsu-api/kitsu/**",
+    "functions"
   ]
 }

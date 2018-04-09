@@ -1,19 +1,19 @@
-import React, { Component } from "react";
-import { withStyles } from "material-ui/styles";
-import { connect } from "react-redux";
-import { firebaseConnect } from "react-redux-firebase";
-import Typography from "material-ui/Typography/Typography";
-import green from "material-ui/colors/green";
-import grey from "material-ui/colors/grey";
-import SwipeableViews from "react-swipeable-views";
-import Tab from "material-ui/Tabs/Tab";
-import Tabs from "material-ui/Tabs/Tabs";
-import SuperTable from "../components/supertable";
-import Button from "material-ui/Button/Button";
-import AddIcon from "material-ui-icons/Add";
-import Hidden from "material-ui/Hidden/Hidden";
-import checklang from "../checklang";
-import strings from "../strings.json";
+import React, { Component } from 'react';
+import { withStyles } from 'material-ui/styles';
+import { connect } from 'react-redux';
+import { firebaseConnect } from 'react-redux-firebase';
+import Typography from 'material-ui/Typography/Typography';
+import green from 'material-ui/colors/green';
+import grey from 'material-ui/colors/grey';
+import SwipeableViews from 'react-swipeable-views';
+import Tab from 'material-ui/Tabs/Tab';
+import Tabs from 'material-ui/Tabs/Tabs';
+import SuperTable from '../components/supertable';
+import Button from 'material-ui/Button/Button';
+import AddIcon from 'material-ui-icons/Add';
+import Hidden from 'material-ui/Hidden/Hidden';
+import checklang from '../checklang';
+import strings from '../strings.json';
 import {
   Root,
   CommandoBar,
@@ -24,69 +24,69 @@ import {
   CommandoBarTop,
   Column,
   Dialogue,
-  SectionTitle
-} from "../components/layouts";
-import CardButton from "../components/cardButton";
-import { scrollFix } from "./../utils/scrollFix";
+  SectionTitle,
+} from '../components/layouts';
+import CardButton from '../components/cardButton';
+import { scrollFix } from './../utils/scrollFix';
 
-const style = theme => ({
+const style = (theme) => ({
   tabLabel: {
     opacity: 0.5,
     fontSize: 16,
-    color: "white",
-    textTransform: "initial"
+    color: 'white',
+    textTransform: 'initial',
   },
   tabLabelActive: {
     fontWeight: 700,
     fontSize: 16,
     opacity: 1,
-    color: "white",
-    textTransform: "initial"
+    color: 'white',
+    textTransform: 'initial',
   },
   tabLine: {
-    filter: "drop-shadow(0 1px 12px rgba(0,0,255,.2))",
+    filter: 'drop-shadow(0 1px 12px rgba(0,0,255,.2))',
     height: 2,
-    background: "white"
+    background: 'white',
   },
   tab: {
-    height: 64
+    height: 64,
   },
   feedTitle: {
     fontWeight: 700,
-    textShadow: "0 2px 24px rgba(0,0,0,.07)",
+    textShadow: '0 2px 24px rgba(0,0,0,.07)',
     marginBottom: theme.spacing.unit * 3,
     zIndex: 20,
-    color: "white"
+    color: 'white',
   },
   infoBox: {
-    display: "flex",
-    marginBottom: theme.spacing.unit * 2
+    display: 'flex',
+    marginBottom: theme.spacing.unit * 2,
   },
   feedContext: {
-    fontSize: theme.typography.pxToRem(16)
+    fontSize: theme.typography.pxToRem(16),
   },
   fabContainer: {
-    transition: theme.transitions.create(["all"]),
-    zIndex: 10000
+    transition: theme.transitions.create(['all']),
+    zIndex: 10000,
   },
   fabPlayButton: {
-    position: "fixed",
+    position: 'fixed',
     bottom: theme.spacing.unit * 4,
     right: theme.spacing.unit * 4,
     zIndex: 10000,
-    transform: "translateZ(0)"
+    transform: 'translateZ(0)',
   },
   fabProgress: {
-    color: "white",
+    color: 'white',
     zIndex: 10001,
-    transition: theme.transitions.create(["all"])
+    transition: theme.transitions.create(['all']),
   },
   fabWrapper: {
-    transition: theme.transitions.create(["all"]),
+    transition: theme.transitions.create(['all']),
     margin: theme.spacing.unit,
-    position: "relative",
-    zIndex: 10000
-  }
+    position: 'relative',
+    zIndex: 10000,
+  },
 });
 
 class Live extends Component {
@@ -96,7 +96,7 @@ class Live extends Component {
     streams: null,
     streamModal: false,
     lang: strings.enus,
-    hue: "#111"
+    hue: '#111',
   };
 
   componentWillMount = () => {
@@ -108,22 +108,22 @@ class Live extends Component {
     this.getColors();
     this.props.firebase
       .database()
-      .ref("/streams")
-      .on("value", value =>
+      .ref('/streams')
+      .on('value', (value) =>
         this.setState({ streams: value.val() }, () =>
-          this.setState({ loading: false })
-        )
+          this.setState({ loading: false }),
+        ),
       );
   };
 
   getColors = () => {
-    const hue = localStorage.getItem("user-hue");
+    const hue = localStorage.getItem('user-hue');
     if (hue) {
       let hues = JSON.parse(hue);
       return this.setState({
         hue: hues.hue,
         hueVib: hues.hueVib,
-        hueVibN: hues.hueVibN
+        hueVibN: hues.hueVibN,
       });
     } else {
       return null;
@@ -144,9 +144,8 @@ class Live extends Component {
           <Button
             color="primary"
             className={classes.fabPlayButton}
-            variant={"fab"}
-            onClick={this.showHelp}
-          >
+            variant={'fab'}
+            onClick={this.showHelp}>
             <AddIcon />
           </Button>
         </div>
@@ -156,8 +155,7 @@ class Live extends Component {
           open={streamModal}
           onClose={() => this.setState({ streamModal: false })}
           title={lang.live.streamHelp.title}
-          actions={"ok"}
-        >
+          actions={'ok'}>
           <Typography variant="body1">{lang.live.streamHelp.desc}</Typography>
         </Dialogue>
         <CommandoBarTop title="Live">
@@ -169,8 +167,7 @@ class Live extends Component {
             onChange={(e, val) => this.setState({ index: val })}
             indicatorClassName={classes.tabLine}
             centered
-            fullWidth
-          >
+            fullWidth>
             <Tab
               label={lang.live.streams}
               classes={{
@@ -178,7 +175,7 @@ class Live extends Component {
                 label:
                   this.state.index === 0
                     ? classes.tabLabelActive
-                    : classes.tabLabel
+                    : classes.tabLabel,
               }}
             />
             <Tab
@@ -188,7 +185,7 @@ class Live extends Component {
                 label:
                   this.state.index === 1
                     ? classes.tabLabelActive
-                    : classes.tabLabel
+                    : classes.tabLabel,
               }}
             />
           </Tabs>
@@ -208,11 +205,11 @@ class Live extends Component {
                   style={{ marginTop: -32 }}
                 />
                 {streams &&
-                Object.values(streams).filter(u => u.id !== "example").length >
-                  0 ? (
+                Object.values(streams).filter((u) => u.id !== 'example')
+                  .length > 0 ? (
                   <Container>
                     {Object.values(streams)
-                      .filter(u => u.id !== "example")
+                      .filter((u) => u.id !== 'example')
                       .map((stream, index) => (
                         <CardButton
                           key={index}
@@ -239,13 +236,13 @@ class Live extends Component {
                 </Typography>
                 {streams &&
                 Object.values(streams)
-                  .filter(u => u.id !== "example")
-                  .filter(s => profile.friends && profile.friends[s.id])
+                  .filter((u) => u.id !== 'example')
+                  .filter((s) => profile.friends && profile.friends[s.id])
                   .length > 0 ? (
                   <Container>
                     {Object.values(streams)
-                      .filter(u => u.id !== "example")
-                      .filter(s => profile.friends && profile.friends[s.id])
+                      .filter((u) => u.id !== 'example')
+                      .filter((s) => profile.friends && profile.friends[s.id])
                       .map((stream, index) => (
                         <CardButton
                           key={index}
@@ -280,5 +277,7 @@ class Live extends Component {
 }
 
 export default firebaseConnect()(
-  connect(({ firebase: { profile } }) => ({ profile }))(withStyles(style)(Live))
+  connect(({ firebase: { profile } }) => ({ profile }))(
+    withStyles(style)(Live),
+  ),
 );
