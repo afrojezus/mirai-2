@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "build/dist",
     "module": "esnext",
-    "target": "es5",
+    "target": "es6",
     "lib": ["es6", "dom"],
     "sourceMap": true,
     "allowJs": true,
@@ -11,21 +11,23 @@
     "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
+    "noImplicitThis": false,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
   "exclude": [
     "node_modules",
-    "node_modules/**",
+    "./node_modules/*",
     "build",
     "scripts",
     "acceptance-tests",
     "webpack",
     "jest",
-    "src/kitsu-api/kitsu/**",
+    "./src/kitsu-api/kitsu/*",
     "functions"
   ]
 }
