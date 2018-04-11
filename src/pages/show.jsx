@@ -922,7 +922,7 @@ class Show extends Component {
       );
       // console.log(meta);
       if (meta.length > 0) {
-        const eps = await Twist.get(meta[0].link, meta[0].ongoing);
+        const eps = await Twist.get(meta[0].link, this.state.data.Media.status.includes("RELEASING") ? true : false);
         try {
           if (eps)
             return Kitsu.addKitsuMetadata(
@@ -932,7 +932,7 @@ class Show extends Component {
             )
               .then(finishedEps =>
                 this.setState({ eps: finishedEps }, async () => {
-                  if (meta[0].ongoing === false) {
+                  if (!this.state.data.Media.status.includes("RELEASING")) {
                     const dbtwist = this.props.firebase
                       .ref("anime")
                       .child("twist");
@@ -943,7 +943,7 @@ class Show extends Component {
               )
               .catch(kmN =>
                 this.setState({ eps: kmN }, async () => {
-                  if (meta[0].ongoing === false) {
+                  if (!this.state.data.Media.status.includes("RELEASING")) {
                     const dbtwist = this.props.firebase
                       .ref("anime")
                       .child("twist");

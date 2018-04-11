@@ -7,6 +7,7 @@ export const entryQuery = `
   query($id: Int) {
     Media(id: $id, type: ANIME) {
       id
+      idMal
       title {
         romaji
         english
@@ -177,6 +178,7 @@ export const entryQueryM = `
   query($id: Int) {
     Media(id: $id, type: MANGA) {
       id
+      idMal
       title {
         romaji
         english
@@ -353,6 +355,8 @@ query ($id: Int, $page: Int, $season: MediaSeason, $seasonYear: Int, $search: St
     media (id: $id, search: $search, season: $season, seasonYear: $seasonYear, sort: $sort, status: $status, isAdult: $isAdult, genre: $genre, tag: $tag, type: ANIME) {
 
       id
+
+      idMal
 
       title {
 
@@ -591,6 +595,7 @@ query ($id: Int, $page: Int, $season: MediaSeason, $seasonYear: Int, $search: St
     media (id: $id, search: $search, season: $season, seasonYear: $seasonYear, sort: $sort, status: $status, isAdult: $isAdult, type: MANGA) {
 
       id
+      idMal
 
       title {
 
@@ -706,6 +711,7 @@ export const tagQuery = `
         type: ANIME
       ) {
         id
+        idMal
         title {
           romaji
           english
@@ -775,6 +781,7 @@ export const smolQuery = `
   query($id: Int) {
     Media(id: $id, type: ANIME) {
       id
+      idMal
       title {
         romaji
         english

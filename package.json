@@ -4,10 +4,12 @@
   "private": true,
   "dependencies": {
     "@shopify/draggable": "^1.0.0-beta.6",
+    "@types/cheerio": "^0.22.7",
     "@types/react-loadable": "^5.3.4",
     "@types/react-redux": "^5.0.15",
     "@types/react-router-redux": "^5.0.13",
     "@types/remote-redux-devtools": "^0.5.2",
+    "@types/request-promise": "^4.1.41",
     "autosuggest-highlight": "^3.1.1",
     "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.2",
@@ -60,8 +62,13 @@
     "@types/node": "^9.6.2",
     "@types/react": "^16.3.6",
     "@types/react-dom": "^16.0.4",
+    "babel-eslint": "7.2.3",
     "eslint": "^4.19.1",
     "eslint-config-react-app": "^2.1.0",
+    "eslint-plugin-flowtype": "2.34.1",
+    "eslint-plugin-import": "2.6.0",
+    "eslint-plugin-jsx-a11y": "5.1.1",
+    "eslint-plugin-react": "7.1.0",
     "tslint": "^5.9.1",
     "typescript": "^2.8.1"
   }
