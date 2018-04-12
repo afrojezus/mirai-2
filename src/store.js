@@ -19,7 +19,7 @@ const rrfConfig = {
   profileParamsToPopulate: [
     { child: 'role', root: 'roles' }, // populates user's role with matching role object from roles
   ],
-  profileFactory: (user) => ({
+  profileFactory: user => ({
     email: user.email || user.providerData[0].email,
     role: 'Normal',
     providerData: user.providerData,
@@ -27,7 +27,7 @@ const rrfConfig = {
   presence: 'presence', // where list of online users is stored in database
   sessions: 'sessions', // where list of user sessions is stored in database (presence must be enabled)
   enableLogging: false,
-  fileMetadataFactory: (uploadRes) => {
+  fileMetadataFactory: uploadRes => {
     // upload response from Firebase's storage upload
     const { metadata: { downloadURLs } } = uploadRes;
     // default factory includes name, fullPath, downloadURL
@@ -64,12 +64,12 @@ const rootReducer = combineReducers({
 const createStoreWithFirebase = compose(
   reactReduxFirebase(firebase, rrfConfig),
   applyMiddleware(...middleware),
-  ...enhancers,
+  ...enhancers
 )(createStore);
 
 const store = createStoreWithFirebase(rootReducer, initialState);
 
-const twistInit = (twist) => ({
+const twistInit = twist => ({
   type: MIR_TWIST_LOAD,
   twist,
 });
@@ -79,7 +79,7 @@ export const twistLoad = async () => {
   if (state.mir && state.mir.twist) {
     return null;
   }
-  Twist.load().then((twist) => store.dispatch(twistInit(twist)));
+  Twist.load().then(twist => store.dispatch(twistInit(twist)));
 
   return null;
 };

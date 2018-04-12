@@ -37,7 +37,9 @@ const load = async () => {
         twist: element['animetwist:id'],
       });
     });
-    if (que) { return output; }
+    if (que) {
+      return output;
+    }
   } catch (error) {
     return error;
   }
@@ -66,7 +68,7 @@ const get = async (query: string, ongoing: boolean) => {
             source(e)
               .find('a')
               .attr('data-episode'),
-            10,
+            10
           ) + 1;
         const name = `Episode ${ep}`;
         const link = `https://twist.moe${source(e)
@@ -81,7 +83,9 @@ const get = async (query: string, ongoing: boolean) => {
           ongoing,
         });
       });
-    if (que) { return output; }
+    if (que) {
+      return output;
+    }
   } catch (error) {
     return error;
   }
@@ -110,7 +114,9 @@ const getSource = async (ep: number) => {
       const urlX = url.includes('https://twist.moe ')
         ? url.replace('https://twist.moe ', 'https://twist.moe')
         : url;
-      if (url) { return decodeURI(urlX); }
+      if (url) {
+        return decodeURI(urlX);
+      }
     }
   } catch (error) {
     return error;
@@ -119,7 +125,7 @@ const getSource = async (ep: number) => {
 };
 
 /**
- * Twist API - a Anime Twist api-wrapper for JS applications. ES6+
+ * Twist API - a Anime Twist api-wrapper for TS applications. ES6+
  *
  */
 const Twist = {
