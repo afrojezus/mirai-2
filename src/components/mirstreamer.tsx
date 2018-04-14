@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import { withStyle } from "material-ui/styles";
+import React, { Component, MouseEvent, ChangeEvent } from "react";
 import { connect } from "react-redux";
 import { firebaseConnect, isEmpty } from "react-redux-firebase";
 import blue from "material-ui/colors/blue";
@@ -47,7 +46,7 @@ import strings from "../strings.json";
 import Avatar from "material-ui/Avatar";
 import checklang from "../checklang";
 
-const style = (theme) => ({
+const style = (theme: any) => ({
   root: {
     minHeight: "100vh",
     minWidth: "100%",
@@ -284,7 +283,7 @@ const style = (theme) => ({
   },
 });
 
-class MirStreamer extends Component {
+class MirStreamer extends Component<any, any> {
   static defaultProps = {
     history,
   };
@@ -305,10 +304,10 @@ class MirStreamer extends Component {
     ep: 0,
     eps: [],
     error: false,
-    menuEl: null,
+    menuEl: undefined,
     showId: 0,
     recentlyWatched: 0,
-    volEl: null,
+    volEl: undefined,
     counter: 5,
     torrent: false,
     quality: 480,
@@ -320,14 +319,21 @@ class MirStreamer extends Component {
     king: false,
     hoster: "",
     hosterAva: "",
-    hosterPlayTime: "",
+    hosterPlayTime: 0,
     date: "",
     alphaMsg: true,
     id: 0,
     lang: strings.enus,
+    resume: 0,
+    showArtwork: '',
+    showDesc: '',
+    showEpisodes: null,
+    showHeaders: '',
+    videoQuality: 0,
+    willLoadNextEp: false
   };
 
-  componentWillMount = async () => {
+  async componentDidMount() {
     const playerVolume = await localForage.getItem("player-settings-volume");
     const playerUseTorrent = await localForage.getItem(
       "player-setting-torrent",
@@ -335,7 +341,7 @@ class MirStreamer extends Component {
 
     checklang(this);
 
-    if (window.mobilecheck()) this.setState({ native: true });
+    if (window['mobilecheck']()) this.setState({ native: true });
 
     if (playerVolume) this.setState({ volume: playerVolume });
 
@@ -344,11 +350,9 @@ class MirStreamer extends Component {
     );
 
     if (localStorage.getItem("hasSeenTheAlphaMsgForStreamingLikeACoolDude")) {
-      return this.setState({ alphaMsg: false });
+      this.setState({ alphaMsg: false });
     }
-  };
 
-  componentDidMount = async () => {
     if (!isEmpty(this.props.profile) && this.props.profile) {
       const id = queryString.parse(this.props.history.location.search);
       console.log(id.s);
@@ -362,18 +366,7 @@ class MirStreamer extends Component {
     }
   };
 
-  componentWillReceiveProps = async (nextProps) => {
-    /*if (this.props.mir !== nextProps.mir) {
-            if (this.props.profile !== nextProps.profile) return false;
-            if (!this.props.fullSize) {
-                this.logTheWatch();
-            }
-            await getState(this);
-        }*/
-    return false;
-  };
-
-  componentWillUnmount = async () => {
+  async componentWillUnmount() {
     /*if (!isEmpty(this.props.profile) && this.state.loaded > 0) {
             const episodePro = this.props.firebase
                 .database()
@@ -411,7 +404,7 @@ class MirStreamer extends Component {
     }
   };
 
-  joinStream = async (streamId) => {
+  joinStream = async (streamId: any) => {
     const db = await this.props.firebase
       .database()
       .ref("/streams")
@@ -428,13 +421,13 @@ class MirStreamer extends Component {
           king: false,
         });
 
-      return db.once("value").then((value) => this.loadStream(value.val()));
+      return db.once("value").then((value: any) => this.loadStream(value.val()));
     } catch (error) {
       return console.error(error);
     }
   };
 
-  makeStream = async (streamData) => {
+  makeStream = async (streamData: any) => {
     const db = await this.props.firebase
       .database()
       .ref("/streams")
@@ -473,14 +466,14 @@ class MirStreamer extends Component {
     return null;
   };
 
-  startStream = async (eps) => {
+  startStream = async (eps: any) => {
     const db = await this.props.firebase
       .database()
       .ref("/streams")
       .child(this.props.profile.userID);
 
     // Synced info (this is for preventing playback to manually fetch ep every damn second info syncs.)
-    db.on("value", (value) => {
+    db.on("value", (value: any) => {
       const val = value.val();
       if (val) {
         this.setState({
@@ -514,13 +507,13 @@ class MirStreamer extends Component {
     );
   };
 
-  loadStream = async (stream) => {
+  loadStream = async (stream: any) => {
     const db = await this.props.firebase
       .database()
       .ref("/streams")
       .child(stream.id);
     // Synced info (this is for preventing playback to manually fetch ep every damn second info syncs.)
-    db.on("value", (value) => {
+    db.on("value", (value: any) => {
       const val = value.val();
       if (val) {
         this.setState({
@@ -557,39 +550,39 @@ class MirStreamer extends Component {
     );
   };
 
-  onSeekMouseDown = (e) => {
+  onSeekMouseDown = (e: MouseEvent<HTMLInputElement>) => {
     this.setState({ seeking: true });
   };
 
-  onSeekChange = (e) => {
-    this.setState({ played: parseFloat(e.target.value) });
+  onSeekChange = (e: ChangeEvent<HTMLInputElement>) => {
+    this.setState({ played: parseFloat(e.target['value']) });
   };
 
-  onSeekMouseUp = (e) => {
+  onSeekMouseUp = (e: MouseEvent<HTMLInputElement>) => {
     this.setState({ seeking: false, buffering: true });
-    this.player.seekTo(parseFloat(e.target.value));
+    this.player && this.player.seekTo(parseFloat(e.target['value']));
   };
 
   onBuffer = () => {
-    this.setState({ buffering: true, status: "Buffering..." }, () => {});
+    this.setState({ buffering: true, status: "Buffering..." }, () => { });
   };
 
-  onProgress = (state) => {
+  onProgress = (state: any) => {
     const play = this.state.played;
     if (!this.state.seeking)
       this.setState(state, async () => {
         this.setState({
           videoQuality: this.player
-            ? this.player.getInternalPlayer().videoHeight
+            ? this.player.getInternalPlayer()['videoHeight']
             : null,
           recentlyWatched: Date.now(),
         });
         if (
           this.player !== null &&
           this.player.getInternalPlayer() &&
-          this.player.getInternalPlayer().networkState
+          this.player.getInternalPlayer()['networkState']
         ) {
-          switch (this.player.getInternalPlayer().networkState) {
+          switch (this.player.getInternalPlayer()['networkState']) {
             case 1:
               this.setState({ buffering: false });
               break;
@@ -601,10 +594,10 @@ class MirStreamer extends Component {
           }
         }
 
-        if (this.state.resume) {
+        if (this.state.resume !== 0) {
           const { resume } = this.state;
           this.setState({ resume: null, buffering: true }, () => {
-            this.player.seekTo(resume);
+            this.player && this.player.seekTo(resume);
             if (resume === this.state.played)
               this.setState({ buffering: false });
           });
@@ -628,7 +621,7 @@ class MirStreamer extends Component {
               .ref("/streams")
               .child(this.state.id)
               .child("playstate")
-              .on("value", async (value) => {
+              .on("value", async (value: any) => {
                 try {
                   const val = await value.val();
                   return this.setState({
@@ -643,19 +636,19 @@ class MirStreamer extends Component {
       });
   };
 
-  setVolume = (e) => {
+  setVolume = (e: ChangeEvent<HTMLInputElement>) => {
     this.setState({ volume: parseFloat(e.target.value) }, async () => {
       await localForage.setItem("player-settings-volume", this.state.volume);
     });
   };
 
-  setPlaybackRate = (e) => {
+  setPlaybackRate = (e: ChangeEvent<HTMLInputElement>) => {
     this.setState({ playbackRate: parseFloat(e.target.value) });
   };
 
   draggable = undefined;
 
-  mute = (e) => {
+  mute = (e: ChangeEvent<HTMLInputElement>) => {
     const prevVol = this.state.volume;
     if (this.state.volume > 0) {
       this.setState({ volume: 0 });
@@ -664,18 +657,18 @@ class MirStreamer extends Component {
     }
   };
 
-  inactivityTimeout;
+  inactivityTimeout: NodeJS.Timer;
   /* stop = () => {
         this.setState({ source: null, playing: false });
       }; */
 
-  playPause = (resume) => {
+  playPause = () => {
     this.setState({ playing: !this.state.playing });
     if (this.timer && this.timer !== undefined) clearInterval(this.timer);
   };
 
   skip30Sec = () => {
-    this.player.seekTo(this.state.played + 18 / 1000, null);
+    this.player && this.player.seekTo(this.state.played + 18 / 1000);
   };
 
   skipToNextEp = () => {
@@ -685,7 +678,7 @@ class MirStreamer extends Component {
     if (this.state.willLoadNextEp) this.setState({ willLoadNextEp: false });
   };
 
-  player = HTMLMediaElement;
+  player: ReactPlayer | null;
   closeMenu = () => this.setState({ menuEl: null });
 
   mouseResetDelay = () => {
@@ -695,15 +688,15 @@ class MirStreamer extends Component {
     }, 4000);
   };
 
-  reveal = (event) => {
+  reveal = () => {
     const back = document.getElementById("backbutton");
     const controls = document.getElementById("controls");
     const pcontrols = document.getElementById("pipcontrols");
     const player = document.getElementById("player");
     if (back && (controls || pcontrols) && player) {
-      back.style.opacity = 1;
-      if (controls) controls.style.opacity = 1;
-      if (pcontrols) pcontrols.style.opacity = 1;
+      back.style.opacity = '1';
+      if (controls) controls.style.opacity = '1';
+      if (pcontrols) pcontrols.style.opacity = '1';
       player.style.cursor = "initial";
       this.mouseResetDelay();
     }
@@ -722,40 +715,40 @@ class MirStreamer extends Component {
       this.state.played < 1
     ) {
       player.style.cursor = "none";
-      back.style.opacity = 0;
-      if (controls) controls.style.opacity = 0;
-      if (pcontrols && window.mobilecheck() === false)
-        pcontrols.style.opacity = 0;
+      back.style.opacity = '0';
+      if (controls) controls.style.opacity = '0';
+      if (pcontrols && window['mobilecheck']() === false)
+        pcontrols.style.opacity = '0';
     }
   };
 
-  handleFullscreen = (e) =>
+  handleFullscreen = () =>
     this.setState({ fullscreen: !this.state.fullscreen }, () => {
       const docElm = document.documentElement;
       if (this.state.fullscreen) {
         if (docElm.requestFullscreen) {
           docElm.requestFullscreen();
-        } else if (docElm.mozRequestFullScreen) {
-          docElm.mozRequestFullScreen();
+        } else if (docElm['mozRequestFullScreen']) {
+          docElm['mozRequestFullScreen']();
         } else if (docElm.webkitRequestFullScreen) {
           docElm.webkitRequestFullScreen();
-        } else if (docElm.msRequestFullscreen) {
-          docElm.msRequestFullscreen();
+        } else if (docElm['msRequestFullscreen']) {
+          docElm['msRequestFullscreen']();
         }
       } else if (!this.state.fullscreen) {
         if (document.exitFullscreen) {
           document.exitFullscreen();
         } else if (document.webkitExitFullscreen) {
           document.webkitExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
+        } else if (document['mozCancelFullScreen']) {
+          document['mozCancelFullScreen']();
+        } else if (document['msExitFullscreen']) {
+          document['msExitFullscreen']();
         }
       }
     });
 
-  skipToHostersTime = () => this.player.seekTo(this.state.hosterPlayTime);
+  skipToHostersTime = () => this.player && this.player.seekTo(this.state.hosterPlayTime);
 
   handleEnded = () => {
     this.reveal();
@@ -785,7 +778,7 @@ class MirStreamer extends Component {
         }*/
   };
 
-  timer = undefined;
+  timer: NodeJS.Timer | undefined;
 
   logTheWatch = () => {
     /*if (!isEmpty(this.props.profile) && this.state.loaded > 0) {
@@ -850,7 +843,7 @@ class MirStreamer extends Component {
         id="frame"
         className={classes.root}
         onMouseLeave={
-          played === 1 ? null : menu || volumeMenu ? null : this.hide
+          played === 1 ? undefined : menu || volumeMenu ? undefined : this.hide
         }
         onMouseMove={this.reveal}
         onTouchMove={this.reveal}>
@@ -863,7 +856,7 @@ class MirStreamer extends Component {
               this.setState({ alphaMsg: false }, () =>
                 localStorage.setItem(
                   "hasSeenTheAlphaMsgForStreamingLikeACoolDude",
-                  true,
+                  'true',
                 ),
               )
             }>
@@ -871,7 +864,7 @@ class MirStreamer extends Component {
           </Dialogue>
           <CircularProgress
             className={classes.loading}
-            style={!buffering ? { opacity: 0 } : null}
+            style={!buffering ? { opacity: 0 } : undefined}
           />
         </div>
         <Toolbar id="backbutton" className={classes.backToolbar}>
@@ -889,10 +882,10 @@ class MirStreamer extends Component {
           <div style={{ flex: 1 }} />
           <Typography variant="body1">
             {users
-              ? Object.values(users).length > 1
-                ? Object.values(users).length + lang.stream.users
-                : Object.values(users).length + lang.stream.user
-              : null}
+              ? Array.from(users).length > 1
+                ? Array.from(users).length + lang.stream.users
+                : Array.from(users).length + lang.stream.user
+              : undefined}
           </Typography>
         </Toolbar>
         <div onClick={this.playPause}>
@@ -921,7 +914,7 @@ class MirStreamer extends Component {
             onEnded={this.handleEnded}
             onError={(e) => console.error(e)}
             onDuration={(dura) => this.setState({ duration: dura })}
-            style={played === 1 ? { filter: "brightness(.2)" } : null}
+            style={played === 1 ? { filter: "brightness(.2)" } : undefined}
           />
         </div>
         {/*played === 1 ? (
@@ -933,7 +926,7 @@ class MirStreamer extends Component {
 									alt=""
 									className={classes.showInfoArtwork}
 									style={{ opacity: 0 }}
-									onLoad={e => e.currentTarget.style.opacity == null}
+									onLoad={e => e.currentTarget.style.opacity == undefined}
 								/>
 							</div>
 							<div className={classes.showInfoColumn} style={{ flex: 1 }}>
@@ -1001,8 +994,8 @@ class MirStreamer extends Component {
                     ) : played === 1 ? (
                       <Icon.Replay />
                     ) : (
-                      <Icon.PlayArrow />
-                    )}
+                          <Icon.PlayArrow />
+                        )}
                   </IconButton>
                 </div>
               </Tooltip>
@@ -1028,16 +1021,16 @@ class MirStreamer extends Component {
                 />
               </Tooltip>
               {users &&
-                Object.values(users)
-                  .filter((u) => !u.king)
-                  .map((user, index) => (
+                Array.from(users)
+                  .filter((u: any) => !u.king)
+                  .map((user: any, index) => (
                     <Tooltip title={user.name}>
                       <Avatar key={index} src={user.avatar} />
                     </Tooltip>
                   ))}
               <IconButton
                 disabled={!torrent}
-                aria-owns={qualityMenu ? "quality-menu" : null}
+                aria-owns={qualityMenu ? "quality-menu" : undefined}
                 aria-haspopup="true"
                 onClick={(e) => this.setState({ quaEl: e.currentTarget })}
                 color="default"
@@ -1063,83 +1056,19 @@ class MirStreamer extends Component {
                     </Typography>
                   ) : null
                 ) : (
-                  <Typography
-                    variant="title"
-                    style={torrent ? null : { opacity: ".2" }}
-                    className={classes.qualityTitle}>
-                    {videoQuality ? `${videoQuality}p` : "HD"}
-                  </Typography>
-                )}
+                    <Typography
+                      variant="title"
+                      style={torrent ? undefined : { opacity: .2 }}
+                      className={classes.qualityTitle}>
+                      {videoQuality ? `${videoQuality}p` : "HD"}
+                    </Typography>
+                  )}
               </IconButton>
               <Typography variant="body1" className={classes.duration}>
-                <Duration seconds={duration * played} />
+                <Duration seconds={duration * played} className={''} />
               </Typography>
-              <Menu
-                id="quality-menu"
-                anchorEl={quaEl}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                transformOrigin={{
-                  vertical: "center",
-                  horizontal: "right",
-                }}
-                open={qualityMenu}
-                classes={{
-                  paper: classes.menuPaper,
-                }}
-                onClose={() => this.setState({ quaEl: null })}
-                PaperProps={{
-                  style: {
-                    width: 300,
-                    padding: 0,
-                    outline: "none",
-                    background: grey[800],
-                  },
-                }}
-                MenuListProps={{
-                  style: {
-                    padding: 0,
-                    outline: "none",
-                  },
-                }}>
-                <Card style={{ background: grey[800] }}>
-                  <CardHeader
-                    style={{ background: grey[900] }}
-                    title="Quality"
-                  />
-                  <Divider />
-                  <CardContent className={classes.epListCont}>
-                    <MenuItem
-                      onClick={() => this.changeQuality(1080)}
-                      selected={quality === 1080}
-                      className={classes.epListItem}>
-                      1080p
-                      <div style={{ flex: 1 }} />
-                      {quality === 1080 ? <Icon.PlayArrow /> : null}
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => this.changeQuality(720)}
-                      selected={quality === 720}
-                      className={classes.epListItem}>
-                      720p
-                      <div style={{ flex: 1 }} />
-                      {quality === 720 ? <Icon.PlayArrow /> : null}
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => this.changeQuality(480)}
-                      selected={quality === 480}
-                      className={classes.epListItem}>
-                      480p
-                      <div style={{ flex: 1 }} />
-                      {quality === 480 ? <Icon.PlayArrow /> : null}
-                    </MenuItem>
-                  </CardContent>
-                </Card>
-              </Menu>
               <IconButton
-                aria-owns={volumeMenu ? "volume-menu" : null}
+                aria-owns={volumeMenu ? "volume-menu" : undefined}
                 aria-haspopup="true"
                 onClick={(e) => this.setState({ volEl: e.currentTarget })}
                 color="default">
@@ -1157,7 +1086,7 @@ class MirStreamer extends Component {
                   horizontal: "right",
                 }}
                 open={volumeMenu}
-                onClose={() => this.setState({ volEl: null })}
+                onClose={() => this.setState({ volEl: undefined })}
                 PaperProps={{
                   style: {
                     outline: "none",
@@ -1203,13 +1132,13 @@ class MirStreamer extends Component {
                 </IconButton>
               </Tooltip>
               <div>
-                <Tooltip title={lang.watch.showEpisodes} disableTriggerFocus>
+                <Tooltip title={lang.watch.showEpisodes} disableFocusListener>
                   <div>
                     <IconButton
                       disabled={
                         !king ? true : eps.length < 1 ? true : !(eps.length > 0)
                       }
-                      aria-owns={menu ? "ep-menu" : null}
+                      aria-owns={menu ? "ep-menu" : undefined}
                       aria-haspopup="true"
                       onClick={(e) =>
                         this.setState({ menuEl: e.currentTarget })
@@ -1266,7 +1195,7 @@ class MirStreamer extends Component {
                     <Divider />
                     <CardContent className={classes.epListCont}>
                       {eps &&
-                        eps.map((e) => (
+                        eps.map((e: any) => (
                           <MenuItem
                             onClick={() => {
                               this.setState({ ep: e.ep }, async () =>
@@ -1327,94 +1256,94 @@ class MirStreamer extends Component {
             </CardActions>
           </Card>
         ) : (
-          <div>
-            <IconButton
-              disabled={!(eps.length > 0)}
-              aria-owns={menu ? "ep-menu" : null}
-              aria-haspopup="true"
-              onClick={(e) => this.setState({ menuEl: e.currentTarget })}
-              color="default"
-              style={{
-                position: "fixed",
-                bottom: theme.spacing.unit * 4,
-                right: theme.spacing.unit * 4,
-              }}>
-              <Icon.ViewList />
-            </IconButton>
-            <Menu
-              id="ep-menu"
-              anchorEl={menuEl}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "center",
-                horizontal: "right",
-              }}
-              open={menu}
-              classes={{
-                paper: classes.menuPaper,
-              }}
-              onClose={this.closeMenu}
-              PaperProps={{
-                style: {
-                  width: 300,
-                  padding: 0,
-                  outline: "none",
-                  background: grey[800],
-                },
-              }}
-              MenuListProps={{
-                style: {
-                  padding: 0,
-                  outline: "none",
-                },
-              }}>
-              <Card style={{ background: grey[800] }}>
-                <CardHeader
-                  style={{ background: grey[900] }}
-                  title="Episodes"
-                />
-                <Divider />
-                <CardContent className={classes.epListCont}>
-                  {eps &&
-                    eps.map((e) => (
-                      <MenuItem
-                        onClick={() => {
-                          this.setState({ ep: e.ep }, async () =>
-                            loadEp(e, null),
-                          );
-                        }}
-                        key={e.ep}
-                        selected={e.ep === ep}
-                        className={classes.epListItem}>
-                        Episode {e.ep}
-                        <div style={{ flex: 1 }} />
-                        {e.ep === ep ? <Icon.PlayArrow /> : null}
-                      </MenuItem>
-                    ))}
-                </CardContent>
-              </Card>
-            </Menu>
-          </div>
-        )}
+            <div>
+              <IconButton
+                disabled={!(eps.length > 0)}
+                aria-owns={menu ? "ep-menu" : undefined}
+                aria-haspopup="true"
+                onClick={(e) => this.setState({ menuEl: e.currentTarget })}
+                color="default"
+                style={{
+                  position: "fixed",
+                  bottom: theme.spacing.unit * 4,
+                  right: theme.spacing.unit * 4,
+                }}>
+                <Icon.ViewList />
+              </IconButton>
+              <Menu
+                id="ep-menu"
+                anchorEl={menuEl}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "center",
+                  horizontal: "right",
+                }}
+                open={menu}
+                classes={{
+                  paper: classes.menuPaper,
+                }}
+                onClose={this.closeMenu}
+                PaperProps={{
+                  style: {
+                    width: 300,
+                    padding: 0,
+                    outline: "none",
+                    background: grey[800],
+                  },
+                }}
+                MenuListProps={{
+                  style: {
+                    padding: 0,
+                    outline: "none",
+                  },
+                }}>
+                <Card style={{ background: grey[800] }}>
+                  <CardHeader
+                    style={{ background: grey[900] }}
+                    title="Episodes"
+                  />
+                  <Divider />
+                  <CardContent className={classes.epListCont}>
+                    {eps &&
+                      eps.map((e: any) => (
+                        <MenuItem
+                          onClick={() => {
+                            this.setState({ ep: e.ep }, async () =>
+                              loadEp(e, null),
+                            );
+                          }}
+                          key={e.ep}
+                          selected={e.ep === ep}
+                          className={classes.epListItem}>
+                          Episode {e.ep}
+                          <div style={{ flex: 1 }} />
+                          {e.ep === ep ? <Icon.PlayArrow /> : null}
+                        </MenuItem>
+                      ))}
+                  </CardContent>
+                </Card>
+              </Menu>
+            </div>
+          )}
       </div>
     );
   }
 }
 
-export const loadPlayer = (play) => ({
+export const loadPlayer = (play: any) => ({
   type: MIR_PLAY_SHOW,
   play,
 });
 
-const mapPTS = (dispatch) => ({
-  removeDataFromMir: (play) => dispatch(loadPlayer(play)),
+const mapPTS = (dispatch: any) => ({
+  removeDataFromMir: (play: any) => dispatch(loadPlayer(play)),
 });
 
 export default firebaseConnect()(
-  connect(({ firebase: { profile }, mir }) => ({ profile, mir }), mapPTS)(
-    withStyles(style, { withTheme: true })(MirStreamer),
+  connect(({ firebase: { profile }, mir }: any) => ({ profile, mir }), mapPTS)(
+    withStyles(style as any, { withTheme: true })(MirStreamer),
   ),
 );

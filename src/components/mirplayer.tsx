@@ -1,7 +1,7 @@
 // TODO: Fix every single eslint-airbnb issue
 /* eslint-disable react/jsx-indent */
 /* eslint-disable react/jsx-closing-tag-location */
-import React, { Component } from "react";
+import * as React from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 import * as Icon from "material-ui-icons";
@@ -30,21 +30,18 @@ import localForage from "localforage";
 import queryString from "query-string";
 import FadeIn from "react-fade-in";
 import { connect } from "react-redux";
-import { firebaseConnect, isEmpty, firebase } from "react-redux-firebase";
+import { firebaseConnect, isEmpty } from "react-redux-firebase";
 import blue from "material-ui/colors/blue";
 import { history } from "../store";
-import Aqua3 from "../assets/aqua3.gif";
 import Duration from "../components/yuplayer/Duration";
-import Twist from "../twist-api";
-import corrector from "../utils/bigfuck";
 import hsfetcher from "../torrent";
-import { getState, loadEp, loadFile } from "../utils/mirfetch";
+import { getState, loadEp } from "../utils/mirfetch";
 import { MIR_PLAY_SHOW } from "../constants";
 import { guid } from "../utils/uuid";
 import strings from "../strings.json";
 import checklang from "../checklang";
 
-const style = (theme) => ({
+const style = (theme: any) => ({
   root: {
     minHeight: "100vh",
     minWidth: "100%",
@@ -281,7 +278,7 @@ const style = (theme) => ({
   },
 });
 
-class MirPlayer extends Component {
+class MirPlayer extends React.Component<any, any> {
   static defaultProps = {
     history,
   };
@@ -302,27 +299,34 @@ class MirPlayer extends Component {
     ep: 0,
     eps: [],
     error: false,
-    menuEl: null,
+    menuEl: undefined,
     showId: 0,
     recentlyWatched: 0,
-    volEl: null,
+    volEl: undefined,
     counter: 5,
     torrent: false,
     quality: 480,
     torrentFile: null,
-    quaEl: null,
+    quaEl: undefined,
     native: false,
     lang: strings.enus,
+    resume: 0,
+    showArtwork: '',
+    showDesc: '',
+    showEpisodes: null,
+    showHeaders: '',
+    videoQuality: 0,
+    willLoadNextEp: false
   };
 
-  componentWillMount = async () => {
+  async componentDidMount() {
     const playerVolume = await localForage.getItem("player-settings-volume");
     const playerUseTorrent = await localForage.getItem(
       "player-setting-torrent",
     );
     checklang(this);
 
-    if (window.mobilecheck()) this.setState({ native: true });
+    if (window['mobilecheck']()) this.setState({ native: true });
 
     if (playerVolume) this.setState({ volume: playerVolume });
 
@@ -334,7 +338,7 @@ class MirPlayer extends Component {
         }) */
   };
   // TODO: Fix loading
-  componentWillReceiveProps = async (nextProps) => {
+  async componentWillReceiveProps(nextProps: any) {
     if (this.props.mir !== nextProps.mir) {
       if (this.props.profile !== nextProps.profile) return false;
       if (!this.props.fullSize) {
@@ -378,7 +382,7 @@ class MirPlayer extends Component {
               this.state.eps.length > 1
                 ? "Episode " + this.state.ep + " of"
                 : ""
-            } ${this.state.title}`,
+              } ${this.state.title}`,
             coverImg: this.state.showArtwork,
             user: {
               username: this.props.profile.username,
@@ -400,7 +404,7 @@ class MirPlayer extends Component {
           showId: this.state.showId,
           activity: `Watched ${
             this.state.eps.length > 1 ? "Episode " + this.state.ep + " of" : ""
-          } ${this.state.title}`,
+            } ${this.state.title}`,
           coverImg: this.state.showArtwork,
           user: {
             username: this.props.profile.username,
@@ -411,14 +415,14 @@ class MirPlayer extends Component {
     }
   };
 
-  componentWillUnmount = async () => {
+  async componentWillUnmount() {
     if (!isEmpty(this.props.profile) && this.state.loaded > 0) {
       const episodePro = this.props.firebase
         .database()
         .ref("users")
         .child(`${this.props.profile.userID}`)
         .child("episodeProgress");
-      localForage.getItem("player-state").then(async (a) => {
+      localForage.getItem("player-state").then(async (a: any) => {
         if (a && a.showId) {
           episodePro.child(`${a.showId}`).update(a);
           return true;
@@ -433,29 +437,29 @@ class MirPlayer extends Component {
     this.props.removeDataFromMir(null);
   };
 
-  onSeekMouseDown = (e) => {
+  onSeekMouseDown = (e: React.MouseEvent<HTMLInputElement>) => {
     this.setState({ seeking: true });
   };
 
-  onSeekChange = (e) => {
-    this.setState({ played: parseFloat(e.target.value) });
+  onSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ played: e.target && parseFloat(e.target['value']) });
   };
 
-  onSeekMouseUp = (e) => {
+  onSeekMouseUp = (e: React.MouseEvent<HTMLInputElement>) => {
     this.setState({ seeking: false, buffering: true });
-    this.player.seekTo(parseFloat(e.target.value));
+    this.player && this.player.seekTo(parseFloat(e.target && e.target['value']));
   };
 
   onBuffer = () => {
-    this.setState({ buffering: true, status: "Buffering..." }, () => {});
+    this.setState({ buffering: true, status: "Buffering..." }, () => { });
   };
 
-  onProgress = (state) => {
+  onProgress = (state: any) => {
     if (!this.state.seeking)
       this.setState(state, async () => {
         this.setState({
           videoQuality: this.player
-            ? this.player.getInternalPlayer().videoHeight
+            ? this.player.getInternalPlayer()['videoHeight']
             : null,
           recentlyWatched: Date.now(),
         });
@@ -467,9 +471,9 @@ class MirPlayer extends Component {
         if (
           this.player !== null &&
           this.player.getInternalPlayer() &&
-          this.player.getInternalPlayer().networkState
+          this.player.getInternalPlayer()['networkState']
         ) {
-          switch (this.player.getInternalPlayer().networkState) {
+          switch (this.player.getInternalPlayer()['networkState']) {
             case 1:
               this.setState({ buffering: false });
               break;
@@ -481,10 +485,10 @@ class MirPlayer extends Component {
           }
         }
 
-        if (this.state.resume) {
+        if (this.state.resume !== 0) {
           const { resume } = this.state;
           this.setState({ resume: null, buffering: true }, () => {
-            this.player.seekTo(resume);
+            this.player && this.player.seekTo(resume);
             if (resume === this.state.played)
               this.setState({ buffering: false });
           });
@@ -494,19 +498,19 @@ class MirPlayer extends Component {
       });
   };
 
-  setVolume = (e) => {
+  setVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ volume: parseFloat(e.target.value) }, async () => {
       await localForage.setItem("player-settings-volume", this.state.volume);
     });
   };
 
-  setPlaybackRate = (e) => {
+  setPlaybackRate = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ playbackRate: parseFloat(e.target.value) });
   };
 
   draggable = undefined;
 
-  mute = (e) => {
+  mute = (e: React.ChangeEvent<HTMLInputElement>) => {
     const prevVol = this.state.volume;
     if (this.state.volume > 0) {
       this.setState({ volume: 0 });
@@ -515,18 +519,18 @@ class MirPlayer extends Component {
     }
   };
 
-  inactivityTimeout;
+  inactivityTimeout: NodeJS.Timer;
   /* stop = () => {
         this.setState({ source: null, playing: false });
       }; */
 
-  playPause = (resume) => {
+  playPause = (resume: number) => {
     this.setState({ playing: !this.state.playing });
     if (this.timer && this.timer !== undefined) clearInterval(this.timer);
   };
 
   skip30Sec = () => {
-    this.player.seekTo(this.state.played + 18 / 1000, null);
+    this.player && this.player.seekTo(this.state.played + 18 / 1000);
   };
 
   skipToNextEp = () => {
@@ -536,7 +540,7 @@ class MirPlayer extends Component {
     if (this.state.willLoadNextEp) this.setState({ willLoadNextEp: false });
   };
 
-  player = HTMLMediaElement;
+  player: ReactPlayer | null;
   closeMenu = () => this.setState({ menuEl: null });
 
   mouseResetDelay = () => {
@@ -546,15 +550,15 @@ class MirPlayer extends Component {
     }, 4000);
   };
 
-  reveal = (event) => {
+  reveal = () => {
     const back = document.getElementById("backbutton");
     const controls = document.getElementById("controls");
     const pcontrols = document.getElementById("pipcontrols");
     const player = document.getElementById("player");
     if (back && (controls || pcontrols) && player) {
-      back.style.opacity = 1;
-      if (controls) controls.style.opacity = 1;
-      if (pcontrols) pcontrols.style.opacity = 1;
+      back.style.opacity = '1';
+      if (controls) controls.style.opacity = '1';
+      if (pcontrols) pcontrols.style.opacity = '1';
       player.style.cursor = "initial";
       this.mouseResetDelay();
     }
@@ -575,37 +579,37 @@ class MirPlayer extends Component {
       this.state.played < 1
     ) {
       player.style.cursor = "none";
-      back.style.opacity = 0;
+      back.style.opacity = '0';
       if (epMenu) this.closeMenu();
       if (volMenu) this.setState({ volEl: null });
-      if (controls) controls.style.opacity = 0;
-      if (pcontrols && window.mobilecheck() === false)
-        pcontrols.style.opacity = 0;
+      if (controls) controls.style.opacity = '0';
+      if (pcontrols && window['mobilecheck']() === false)
+        pcontrols.style.opacity = '0';
     }
   };
 
-  handleFullscreen = (e) =>
+  handleFullscreen = () =>
     this.setState({ fullscreen: !this.state.fullscreen }, () => {
       const docElm = document.documentElement;
       if (this.state.fullscreen) {
         if (docElm.requestFullscreen) {
           docElm.requestFullscreen();
-        } else if (docElm.mozRequestFullScreen) {
-          docElm.mozRequestFullScreen();
+        } else if (docElm['mozRequestFullScreen']) {
+          docElm['mozRequestFullScreen']();
         } else if (docElm.webkitRequestFullScreen) {
           docElm.webkitRequestFullScreen();
-        } else if (docElm.msRequestFullscreen) {
-          docElm.msRequestFullscreen();
+        } else if (docElm['msRequestFullscreen']) {
+          docElm['msRequestFullscreen']();
         }
       } else if (!this.state.fullscreen) {
         if (document.exitFullscreen) {
           document.exitFullscreen();
         } else if (document.webkitExitFullscreen) {
           document.webkitExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-          document.mozCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
+        } else if (document['mozCancelFullScreen']) {
+          document['mozCancelFullScreen']();
+        } else if (document['msExitFullscreen']) {
+          document['msExitFullscreen']();
         }
       }
     });
@@ -618,7 +622,7 @@ class MirPlayer extends Component {
         .ref("users")
         .child(`${this.props.profile.userID}`)
         .child("episodeProgress");
-      localForage.getItem("player-state").then(async (a) => {
+      localForage.getItem("player-state").then(async (a: any) => {
         if (a && a.showId) {
           episodePro.child(`${a.showId}`).update(a);
           return true;
@@ -638,9 +642,9 @@ class MirPlayer extends Component {
     }
   };
 
-  timer = undefined;
+  timer: NodeJS.Timer | undefined;
 
-  changeQuality = (int) => {
+  changeQuality = (int: number) => {
     switch (int) {
       case 1080:
         if (this.state.torrentFile)
@@ -748,14 +752,14 @@ class MirPlayer extends Component {
       await this.props.firebase.updateProfile({
         status: `Watching ${this.state.title} ${
           this.state.eps.length > 1 ? "Episode " + this.state.ep : null
-        }`,
+          }`,
       });
       const episodePro = this.props.firebase
         .database()
         .ref("users")
         .child(`${this.props.profile.userID}`)
         .child("episodeProgress");
-      localForage.getItem("player-state").then(async (a) => {
+      localForage.getItem("player-state").then(async (a: any) => {
         if (a && a.showId) {
           episodePro.child(`${a.showId}`).update(a);
           return true;
@@ -803,22 +807,22 @@ class MirPlayer extends Component {
     return (
       <div
         id="frame"
-        style={!mir.play ? { display: "none" } : null}
+        style={!mir.play ? { display: "none" } : undefined}
         className={!fullSize ? classes.rootSmol : classes.root}
         onMouseLeave={
-          played === 1 ? null : menu || volumeMenu ? null : this.hide
+          played === 1 ? undefined : menu || volumeMenu ? undefined : this.hide
         }
         onMouseMove={this.reveal}
         onTouchMove={this.reveal}>
         {!fullSize ? (
           <div
             className={classes.pipcontrols}
-            style={!loaded > 0 ? { opacity: 0 } : null}
+            style={!(loaded > 0) ? { opacity: 0 } : undefined}
             id="pipcontrols">
             <div
               style={{
                 display: "flex",
-                padding: window.mobilecheck() ? 0 : 8,
+                padding: window['mobilecheck']() ? 0 : 8,
               }}>
               <Typography
                 variant="title"
@@ -828,7 +832,7 @@ class MirPlayer extends Component {
               </Typography>
               <div style={{ flex: 1 }} />
               {loaded > 0 ? (
-                <IconButton onClick={this.playPause}>
+                <IconButton onClick={() => this.playPause(0)}>
                   {playing ? <Icon.Pause /> : <Icon.PlayArrow />}
                 </IconButton>
               ) : null}
@@ -874,21 +878,21 @@ class MirPlayer extends Component {
         ) : null}
         <div
           style={
-            !fullSize && !window.mobilecheck()
+            !fullSize && !window['mobilecheck']()
               ? { position: "relative", height: 140, width: "100%" }
-              : !fullSize && window.mobilecheck()
+              : !fullSize && window['mobilecheck']()
                 ? { position: "relative", height: 80, width: "100%" }
-                : null
+                : undefined
           }>
           <CircularProgress
             className={classes.loading}
-            style={!buffering ? { opacity: 0 } : null}
+            style={!buffering ? { opacity: 0 } : undefined}
           />
         </div>
         <Toolbar
           id="backbutton"
           className={classes.backToolbar}
-          style={!fullSize ? { display: "none" } : null}>
+          style={!fullSize ? { display: "none" } : undefined}>
           <IconButton
             style={{
               marginLeft: -12,
@@ -898,7 +902,7 @@ class MirPlayer extends Component {
             <Icon.ArrowBack />
           </IconButton>
         </Toolbar>
-        <div onClick={this.playPause}>
+        <div onClick={() => this.playPause(0)}>
           <ReactPlayer
             id="player"
             ref={(player) => {
@@ -920,7 +924,7 @@ class MirPlayer extends Component {
             onEnded={this.handleEnded}
             onError={(e) => console.error(e)}
             onDuration={(dura) => this.setState({ duration: dura })}
-            style={played === 1 ? { filter: "brightness(.2)" } : null}
+            style={played === 1 ? { filter: "brightness(.2)" } : undefined}
           />
         </div>
         {/*played === 1 ? (
@@ -956,7 +960,7 @@ class MirPlayer extends Component {
           <Card
             id="controls"
             className={classes.controlpanel}
-            style={!fullSize ? { display: "none" } : null}>
+            style={!fullSize ? { display: "none" } : undefined}>
             <CardContent className={classes.indicator}>
               <LinearProgress
                 classes={{
@@ -997,14 +1001,14 @@ class MirPlayer extends Component {
                 <div>
                   <IconButton
                     disabled={!!(loaded === 0 || !source)}
-                    onClick={this.playPause}>
+                    onClick={() => this.playPause(0)}>
                     {playing ? (
                       <Icon.Pause />
                     ) : played === 1 ? (
                       <Icon.Replay />
                     ) : (
-                      <Icon.PlayArrow />
-                    )}
+                          <Icon.PlayArrow />
+                        )}
                   </IconButton>
                 </div>
               </Tooltip>
@@ -1016,7 +1020,7 @@ class MirPlayer extends Component {
               <div style={{ flex: 1 }} />
               <IconButton
                 disabled={!torrent}
-                aria-owns={qualityMenu ? "quality-menu" : null}
+                aria-owns={qualityMenu ? "quality-menu" : undefined}
                 aria-haspopup="true"
                 onClick={(e) => this.setState({ quaEl: e.currentTarget })}
                 color="default">
@@ -1041,16 +1045,16 @@ class MirPlayer extends Component {
                     </Typography>
                   ) : null
                 ) : (
-                  <Typography
-                    variant="title"
-                    style={torrent ? null : { opacity: ".2" }}
-                    className={classes.qualityTitle}>
-                    {videoQuality ? `${videoQuality}p` : "HD"}
-                  </Typography>
-                )}
+                    <Typography
+                      variant="title"
+                      style={torrent ? undefined : { opacity: .2 }}
+                      className={classes.qualityTitle}>
+                      {videoQuality ? `${videoQuality}p` : "HD"}
+                    </Typography>
+                  )}
               </IconButton>
               <Typography variant="body1" className={classes.duration}>
-                <Duration seconds={duration * played} />
+                <Duration seconds={duration * played} className={''} />
               </Typography>
               <Menu
                 id="quality-menu"
@@ -1067,7 +1071,7 @@ class MirPlayer extends Component {
                 classes={{
                   paper: classes.menuPaper,
                 }}
-                onClose={() => this.setState({ quaEl: null })}
+                onClose={() => this.setState({ quaEl: undefined })}
                 PaperProps={{
                   style: {
                     width: 300,
@@ -1117,7 +1121,7 @@ class MirPlayer extends Component {
                 </Card>
               </Menu>
               <IconButton
-                aria-owns={volumeMenu ? "volume-menu" : null}
+                aria-owns={volumeMenu ? "volume-menu" : undefined}
                 aria-haspopup="true"
                 onClick={(e) => this.setState({ volEl: e.currentTarget })}
                 color="default">
@@ -1135,7 +1139,7 @@ class MirPlayer extends Component {
                   horizontal: "right",
                 }}
                 open={volumeMenu}
-                onClose={() => this.setState({ volEl: null })}
+                onClose={() => this.setState({ volEl: undefined })}
                 PaperProps={{
                   style: {
                     outline: "none",
@@ -1201,11 +1205,11 @@ class MirPlayer extends Component {
                 </IconButton>
               </Tooltip>
               <div>
-                <Tooltip title={lang.watch.showEpisodes} disableTriggerFocus>
+                <Tooltip title={lang.watch.showEpisodes} disableFocusListener>
                   <div>
                     <IconButton
                       disabled={eps.length < 1 ? true : !(eps.length > 0)}
-                      aria-owns={menu ? "ep-menu" : null}
+                      aria-owns={menu ? "ep-menu" : undefined}
                       aria-haspopup="true"
                       onClick={(e) =>
                         this.setState({ menuEl: e.currentTarget })
@@ -1262,7 +1266,7 @@ class MirPlayer extends Component {
                     <Divider />
                     <CardContent className={classes.epListCont}>
                       {eps &&
-                        eps.map((e) => (
+                        eps.map((e: any) => (
                           <MenuItem
                             onClick={() => {
                               this.logToActivity();
@@ -1324,128 +1328,128 @@ class MirPlayer extends Component {
             </CardActions>
           </Card>
         ) : (
-          <div>
-            <IconButton
-              disabled={!(eps.length > 0)}
-              aria-owns={menu ? "ep-menu" : null}
-              aria-haspopup="true"
-              onClick={(e) => this.setState({ menuEl: e.currentTarget })}
-              color="default"
-              style={{
-                position: "fixed",
-                bottom: theme.spacing.unit * 4,
-                right: theme.spacing.unit * 4,
-              }}>
-              <Icon.ViewList />
-            </IconButton>
-            <Menu
-              id="ep-menu"
-              anchorEl={menuEl}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "center",
-                horizontal: "right",
-              }}
-              open={menu}
-              classes={{
-                paper: classes.menuPaper,
-              }}
-              onClose={this.closeMenu}
-              PaperProps={{
-                style: {
-                  width: 420,
-                  padding: 0,
-                  outline: "none",
-                  background: grey[800],
-                },
-              }}
-              MenuListProps={{
-                style: {
-                  padding: 0,
-                  outline: "none",
-                },
-              }}>
-              <Card style={{ background: grey[800] }}>
-                <CardHeader
-                  style={{ background: grey[900] }}
-                  title="Episodes"
-                  classes={{
-                    action: classes.marginAuto,
-                    title: classes.secTitleText,
-                  }}
-                  action={
-                    <IconButton onClick={this.closeMenu}>
-                      <Icon.ExpandMore />
-                    </IconButton>
-                  }
-                />
-                <Divider />
-                <CardContent className={classes.epListCont}>
-                  {eps &&
-                    eps.map((e) => (
-                      <MenuItem
-                        onClick={() => {
-                          this.setState({ ep: e.ep }, async () =>
-                            loadEp(this, e, null),
-                          );
-                        }}
-                        key={e.ep}
-                        selected={e.ep === ep}
-                        className={classes.epListItem}>
-                        {e.thumb ? (
-                          <img
-                            alt=""
-                            className={classes.episodeThumb}
-                            src={e.thumb.original}
-                          />
-                        ) : null}
-                        <div
-                          style={{
-                            display: "flex",
-                            flexFlow: "column nowrap",
-                            paddingLeft: 8,
-                          }}>
-                          <Typography
-                            variant="title"
-                            className={classes.episodeCount}>
-                            Episode {e.ep}
-                          </Typography>
-                          {e.canon ? (
-                            <Typography
-                              variant="body1"
-                              className={classes.episodeName}>
-                              {e.canon}
-                            </Typography>
+            <div>
+              <IconButton
+                disabled={!(eps.length > 0)}
+                aria-owns={menu ? "ep-menu" : undefined}
+                aria-haspopup="true"
+                onClick={(e) => this.setState({ menuEl: e.currentTarget })}
+                color="default"
+                style={{
+                  position: "fixed",
+                  bottom: theme.spacing.unit * 4,
+                  right: theme.spacing.unit * 4,
+                }}>
+                <Icon.ViewList />
+              </IconButton>
+              <Menu
+                id="ep-menu"
+                anchorEl={menuEl}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "center",
+                  horizontal: "right",
+                }}
+                open={menu}
+                classes={{
+                  paper: classes.menuPaper,
+                }}
+                onClose={this.closeMenu}
+                PaperProps={{
+                  style: {
+                    width: 420,
+                    padding: 0,
+                    outline: "none",
+                    background: grey[800],
+                  },
+                }}
+                MenuListProps={{
+                  style: {
+                    padding: 0,
+                    outline: "none",
+                  },
+                }}>
+                <Card style={{ background: grey[800] }}>
+                  <CardHeader
+                    style={{ background: grey[900] }}
+                    title="Episodes"
+                    classes={{
+                      action: classes.marginAuto,
+                      title: classes.secTitleText,
+                    }}
+                    action={
+                      <IconButton onClick={this.closeMenu}>
+                        <Icon.ExpandMore />
+                      </IconButton>
+                    }
+                  />
+                  <Divider />
+                  <CardContent className={classes.epListCont}>
+                    {eps &&
+                      eps.map((e: any) => (
+                        <MenuItem
+                          onClick={() => {
+                            this.setState({ ep: e.ep }, async () =>
+                              loadEp(this, e, null),
+                            );
+                          }}
+                          key={e.ep}
+                          selected={e.ep === ep}
+                          className={classes.epListItem}>
+                          {e.thumb ? (
+                            <img
+                              alt=""
+                              className={classes.episodeThumb}
+                              src={e.thumb.original}
+                            />
                           ) : null}
-                        </div>
-                        <div style={{ flex: 1 }} />
-                        {e.ep === ep ? <Icon.PlayArrow /> : null}
-                      </MenuItem>
-                    ))}
-                </CardContent>
-              </Card>
-            </Menu>
-          </div>
-        )}
+                          <div
+                            style={{
+                              display: "flex",
+                              flexFlow: "column nowrap",
+                              paddingLeft: 8,
+                            }}>
+                            <Typography
+                              variant="title"
+                              className={classes.episodeCount}>
+                              Episode {e.ep}
+                            </Typography>
+                            {e.canon ? (
+                              <Typography
+                                variant="body1"
+                                className={classes.episodeName}>
+                                {e.canon}
+                              </Typography>
+                            ) : null}
+                          </div>
+                          <div style={{ flex: 1 }} />
+                          {e.ep === ep ? <Icon.PlayArrow /> : null}
+                        </MenuItem>
+                      ))}
+                  </CardContent>
+                </Card>
+              </Menu>
+            </div>
+          )}
       </div>
     );
   }
 }
 
-export const loadPlayer = (play) => ({
+export const loadPlayer = (play: any) => ({
   type: MIR_PLAY_SHOW,
   play,
 });
 
-const mapPTS = (dispatch) => ({
-  removeDataFromMir: (play) => dispatch(loadPlayer(play)),
+const mapPTS = (dispatch: any) => ({
+  removeDataFromMir: (play: any) => dispatch(loadPlayer(play)),
 });
 
 export default firebaseConnect()(
-  connect(({ firebase: { profile }, mir }) => ({ profile, mir }), mapPTS)(
-    withStyles(style, { withTheme: true })(MirPlayer),
+  connect(({ firebase: { profile }, mir }: any) => ({ profile, mir }), mapPTS)(
+    withStyles(style as any, { withTheme: true })(MirPlayer),
   ),
 );

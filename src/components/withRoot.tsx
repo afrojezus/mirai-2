@@ -1,6 +1,6 @@
 /* eslint-disable flowtype/require-valid-file-annotation */
 
-import React from "react";
+import React, { ReactElement } from "react";
 import { MuiThemeProvider, createMuiTheme } from "material-ui/styles";
 import CssBaseline from "material-ui/CssBaseline";
 import { blue } from "material-ui/colors/index";
@@ -24,22 +24,13 @@ const getColors = () => {
 // Apply some reset
 const theme = createMuiTheme({
   palette: {
-    primary: getColors()
-      ? {
-          main: getColors().hueAccent
-            ? getColors().hueAccent
-            : getColors().hueVibN ? getColors().hueVibN : blue
-        }
-      : blue,
+    primary: blue,
     secondary: blue,
     type: "dark",
     background: {
       default: "#111",
       paper: "#111",
-      appBar: "#111",
-      contentFrame: "#eeeeee"
     },
-    contrastThreshold: 3
   },
   typography: {
     // Use the system font.
@@ -89,12 +80,12 @@ const theme = createMuiTheme({
   }
 });
 // Expose the theme as a global variable so people can play with it.
-if (process.browser) {
-  window.theme = theme;
+if (process['browser']) {
+  window['theme'] = theme;
 }
 
-function withRoot(Component) {
-  function WithRoot(props) {
+function withRoot(Component: any) {
+  function WithRoot(props: any) {
     // MuiThemeProvider makes the theme available down the React tree
     // thanks to React context.
     return (

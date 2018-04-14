@@ -56,47 +56,47 @@ const styles = theme => ({
     "&:hover > svg": {
       opacity: 1
     },
-    transition: theme.transitions.create(["all"]),
+    transition: theme.transitions.create(['all']),
     zIndex: 1000,
-    cursor: "pointer"
+    cursor: 'pointer'
   },
   dropzoneBg: {
     height: 256,
     width: 480,
-    position: "relative",
-    margin: "auto",
-    border: "2px solid white",
-    "&:hover > img": {
-      filter: "brightness(0.5)"
+    position: 'relative',
+    margin: 'auto',
+    border: '2px solid white',
+    '&:hover > img': {
+      filter: 'brightness(0.5)'
     },
-    "&:hover > svg": {
+    '&:hover > svg': {
       opacity: 1
     },
     zIndex: 1000,
-    transition: theme.transitions.create(["all"])
+    transition: theme.transitions.create(['all'])
   },
   avaImg: {
-    height: "100%",
-    width: "100%",
-    objectFit: "cover",
-    borderRadius: "50%"
+    height: '100%',
+    width: '100%',
+    objectFit: 'cover',
+    borderRadius: '50%'
   },
   pictureIcon: {
-    top: "50%",
-    left: "50%",
-    position: "absolute",
-    transform: "translate(-50%,-50%)",
-    color: "white",
+    top: '50%',
+    left: '50%',
+    position: 'absolute',
+    transform: 'translate(-50%,-50%)',
+    color: 'white',
     fontSize: 48,
     opacity: 0,
-    transition: theme.transitions.create(["all"])
+    transition: theme.transitions.create(['all'])
   }
 });
 
 class Wizard extends Component {
   state = {
     data: {},
-    user: "",
+    user: '',
     ava: null,
     avaLoading: false
   };
@@ -112,13 +112,13 @@ class Wizard extends Component {
   changeAva = async () => {
     const ava = this.props.firebase
       .storage()
-      .ref("userData")
-      .child("avatar")
+      .ref('userData')
+      .child('avatar')
       .child(this.state.ava.name)
       .put(this.state.ava);
 
     return ava.on(
-      "state_changed",
+      'state_changed',
       () => {},
       error => console.error(error),
       () => {
@@ -128,7 +128,7 @@ class Wizard extends Component {
             avatar: ava.snapshot.downloadURL
           })
           .then(() => {
-            console.info("Avatar updated.");
+            console.info('Avatar updated.');
             return this.setState({ avaLoading: false, ava: null });
           });
       }
@@ -146,19 +146,19 @@ class Wizard extends Component {
     if (this.state.ava && this.state.user) {
       return this.changeAva().then(() =>
         this.changeUsername().then(() =>
-          this.props.history.push("/", { firstTime: true })
+          this.props.history.push('/', { firstTime: true })
         )
       );
     } else if (this.state.ava && !this.state.user) {
       return this.changeAva().then(() =>
-        this.props.history.push("/", { firstTime: true })
+        this.props.history.push('/', { firstTime: true })
       );
     } else if (this.state.user && !this.state.ava) {
       return this.changeUsername().then(() =>
-        this.props.history.push("/", { firstTime: true })
+        this.props.history.push('/', { firstTime: true })
       );
     } else {
-      return this.props.history.push("/", { firstTime: true });
+      return this.props.history.push('/', { firstTime: true });
     }
   };
 
@@ -192,7 +192,7 @@ class Wizard extends Component {
                 in the Help section of the app, which is also avaliable on the
                 menu of the app.
               </Typography>
-              <Divider style={{ margin: "16px 0" }} />
+              <Divider style={{ margin: '16px 0' }} />
               <Typography
                 variant="title"
                 style={{ marginBottom: theme.spacing.unit * 2 }}
@@ -209,7 +209,7 @@ class Wizard extends Component {
                 fullWidth
                 margin="normal"
               />
-              <Divider style={{ margin: "16px 0" }} />
+              <Divider style={{ margin: '16px 0' }} />
               <Typography
                 variant="title"
                 style={{ marginBottom: theme.spacing.unit * 2 }}

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, ChangeEvent, FormEvent, MouseEvent } from "react";
 import Button from "material-ui/Button";
 import AppBar from "material-ui/AppBar";
 import Typography from "material-ui/Typography";
@@ -29,6 +29,7 @@ import { CardHeader } from "material-ui/Card";
 import HomeIcon from "material-ui-icons/Home";
 import SearchIcon from "material-ui-icons/Search";
 import LiveTvIcon from "material-ui-icons/LiveTv";
+import AtIcon from 'material-ui-icons/Email'
 import BellIcon from "material-ui-icons/Notifications";
 import BellOffIcon from "material-ui-icons/NotificationsNone";
 import Avatar from "material-ui/Avatar";
@@ -49,7 +50,7 @@ import Tabs, { Tab } from "material-ui/Tabs";
 import { firebaseConnect, isEmpty } from "react-redux-firebase";
 import miraiLogo from "../assets/mirai-icon.png";
 import miraiLogoBlack from "../assets/mirai-icon-dark.png";
-import NotificationForm, { types } from "./notificationForm";
+import NotificationForm from "./notificationForm";
 import { history } from "../store";
 import MirPlayer from "./mirplayer";
 import { Dialogue } from "./layouts";
@@ -57,7 +58,7 @@ import { MenuItem } from "material-ui/Menu";
 
 const drawerWidth = 240;
 
-const styles = (theme) => ({
+const styles = (theme: any) => ({
   root: {
     width: "100%",
     transition: theme.transitions.create(["all"]),
@@ -378,10 +379,10 @@ const styles = (theme) => ({
   },
 });
 
-class Superbar extends Component {
+class Superbar extends Component<any, any> {
   state = {
-    anchorEl: null,
-    infoEl: null,
+    anchorEl: undefined,
+    infoEl: undefined,
     drawerOpen: false,
     searchVal: "",
     notAtTop: true,
@@ -398,12 +399,13 @@ class Superbar extends Component {
     userMenuHover: false,
     onlineUsers: [],
     donateModal: false,
-    langMenu: null,
+    langMenu: undefined,
     openSnack: false,
     snackMessage: "",
+    tabVal: 0
   };
 
-  componentWillMount = () => {
+  async componentDidMount() {
     if (this.props.history.location.pathname === "/")
       this.setState({ tabVal: 0, currentPage: "Mirai" });
     else {
@@ -429,15 +431,12 @@ class Superbar extends Component {
     }
 
     checklang(this);
-  };
-
-  componentDidMount = async () => {
     window.addEventListener("scroll", this.handleScroll);
     await this.getUsersOnline();
     // await this.handleNotifications(); TODO: Service worker method instead of this.
   };
 
-  componentWillReceiveProps = (nextProps) => {
+  async componentWillReceiveProps(nextProps: any) {
     if (this.props.mir)
       if (this.props.mir.title !== nextProps.mir.title) {
         this.setState({ mirTitle: "" }, () =>
@@ -453,15 +452,15 @@ class Superbar extends Component {
         .ref("/users")
         .child(this.props.profile.userID)
         .child("notifications")
-        .on("value", (val) => {
+        .on("value", (val: any) => {
           const data = val.val();
           if (data) {
-            const notifications = Object.values(data).filter(
-              (n) => n.ignored === false,
+            const notifications = Array.from(data).filter(
+              (n: any) => n.ignored === false,
             );
             const sortedNotificationsByDate =
               notifications.length > 0
-                ? notifications.sort((a, b) => b.date - a.date)
+                ? notifications.sort((a: any, b: any) => b.date - a.date)
                 : null;
             return this.checkForNotifications(sortedNotificationsByDate);
           } else {
@@ -473,7 +472,7 @@ class Superbar extends Component {
     }
   };
 
-  checkForNotifications = async (notification) => {
+  checkForNotifications = async (notification: any) => {
     if (!("Notification" in window)) {
       return console.info(
         "[mirai] Web notification support not found on this browser.",
@@ -488,31 +487,28 @@ class Superbar extends Component {
 
     try {
       await Notification.requestPermission();
-      if (Notification.permission === "denied") {
+      if (Notification['permission'] === "denied") {
         throw new Error("Web notifications denied.");
       } else {
         if (!notification) return null;
         else {
-          notification.forEach((s) => {
+          notification.forEach((s: any) => {
             const n = new Notification("Mirai", {
               body: s.desc,
               icon: s.avatar,
-              badge: miraiLogoBlack,
-              vibrate: [110],
-              tag: s.id,
             });
-            n.addEventListener("click", (event) => {
+            n.addEventListener("click", (event: any) => {
               n.close();
             });
           });
         }
       }
     } catch (error) {
-      return console.error(error);
+      return error;
     }
   };
 
-  componentWillUnmount = () => {
+  componentWillUnmount() {
     window.removeEventListener("scroll", this.handleScroll);
     this.listenToHistory();
   };
@@ -531,11 +527,12 @@ class Superbar extends Component {
     }
   };
 
-  handleScroll = (event) => {
+  handleScroll = () => {
+    const fB = document.getElementById("fabShowButton");
     if (window.scrollY === 0 && this.state.scrolling === true)
       this.setState({ scrolling: false }, () => {
-        if (document.getElementById("fabShowButton") && !window.safari)
-          document.getElementById("fabShowButton").style.opacity = 0;
+        if (fB && !window['safari'])
+          fB.style.opacity = '0';
         const mainH = document.getElementById("mainHeader");
         const mainC = document.getElementById("mainCard");
         const commando = document.getElementById("commandoBar");
@@ -546,8 +543,8 @@ class Superbar extends Component {
       });
     else if (window.scrollY !== 0 && this.state.scrolling !== true)
       this.setState({ scrolling: true }, () => {
-        if (document.getElementById("fabShowButton"))
-          document.getElementById("fabShowButton").style.opacity = 1;
+        if (fB)
+          fB.style.opacity = '1';
         const mainH = document.getElementById("mainHeader");
         const mainC = document.getElementById("mainCard");
         const commando = document.getElementById("commandoBar");
@@ -558,7 +555,7 @@ class Superbar extends Component {
       });
   };
 
-  handleMenu = (event) => {
+  handleMenu = (event: MouseEvent<HTMLElement>) => {
     this.setState({ anchorEl: event.currentTarget });
   };
 
@@ -566,7 +563,7 @@ class Superbar extends Component {
     this.setState({ anchorEl: null });
   };
 
-  handleInfoMenu = (event) => {
+  handleInfoMenu = (event: MouseEvent<HTMLElement>) => {
     this.setState({ infoEl: event.currentTarget });
   };
 
@@ -576,7 +573,7 @@ class Superbar extends Component {
 
   toggleDrawer = () => this.setState({ drawerOpen: !this.state.drawerOpen });
 
-  tabChange = (e, val) => {
+  tabChange = (e: any, val: number) => {
     this.setState({ tabVal: val }, () => {
       switch (this.state.tabVal) {
         case 0:
@@ -594,7 +591,7 @@ class Superbar extends Component {
     });
   };
 
-  listenToHistory = this.props.history.listen((location) => {
+  listenToHistory = this.props.history.listen((location: any) => {
     const { superbar } = this.state.lang;
     switch (location.pathname) {
       case "/":
@@ -724,7 +721,7 @@ class Superbar extends Component {
     }
   });
 
-  shouldComponentUpdate = (nextProps, nextState) => {
+  shouldComponentUpdate(nextProps: any, nextState: any) {
     if (this.state !== nextState) {
       return true;
     }
@@ -736,9 +733,15 @@ class Superbar extends Component {
     return false;
   };
 
-  revealBar = () => document.getElementById("superBar").style.opacity === 1;
+  revealBar = () => {
+    const sB = document.getElementById("superBar");
+    sB && sB.style.opacity === '1';
+  }
 
-  hideBar = () => document.getElementById("superBar").style.opacity === 0;
+  hideBar = () => {
+    const sB = document.getElementById("superBar");
+    sB && sB.style.opacity === '0';
+  }
 
   handleMenuOver = () =>
     this.setState({ userMenuHover: !this.state.userMenuHover });
@@ -747,19 +750,19 @@ class Superbar extends Component {
     this.props.firebase
       .database()
       .ref("presence")
-      .on("value", (value) =>
+      .on("value", (value: any) =>
         this.setState({
           onlineUsers: value === undefined ? 0 : value.val(),
         }),
-      );
+    );
 
   openDonate = () => this.setState({ donateModal: true, anchorEl: null });
 
-  handleLangMenu = (event) => {
+  handleLangMenu = (event: MouseEvent<HTMLElement>) => {
     this.setState({ langMenu: event.currentTarget });
   };
 
-  changeLang = (lang) => {
+  changeLang = (lang: string) => {
     switch (lang) {
       case "en":
         localStorage.setItem("language", "en-us");
@@ -783,18 +786,18 @@ class Superbar extends Component {
 
   // Electron functions
   eMaximize = () => {
-    const electron = window.require("electron").remote.getCurrentWindow();
+    const electron = window['require']("electron").remote.getCurrentWindow();
     if (electron.isMaximized()) return electron.unmaximize();
     else return electron.maximize();
   };
 
   eMinimize = () => {
-    const electron = window.require("electron").remote.getCurrentWindow();
+    const electron = window['require']("electron").remote.getCurrentWindow();
     return electron.minimize();
   };
 
   eClose = () => {
-    const electron = window.require("electron").remote.getCurrentWindow();
+    const electron = window['require']("electron").remote.getCurrentWindow();
     return electron.close();
   };
 
@@ -821,7 +824,7 @@ class Superbar extends Component {
 
     const notifications = user
       ? user.notifications
-        ? Object.values(user.notifications).filter((n) => n.ignored === false)
+        ? Array.from(user.notifications).filter((n: any) => n.ignored === false)
         : null
       : null;
 
@@ -834,11 +837,11 @@ class Superbar extends Component {
         <Typography className={classes.footerCopy} variant="headline">
           Mirai 1.0.1f1
           <br />
-          {onlineUsers ? Object.values(onlineUsers).length : 0} users online
+          {onlineUsers ? Array.from(onlineUsers).length : 0} users online
           <br />
           {this.props.mir && this.props.mir.twist
             ? `${Object.keys(this.props.mir.twist).length -
-                1} anime in database avaliable`
+            1} anime in database avaliable`
             : null}
           <br />2018 afroJ "thor"
         </Typography>
@@ -858,8 +861,6 @@ class Superbar extends Component {
             </IconButton>
           </Tooltip>
           <IconButton
-            style={{ display: "none" }}
-            disabled
             onClick={() => {
               this.toggleDrawer();
               window.open("https://github.com/afrojezus/mirai");
@@ -871,14 +872,14 @@ class Superbar extends Component {
               />
             </svg>
           </IconButton>
-          {/*<IconButton
+          <IconButton
             onClick={() => {
               this.toggleDrawer();
               window.open("mailto:thoralf21@gmail.com");
             }}
           >
             <AtIcon />
-          </IconButton>*/}
+          </IconButton>
         </div>
       </div>
     );
@@ -1055,10 +1056,10 @@ class Superbar extends Component {
           id="superBar"
           classes={{ root: classes.root }}
           className={
-            scrolling && !window.safari ? classes.appBar : classes.appBarTop
+            scrolling && !window['safari'] ? classes.appBar : classes.appBarTop
           }
-          style={watchIsOn ? { display: "none" } : null}>
-          {window.safari ? null : (
+          style={watchIsOn ? { display: "none" } : undefined}>
+          {window['safari'] ? null : (
             <div
               className={classes.gd}
               style={scrolling ? { opacity: 0.9 } : { opacity: 0.5 }}
@@ -1070,7 +1071,6 @@ class Superbar extends Component {
             <Hidden mdUp>
               <IconButton
                 className={classes.menuButton}
-                contrast={"default"}
                 aria-label="Menu"
                 onClick={this.toggleDrawer}>
                 <MenuIcon />
@@ -1080,7 +1080,7 @@ class Superbar extends Component {
               className={classes.contextBar}
               value={tabVal}
               onChange={this.tabChange}
-              indicatorClassName={classes.tabLine}
+              classes={{ indicator: classes.tabLine }}
               centered>
               <Tab
                 classes={{
@@ -1166,47 +1166,44 @@ class Superbar extends Component {
                 />
               </Hidden>
             ) : (
-              <Hidden smDown>
-                <SearchBox
-                  mir={this.props.mir}
-                  history={history}
-                  classes={{
-                    searchBar: classes.searchBar,
-                    searchInput: classes.searchInput,
-                    searchIcon: classes.searchIcon,
-                  }}
-                />
-              </Hidden>
-            )}
+                <Hidden smDown>
+                  <SearchBox
+                    mir={this.props.mir}
+                    history={history}
+                    classes={{
+                      searchBar: classes.searchBar,
+                      searchInput: classes.searchInput,
+                      searchIcon: classes.searchIcon,
+                    }}
+                  />
+                </Hidden>
+              )}
             {!user && tabVal === 0 ? null : !user ? (
               <Hidden mdUp>
                 <IconButton
-                  onClick={() => this.props.history.push("/search")}
-                  contrast={"default"}>
+                  onClick={() => this.props.history.push("/search")}>
                   <SearchIcon />
                 </IconButton>
               </Hidden>
             ) : (
-              <Hidden mdUp>
-                <IconButton
-                  onClick={() => this.props.history.push("/search")}
-                  contrast={"default"}>
-                  <SearchIcon />
-                </IconButton>
-              </Hidden>
-            )}
+                <Hidden mdUp>
+                  <IconButton
+                    onClick={() => this.props.history.push("/search")}>
+                    <SearchIcon />
+                  </IconButton>
+                </Hidden>
+              )}
             <div>
               <IconButton
                 disabled={!user}
-                aria-owns={open ? "info-menu" : null}
+                aria-owns={open ? "info-menu" : undefined}
                 aria-haspopup="true"
-                onClick={this.handleInfoMenu}
-                contrast={"default"}>
+                onClick={this.handleInfoMenu}>
                 {notifications && notifications.length > 0 ? (
                   <BellIcon />
                 ) : (
-                  <BellOffIcon />
-                )}
+                    <BellOffIcon />
+                  )}
               </IconButton>
               <Menu
                 id="info-menu"
@@ -1227,19 +1224,17 @@ class Superbar extends Component {
             </div>
             {isEmpty(user) ? (
               <IconButton
-                aria-owns={openLangMenu ? "lang-menu" : null}
+                aria-owns={openLangMenu ? "lang-menu" : undefined}
                 aria-haspopup="true"
-                onClick={this.handleLangMenu}
-                contrast={"default"}>
+                onClick={this.handleLangMenu}>
                 <TranslateIcon />
               </IconButton>
             ) : null}
             <div>
               <IconButton
-                aria-owns={open ? "profile-menu" : null}
+                aria-owns={open ? "profile-menu" : undefined}
                 aria-haspopup="true"
-                onClick={this.handleMenu}
-                contrast={"default"}>
+                onClick={this.handleMenu}>
                 {user ? (
                   <Avatar
                     src={user.avatar}
@@ -1252,8 +1247,8 @@ class Superbar extends Component {
                     }}
                   />
                 ) : (
-                  <MoreVert />
-                )}
+                    <MoreVert />
+                  )}
               </IconButton>
               <Menu
                 id="profile-menu"
@@ -1274,14 +1269,13 @@ class Superbar extends Component {
                     zIndex: 2000,
                   },
                 }}
-                onClose={this.handleRequestClose}
-                PopoverClasses={{ paper: classes.menuPadding }}>
+                onClose={this.handleRequestClose}>
                 <div
                   style={{ outline: "none", maxHeight: "inherit" }}
                   className={classes.profileCard}>
                   <CardHeader
                     className={classes.profileCardHeader}
-                    style={{ cursor: user ? "pointer" : null }}
+                    style={{ cursor: user ? "pointer" : undefined }}
                     onClick={() => {
                       if (user) {
                         this.handleRequestClose();
@@ -1419,8 +1413,8 @@ class Superbar extends Component {
                                 this.props.history.push("/setup");
                                 await localForage.removeItem("player-state");
                               }),
-                            )
-                            .catch((err) => console.error(err.message));
+                          )
+                            .catch((err: ErrorEvent) => console.error(err.message));
                         }}>
                         <ListItemText
                           primary={lang.superbar.usermenu.signout}
@@ -1451,8 +1445,7 @@ class Superbar extends Component {
                   zIndex: 2000,
                 },
               }}
-              onClose={() => this.setState({ langMenu: null })}
-              PopoverClasses={{ paper: classes.menuPadding }}>
+              onClose={() => this.setState({ langMenu: null })}>
               <div
                 style={{ outline: "none", maxHeight: "inherit", maxWidth: 350 }}
                 className={classes.profileCard}>
@@ -1526,13 +1519,13 @@ class Superbar extends Component {
             {isElectron() ? (
               <IconButton onClick={this.eMaximize}>
                 {window
-                  .require("electron")
+                ['require']("electron")
                   .remote.getCurrentWindow()
                   .isMaximized() ? (
-                  <UnMaximize />
-                ) : (
-                  <Maximize />
-                )}
+                    <UnMaximize />
+                  ) : (
+                    <Maximize />
+                  )}
               </IconButton>
             ) : null}
             {isElectron() ? (
@@ -1583,7 +1576,7 @@ class Superbar extends Component {
             classes={{ paper: classes.drawer }}
             open={drawerOpen}
             onClose={this.toggleDrawer}
-            type="temporary"
+            variant="temporary"
             ModalProps={{
               keepMounted: true,
             }}>
@@ -1620,33 +1613,33 @@ class Superbar extends Component {
   }
 }
 
-export class SearchBox extends Component {
+export class SearchBox extends Component<any, any> {
   state = {
     value: "",
     suggestionList: null,
     lang: strings.enus,
   };
 
-  componentWillMount = () => {
+  componentDidMount() {
     checklang(this);
   };
 
-  onChange = (e) =>
-    this.setState({ value: e.currentTarget.value }, () => {
+  onChange = (e: ChangeEvent<HTMLInputElement>) =>
+    this.setState({ value: e.currentTarget['value'] }, () => {
       if (this.props.mir !== null && this.props.mir.twist !== null) {
         const search = this.state.value;
         this.setState({
-          suggestionList: this.props.mir.twist.filter((s) =>
+          suggestionList: this.props.mir.twist.filter((s: any) =>
             s.name.toLowerCase().match(search.toLowerCase()),
           ),
         });
       }
     });
 
-  onSubmit = (e) => {
+  onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const search = this.state.value;
-    if (search.length > 2 && search.value !== "") {
+    if (search.length > 2 && search['value'] !== "") {
       if (
         search.match("cory in the house") ||
         search.match("Cory in the house") ||
@@ -1694,10 +1687,10 @@ export class SearchBox extends Component {
 
 export default firebaseConnect()(
   connect(
-    ({ firebase: { profile }, mir }) => ({
+    ({ firebase: { profile }, mir }: any) => ({
       profile,
       mir,
     }),
     null,
-  )(withStyles(styles)(Superbar)),
+  )(withStyles(styles as any)(Superbar)),
 );

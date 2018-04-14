@@ -30,7 +30,7 @@ import Hidden from "material-ui/Hidden";
 import Divider from "material-ui/Divider";
 import IconButton from "material-ui/IconButton";
 
-const style = theme => ({
+const style = (theme: any) => ({
   compacMode: {
     background: "transparent"
   },
@@ -323,7 +323,7 @@ const style = theme => ({
     background: theme.palette.background.paper,
     outline: "none",
     minHeight: 120,
-    minWidth: window.mobilecheck() ? null : 500
+    minWidth: window['mobilecheck']() ? null : 500
   },
   modalTextColor: {
     color: grey[50]
@@ -350,16 +350,16 @@ const style = theme => ({
   }
 });
 
-export const Column = withStyles(style, { withTheme: true })(
-  ({ classes, children }) => <div className={classes.column}>{children}</div>
+export const Column = withStyles(style as any, { withTheme: true })(
+  ({ classes, children }: any) => <div className={classes.column}>{children}</div>
 );
 
-export const Row = withStyles(style, { withTheme: true })(
-  ({ classes, children }) => <div className={classes.row}>{children}</div>
+export const Row = withStyles(style as any, { withTheme: true })(
+  ({ classes, children }: any) => <div className={classes.row}>{children}</div>
 );
 
-export const ItemContainer = withStyles(style, { withTheme: true })(
-  ({ classes, theme, children, noMargin, spacing, topPad, ...props }) => (
+export const ItemContainer = withStyles(style as any, { withTheme: true })(
+  ({ classes, theme, children, noMargin, spacing, topPad, ...props }: any) => (
     <Grid
       container
       className={classes.itemcontainer}
@@ -380,7 +380,7 @@ ItemContainer.defaultProps = {
   noMargin: true
 };
 
-export const SectionTitle = withStyles(style, { withTheme: true })(
+export const SectionTitle = withStyles(style as any, { withTheme: true })(
   ({
     classes,
     theme,
@@ -391,50 +391,50 @@ export const SectionTitle = withStyles(style, { withTheme: true })(
     button,
     buttonClick,
     ...props
-  }) => (
-    <div className={classes.secTitle}>
-      <Typography
-        variant={"title"}
-        className={classNames(
-          classes.secTitleText,
-          lighter ? classes.lightersecTitle : null
-        )}
-        style={{
-          color: lighter ? "rgba(255,255,255,.5)" : null,
-          paddingBottom: noPad ? 0 : null,
-          ...props.style
-        }}
-      >
-        {title}
-      </Typography>
-      {subtitle && subtitle !== "" ? (
-        <Hidden mdDown>
-          <Typography
-            variant={"title"}
-            className={classNames(
-              classes.secTitleText,
-              classes.lightersecTitle
-            )}
-            style={{
-              color: "rgba(255,255,255,.5)",
-              paddingBottom: noPad ? 0 : null,
-              marginLeft: theme.spacing.unit,
-              fontWeight: 500,
-              fontSize: 18
-            }}
-          >
-            {subtitle}
-          </Typography>
-        </Hidden>
-      ) : null}
-      {button ? <div style={{ flex: 1 }} /> : null}
-      {button ? <Button onClick={buttonClick}>{button}</Button> : null}
-    </div>
-  )
+  }: any) => (
+      <div className={classes.secTitle}>
+        <Typography
+          variant={"title"}
+          className={classNames(
+            classes.secTitleText,
+            lighter ? classes.lightersecTitle : null
+          )}
+          style={{
+            color: lighter ? "rgba(255,255,255,.5)" : null,
+            paddingBottom: noPad ? 0 : null,
+            ...props.style
+          }}
+        >
+          {title}
+        </Typography>
+        {subtitle && subtitle !== "" ? (
+          <Hidden mdDown>
+            <Typography
+              variant={"title"}
+              className={classNames(
+                classes.secTitleText,
+                classes.lightersecTitle
+              )}
+              style={{
+                color: "rgba(255,255,255,.5)",
+                paddingBottom: noPad ? 0 : undefined,
+                marginLeft: theme.spacing.unit,
+                fontWeight: 500,
+                fontSize: 18
+              }}
+            >
+              {subtitle}
+            </Typography>
+          </Hidden>
+        ) : null}
+        {button ? <div style={{ flex: 1 }} /> : null}
+        {button ? <Button onClick={buttonClick}>{button}</Button> : null}
+      </div>
+    )
 );
 
-export const SectionSubTitle = withStyles(style, { withTheme: true })(
-  ({ classes, title, ...props }) => (
+export const SectionSubTitle = withStyles(style as any, { withTheme: true })(
+  ({ classes, title, ...props }: any) => (
     <Typography
       variant={"body1"}
       className={classes.secSubtitle}
@@ -445,15 +445,15 @@ export const SectionSubTitle = withStyles(style, { withTheme: true })(
   )
 );
 
-export const LoadingScreen = withStyles(style, { withTheme: true })(
-  ({ classes, error, log }) => (
+export const LoadingScreen = withStyles(style as any, { withTheme: true })(
+  ({ classes, error, log }: any) => (
     <div className={classes.loadingRoot}>
       <div style={{ margin: "auto", display: "flex", flexDirection: "column" }}>
         {error ? (
           <Icon.ErrorOutline className={classes.loadingCircle} />
         ) : (
-          <CircularProgress className={classes.loadingCircle} />
-        )}
+            <CircularProgress className={classes.loadingCircle} />
+          )}
         {log && log !== "" ? (
           <Typography
             variant="title"
@@ -467,7 +467,7 @@ export const LoadingScreen = withStyles(style, { withTheme: true })(
   )
 );
 
-export const Container = withStyles(style, { withTheme: true })(
+export const Container = withStyles(style as any, { withTheme: true })(
   ({
     classes,
     theme,
@@ -481,38 +481,38 @@ export const Container = withStyles(style, { withTheme: true })(
     alignContent,
     alignItems,
     ...props
-  }) => (
-    <Grid
-      container
-      direction={direction}
-      justify={justify}
-      alignContent={alignContent}
-      alignItems={alignItems}
-      style={
-        hasHeader
-          ? window.innerWidth < 1000 || window.mobilecheck()
-            ? null
-            : {
+  }: any) => (
+      <Grid
+        container
+        direction={direction}
+        justify={justify}
+        alignContent={alignContent}
+        alignItems={alignItems}
+        style={
+          hasHeader
+            ? window.innerWidth < 1000 || window['mobilecheck']()
+              ? null
+              : {
                 marginTop: theme.spacing.unit * 16
               }
-          : null
-      }
-      spacing={spacing}
-      {...props}
-      className={
-        row ? classes.containerRow : special ? "containerS" : classes.container
-      }
-    >
-      {children}
-    </Grid>
-  )
+            : null
+        }
+        spacing={spacing}
+        {...props}
+        className={
+          row ? classes.containerRow : special ? "containerS" : classes.container
+        }
+      >
+        {children}
+      </Grid>
+    )
 );
 
-export const Root = withStyles(style, { withTheme: true })(
-  ({ classes, theme, children, hasTab, ...props }) => (
+export const Root = withStyles(style as any, { withTheme: true })(
+  ({ classes, theme, children, hasTab, ...props }: any) => (
     <div
       className={classes.root}
-      style={hasTab ? { paddingTop: theme.spacing.unit * 4 } : null}
+      style={hasTab ? { paddingTop: theme.spacing.unit * 4 } : undefined}
       {...props}
     >
       {children}
@@ -521,8 +521,8 @@ export const Root = withStyles(style, { withTheme: true })(
 );
 
 export const Dialogue = firebaseConnect()(
-  connect(({ firebase: { profile }, ...state }) => ({ profile, ...state }))(
-    withStyles(style, { withTheme: true })(
+  connect(({ firebase: { profile }, ...state }: any) => ({ profile, ...state }))(
+    withStyles(style as any, { withTheme: true })(
       ({
         classes,
         theme,
@@ -536,163 +536,163 @@ export const Dialogue = firebaseConnect()(
         profile,
         style,
         onClose
-      }) => (
-        <Modal open={open} style={style} onClose={onClose}>
-          {zoom ? (
-            <Zoom in={open}>
-              <Card
-                elevation={4}
-                className={classes.modalPaper}
-                style={{ padding: 0, maxWidth: 700 }}
-              >
-                <CardHeader
-                  title={feed.ftitle}
-                  subheader={
-                    feed.context + " | " + moment(feed.date).from(Date.now())
-                  }
-                  avatar={<Avatar src={feed.avatar} />}
-                  action={
-                    <IconButton onClick={onClose}>
-                      <Icon.Close />
-                    </IconButton>
-                  }
-                  classes={{
-                    action: classes.dialogueActionButton
-                  }}
-                />
-                <Divider />
-                {feed.image ? (
-                  <img
-                    style={{
-                      transition: theme.transitions.create(["all"]),
-                      maxHeight: window.innerHeight,
-                      width: "100%",
-                      objectFit: "cover"
-                    }}
-                    alt=""
-                    src={feed.image}
-                  />
-                ) : null}
-                <CardContent>
-                  <Typography
-                    variant="body1"
-                    dangerouslySetInnerHTML={{ __html: feed.text }}
-                  />
-                </CardContent>
-                <Divider />
-                <CardActions>
-                  <Tooltip
-                    title={
-                      !feed.likes
-                        ? "Nobody likes this post"
-                        : Object.values(feed.likes).length > 1
-                          ? Object.values(feed.likes).length +
-                            " users liked this"
-                          : Object.values(feed.likes).length +
-                            " user liked this"
+      }: any) => (
+          <Modal open={open} style={style} onClose={onClose}>
+            {zoom ? (
+              <Zoom in={open}>
+                <Card
+                  elevation={4}
+                  className={classes.modalPaper}
+                  style={{ padding: 0, maxWidth: 700 }}
+                >
+                  <CardHeader
+                    title={feed.ftitle}
+                    subheader={
+                      feed.context + " | " + moment(feed.date).from(Date.now())
                     }
-                  >
-                    <div className={classes.likeContainer}>
-                      <Icon.Favorite className={classes.likeIcon} />
-                      <Typography vairant="title" className={classes.likeCount}>
-                        {!feed.likes ? 0 : Object.values(feed.likes).length}
-                      </Typography>
-                    </div>
-                  </Tooltip>
-                  <IconButton
-                    style={{
-                      opacity: 0,
-                      pointerEvents: "none",
-                      cursor: "default"
+                    avatar={<Avatar src={feed.avatar} />}
+                    action={
+                      <IconButton onClick={onClose}>
+                        <Icon.Close />
+                      </IconButton>
+                    }
+                    classes={{
+                      action: classes.dialogueActionButton
                     }}
                   />
-                  <div style={{ flex: 1 }} />
-                  {!isEmpty(profile) && profile ? (
+                  <Divider />
+                  {feed.image ? (
+                    <img
+                      style={{
+                        transition: theme.transitions.create(["all"]),
+                        maxHeight: window.innerHeight,
+                        width: "100%",
+                        objectFit: "cover"
+                      }}
+                      alt=""
+                      src={feed.image}
+                    />
+                  ) : null}
+                  <CardContent>
+                    <Typography
+                      variant="body1"
+                      dangerouslySetInnerHTML={{ __html: feed.text }}
+                    />
+                  </CardContent>
+                  <Divider />
+                  <CardActions>
                     <Tooltip
                       title={
-                        isEmpty(profile)
-                          ? "You need to login to like posts"
-                          : feed.likes && feed.likes[profile.userID]
-                            ? "Dislike this"
-                            : "Like this"
+                        !feed.likes
+                          ? "Nobody likes this post"
+                          : Array.from(feed.likes).length > 1
+                            ? Array.from(feed.likes).length +
+                            " users liked this"
+                            : Array.from(feed.likes).length +
+                            " user liked this"
                       }
-                      placement="bottom"
                     >
-                      <div>
-                        <IconButton
-                          disabled={isEmpty(feed.profile) ? true : false}
-                          classes={{ label: classes.text }}
-                          onClick={async () =>
-                            feed.likes && feed.likes[profile.userID]
-                              ? feed.disLikeThis()
-                              : feed.likeThis()
-                          }
-                        >
-                          {profile &&
-                          profile.userID &&
-                          feed.likes &&
-                          feed.likes[profile.userID] ? (
-                            <Icon.Favorite />
-                          ) : (
-                            <Icon.FavoriteBorder />
-                          )}
-                        </IconButton>
+                      <div className={classes.likeContainer}>
+                        <Icon.Favorite className={classes.likeIcon} />
+                        <Typography variant="title" className={classes.likeCount}>
+                          {!feed.likes ? 0 : Array.from(feed.likes).length}
+                        </Typography>
                       </div>
                     </Tooltip>
-                  ) : null}
-                </CardActions>
-              </Card>
-            </Zoom>
-          ) : (
-            <Fade in={open}>
-              <Card elevation={4} className={classes.modalPaper}>
-                <CardContent>
-                  <Typography
-                    variant="title"
-                    className={classNames(
-                      classes.modalTextColor,
-                      classes.modalTitle
-                    )}
-                  >
-                    {title}
-                  </Typography>
-                  {children}
-                </CardContent>
-                {actions !== undefined ? (
-                  <CardActions>
-                    <Hidden mdDown>
-                      <div style={{ flex: 1 }} />
-                    </Hidden>
-                    {actions.includes("send") ? (
-                      <Button onClick={actionsSend}>SEND</Button>
-                    ) : null}
-                    {actions.includes("ok") ? (
-                      <Button onClick={onClose}>OK</Button>
-                    ) : null}
-                    {actions.includes("close") ? (
-                      <Button onClick={onClose}>CLOSE</Button>
+                    <IconButton
+                      style={{
+                        opacity: 0,
+                        pointerEvents: "none",
+                        cursor: "default"
+                      }}
+                    />
+                    <div style={{ flex: 1 }} />
+                    {!isEmpty(profile) && profile ? (
+                      <Tooltip
+                        title={
+                          isEmpty(profile)
+                            ? "You need to login to like posts"
+                            : feed.likes && feed.likes[profile.userID]
+                              ? "Dislike this"
+                              : "Like this"
+                        }
+                        placement="bottom"
+                      >
+                        <div>
+                          <IconButton
+                            disabled={isEmpty(feed.profile) ? true : false}
+                            classes={{ label: classes.text }}
+                            onClick={async () =>
+                              feed.likes && feed.likes[profile.userID]
+                                ? feed.disLikeThis()
+                                : feed.likeThis()
+                            }
+                          >
+                            {profile &&
+                              profile.userID &&
+                              feed.likes &&
+                              feed.likes[profile.userID] ? (
+                                <Icon.Favorite />
+                              ) : (
+                                <Icon.FavoriteBorder />
+                              )}
+                          </IconButton>
+                        </div>
+                      </Tooltip>
                     ) : null}
                   </CardActions>
-                ) : null}
-              </Card>
-            </Fade>
-          )}
-        </Modal>
-      )
+                </Card>
+              </Zoom>
+            ) : (
+                <Fade in={open}>
+                  <Card elevation={4} className={classes.modalPaper}>
+                    <CardContent>
+                      <Typography
+                        variant="title"
+                        className={classNames(
+                          classes.modalTextColor,
+                          classes.modalTitle
+                        )}
+                      >
+                        {title}
+                      </Typography>
+                      {children}
+                    </CardContent>
+                    {actions !== undefined ? (
+                      <CardActions>
+                        <Hidden mdDown>
+                          <div style={{ flex: 1 }} />
+                        </Hidden>
+                        {actions.includes("send") ? (
+                          <Button onClick={actionsSend}>SEND</Button>
+                        ) : null}
+                        {actions.includes("ok") ? (
+                          <Button onClick={onClose}>OK</Button>
+                        ) : null}
+                        {actions.includes("close") ? (
+                          <Button onClick={onClose}>CLOSE</Button>
+                        ) : null}
+                      </CardActions>
+                    ) : null}
+                  </Card>
+                </Fade>
+              )}
+          </Modal>
+        )
     )
   )
 );
 
-export const CommandoBar = withStyles(style)(
-  ({ classes, children, ...props }) => (
+export const CommandoBar = withStyles(style as any)(
+  ({ classes, children, ...props }: any) => (
     <Toolbar id="commandoBar" className={classes.commandoBar} {...props}>
       {children}
     </Toolbar>
   )
 );
 
-export const CommandoBarTop = withStyles(style)(
-  ({ classes, title, children, ...props }) => (
+export const CommandoBarTop = withStyles(style as any)(
+  ({ classes, title, children, ...props }: any) => (
     <div className={classes.commandoBarTop} id="commandoBarMain">
       <Toolbar className={classes.commandoBarTopInner} {...props}>
         {children}
@@ -701,13 +701,13 @@ export const CommandoBarTop = withStyles(style)(
   )
 );
 
-export const MainCard = withStyles(style)(({ classes, children, ...props }) => (
+export const MainCard = withStyles(style as any)(({ classes, children, ...props }: any) => (
   <Paper id="mainCard" className={classes.bigBar} {...props}>
     {children}
   </Paper>
 ));
 
-export const TitleHeader = withStyles(style, { withTheme: true })(
+export const TitleHeader = withStyles(style as any, { withTheme: true })(
   ({
     classes,
     theme,
@@ -718,7 +718,7 @@ export const TitleHeader = withStyles(style, { withTheme: true })(
     miraiLogo,
     colortext,
     ...props
-  }) => {
+  }: any) => {
     if (window.innerWidth < 1000) return null;
     else
       return (
@@ -727,9 +727,9 @@ export const TitleHeader = withStyles(style, { withTheme: true })(
           style={
             color
               ? {
-                  opacity: 1,
-                  background: `linear-gradient(to top, transparent, ${color})`
-                }
+                opacity: 1,
+                background: `linear-gradient(to top, transparent, ${color})`
+              }
               : null
           }
           {...props}
@@ -737,7 +737,7 @@ export const TitleHeader = withStyles(style, { withTheme: true })(
           <div className={classes.titleHeaderInner}>
             {miraiLogo ? <div style={{ flex: 1 }} /> : null}
             {miraiLogo ? (
-              <div style={{ display: window.mobilecheck() ? "none" : null }}>
+              <div style={{ display: window['mobilecheck']() ? "none" : undefined }}>
                 <Typography
                   className={classes.titleheadertitle}
                   style={{
@@ -752,7 +752,7 @@ export const TitleHeader = withStyles(style, { withTheme: true })(
                   className={classes.titleheadersubtitle}
                   style={{
                     marginTop: -8,
-                    textAlign: window.mobilecheck() ? null : "center",
+                    textAlign: window['mobilecheck']() ? undefined : "center",
                     fontSize: 18
                   }}
                   variant="headline"
@@ -764,7 +764,7 @@ export const TitleHeader = withStyles(style, { withTheme: true })(
             {miraiLogo ? null : (
               <Typography
                 className={classes.titleheadertitle}
-                style={colortext ? { color: colortext } : null}
+                style={colortext ? { color: colortext } : undefined}
                 variant="display3"
               >
                 {title}
@@ -778,7 +778,7 @@ export const TitleHeader = withStyles(style, { withTheme: true })(
             {miraiLogo ? null : (
               <Typography
                 className={classes.titleheadersubtitle}
-                style={colortext ? { color: colortext } : null}
+                style={colortext ? { color: colortext } : undefined}
                 variant="headline"
               >
                 {subtitle}
@@ -791,26 +791,26 @@ export const TitleHeader = withStyles(style, { withTheme: true })(
   }
 );
 
-class HeaderRaw extends React.Component {
+class HeaderRaw extends React.Component<any, any> {
   static defaultProps = {
     color: "#111",
     image: null,
     classes: style
   };
 
-  componentDidMount = () => {
+  componentDidMount() {
     if (this.props.color) {
       document.documentElement.style.background = this.props.color;
     }
   };
 
-  componentWillReceiveProps = nextProps => {
+  componentWillReceiveProps(nextProps: any) {
     if (this.props.color) {
       document.documentElement.style.background = nextProps.color;
     }
   };
 
-  componentWillUnmount = () => {
+  componentWillUnmount() {
     if (this.props.color) {
       document.documentElement.style.background = null;
     }
@@ -838,22 +838,22 @@ class HeaderRaw extends React.Component {
   }
 }
 
-export const Header = withStyles(style)(HeaderRaw);
+export const Header = withStyles(style as any)(HeaderRaw);
 
-export const LoadingIndicator = withStyles(style)(({ classes, loading }) => {
-  if (window.mobilecheck())
+export const LoadingIndicator = withStyles(style as any)(({ classes, loading }: any) => {
+  if (window['mobilecheck']())
     return (
       <LinearProgress
         className={classes.loadingBarMobile}
         classes={{ barColorPrimary: classes.loadingBarColor }}
-        style={!loading ? { opacity: 0 } : null}
+        style={!loading ? { opacity: 0 } : undefined}
       />
     );
   else
     return (
       <CircularProgress
         className={classes.loadingBar}
-        style={!loading ? { opacity: 0 } : null}
+        style={!loading ? { opacity: 0 } : undefined}
       />
     );
 });

@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import PT from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import { connect } from 'react-redux';
 
-const style = theme => ({
+const style = (theme: any) => ({
 
 });
 
-class MirReader extends Component {
+class MirReader extends Component<any, any> {
     static propTypes = {
 
     };
@@ -16,25 +15,12 @@ class MirReader extends Component {
 
     };
 
-    constructor(props) {
+    constructor(props: any) {
         super(props);
         this.state = {
             recentlyRead: Date.now()
         };
     }
-    componentWillMount = () => {
-
-    };
-
-
-    componentDidMount = () => {
-
-    };
-
-
-    componentWillReceiveProps = (nextProps) => {
-
-    };
 
 
     render() {
@@ -44,4 +30,4 @@ class MirReader extends Component {
     }
 }
 
-export default connect(state => state)(withStyles(style)(MirReader));
+export default connect(state => state)(withStyles(style as any)(MirReader));

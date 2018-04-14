@@ -41,7 +41,7 @@
     "no-empty": true,
     "no-eval": true,
     "no-shadowed-variable": true,
-    "no-string-literal": true,
+    "no-string-literal": false,
     "no-switch-case-fall-through": true,
     "no-trailing-whitespace": false,
     "no-unused-expression": true,
@@ -89,6 +89,6 @@
       "check-type",
       "check-typecast"
     ],
-    "jsx-boolean-value": false
+    "jsx-boolean-value": false,
   }
 }

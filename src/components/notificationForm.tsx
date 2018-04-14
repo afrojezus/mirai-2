@@ -23,7 +23,7 @@ export const types = {
   FEED_COMMENT: "feedcomment"
 };
 
-const style = theme => ({
+const style = (theme: any) => ({
   root: {
     width: 300,
     boxShadow: "none",
@@ -43,14 +43,14 @@ const style = theme => ({
 
 export const NotificationCard = firebaseConnect()(
   connect(
-    ({ firebase: { profile }, mir }) => ({
+    ({ firebase: { profile }, mir }: any) => ({
       profile,
       mir
     }),
     null
   )(
-    withStyles(style)(
-      class extends Component {
+    withStyles(style as any)(
+      class extends Component<any, any> {
         // Friend request functions
         acceptFR = async () => {
           try {
@@ -154,7 +154,7 @@ export const NotificationCard = firebaseConnect()(
                 />
                 <CardActions className={classes.notificationCardActions}>
                   {options &&
-                    options.map((option, index) => (
+                    options.map((option: any, index: number) => (
                       <Button
                         key={index}
                         onClick={
@@ -176,28 +176,25 @@ export const NotificationCard = firebaseConnect()(
   )
 );
 
-class NotificationForm extends Component {
+class NotificationForm extends Component<any, any> {
   state = {
-    notifications: null,
+    notifications: [],
     lang: strings.enus
   };
 
-  componentWillMount = () => {
+  async componentDidMount() {
     checklang(this);
-  };
-
-  componentDidMount = async () => {
     if (!isEmpty(this.props.profile)) {
       return this.props.firebase
         .database()
         .ref("/users")
         .child(this.props.profile.userID)
         .child("notifications")
-        .on("value", val => {
+        .on("value", (val: any) => {
           const data = val.val();
           if (data) {
-            const notifications = Object.values(data).filter(
-              n => n.ignored === false
+            const notifications = Array.from(data).filter(
+              (n: any) => n.ignored === false
             );
             return this.setState({ notifications });
           } else {
@@ -221,7 +218,7 @@ class NotificationForm extends Component {
         <Divider />
         <CardContent>
           {notifications && notifications.length > 0 ? (
-            notifications.map((notification, index) => (
+            notifications.map((notification: any, index: number) => (
               <NotificationCard
                 key={index}
                 userid={notification.userid}
@@ -236,12 +233,12 @@ class NotificationForm extends Component {
               />
             ))
           ) : (
-            <Typography variant="title">
-              {isEmpty(this.props.profile)
-                ? lang.superbar.notifications.signup
-                : lang.superbar.notifications.empty}
-            </Typography>
-          )}
+              <Typography variant="title">
+                {isEmpty(this.props.profile)
+                  ? lang.superbar.notifications.signup
+                  : lang.superbar.notifications.empty}
+              </Typography>
+            )}
         </CardContent>
       </Card>
     );
@@ -250,10 +247,10 @@ class NotificationForm extends Component {
 
 export default firebaseConnect()(
   connect(
-    ({ firebase: { profile }, mir }) => ({
+    ({ firebase: { profile }, mir }: any) => ({
       profile,
       mir
     }),
     null
-  )(withStyles(style)(NotificationForm))
+  )(withStyles(style as any)(NotificationForm))
 );
