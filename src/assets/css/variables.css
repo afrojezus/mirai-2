@@ -1,0 +1,13 @@
+:root {
+  --bg-color: #222;
+  --accent-color: rgb(255, 40, 172);
+  --weak-text-color: rgba(255, 255, 255, 0.6);
+  --text-color: rgba(255, 255, 255, 0.9);
+  --link-text-color: rgba(255, 255, 255, 1);
+  --button-color: rgba(255, 255, 255, 0.1);
+  --button-color-hover: rgba(255, 255, 255, 0.3);
+  --button-color-focus: rgba(255, 255, 255, 0.4);
+  --layer-1: rgba(255, 255, 255, 0.1);
+  --layer-2: 0pt 2pt 8pt rgba(0, 0, 0, 0.1);
+  --layer-3: 0pt 3pt 24pt rgba(0, 0, 0, 0.2);
+}

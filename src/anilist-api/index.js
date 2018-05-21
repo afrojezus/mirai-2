@@ -1,31 +1,31 @@
 // Anilist 0.2 API wrapper for Mirai
 
 // Fetch? Fuck that.
-import axios from 'axios';
+import axios from "axios";
 
 // Point to your configuration file
-import { clientID, clientSecret } from '../utils/segoku/config.json';
-import { userQuery } from './userqueries';
+import { clientID, clientSecret } from "../utils/segoku/config.json";
+import { userQuery } from "./userqueries";
 const client = clientID;
 const secret = clientSecret;
 
 // Anilist GraphlQL url
-const source = 'https://graphql.anilist.co';
+const source = "https://graphql.anilist.co";
 
 // Headers for request
 const headers = {
   headers: {
-    'Content-type': 'application/json',
-    Accept: 'application/json',
-  },
+    "Content-type": "application/json",
+    Accept: "application/json"
+  }
 };
 
 // This gets thrown if you don't specify configuration file, or if it has any errors.
-const noKey = () => new Error('No keys defined, API error.');
+const noKey = () => new Error("No keys defined, API error.");
 
 // Async get method for any kind of query.
 const get = async (query, reqObj) => {
-  const userToken = localStorage.getItem('ALTOKEN');
+  const userToken = localStorage.getItem("ALTOKEN");
   try {
     if (!client && !secret) {
       throw noKey;
@@ -34,15 +34,15 @@ const get = async (query, reqObj) => {
       source,
       {
         query,
-        variables: reqObj,
+        variables: reqObj
       },
       userToken
         ? {
             headers: {
-              Authorization: 'Bearer ' + userToken,
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-            },
+              Authorization: "Bearer " + userToken,
+              "Content-Type": "application/json",
+              Accept: "application/json"
+            }
           }
         : null
     );
@@ -53,7 +53,7 @@ const get = async (query, reqObj) => {
 };
 
 const getUser = async reqObj => {
-  const userToken = localStorage.getItem('ALTOKEN');
+  const userToken = localStorage.getItem("ALTOKEN");
   if (!userToken) return null;
   try {
     if (!client && !secret) {
@@ -62,14 +62,14 @@ const getUser = async reqObj => {
     const data = await axios.post(
       source,
       {
-        query: userQuery,
+        query: userQuery
       },
       {
         headers: {
-          Authorization: userToken ? 'Bearer ' + userToken : null,
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
+          Authorization: userToken ? "Bearer " + userToken : null,
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        }
       }
     );
     console.log(data);
@@ -87,12 +87,12 @@ const fGet = async (query, reqObj) => {
     }
     const request = await fetch({
       url: source,
-      method: 'POST',
+      method: "POST",
       headers,
       body: JSON.stringify({
         query,
-        variables: reqObj,
-      }),
+        variables: reqObj
+      })
     });
     const { data } = await request.json();
     return data;
@@ -102,13 +102,13 @@ const fGet = async (query, reqObj) => {
 };
 
 const auth = async token => {
-  localStorage.setItem('ALTOKEN', token);
-  return console.info('[mirai] AniList token applied');
+  localStorage.setItem("ALTOKEN", token);
+  return console.info("[mirai] AniList token applied");
 };
 
 export default {
   get,
   fGet,
   auth,
-  getUser,
+  getUser
 };

@@ -1,31 +1,30 @@
-// TODO: Fix every single eslint-airbnb issue
-import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
-import { routerMiddleware, routerReducer } from 'react-router-redux';
-import thunk from 'redux-thunk';
-import createHistory from 'history/createBrowserHistory';
+import { createStore, applyMiddleware, compose, combineReducers } from "redux";
+import { routerMiddleware, routerReducer } from "react-router-redux";
+import thunk from "redux-thunk";
+import createHistory from "history/createBrowserHistory";
 import {
   reactReduxFirebase,
   firebaseReducer,
-  getFirebase,
-} from 'react-redux-firebase';
-import firebase from 'firebase';
-import mirReducer from './modules';
-import { MIR_TWIST_LOAD } from './constants';
-import { fireconfig } from './utils/config.json';
-import Twist from './twist-api';
+  getFirebase
+} from "react-redux-firebase";
+import firebase from "firebase";
+import mirReducer from "./modules";
+import { MIR_TWIST_LOAD } from "./constants";
+import { fireconfig } from "./utils/config.json";
+import Twist from "./twist-api";
 
 const rrfConfig = {
-  userProfile: 'users',
+  userProfile: "users",
   profileParamsToPopulate: [
-    { child: 'role', root: 'roles' }, // populates user's role with matching role object from roles
+    { child: "role", root: "roles" } // populates user's role with matching role object from roles
   ],
   profileFactory: user => ({
     email: user.email || user.providerData[0].email,
-    role: 'Normal',
-    providerData: user.providerData,
+    role: "Normal",
+    providerData: user.providerData
   }),
-  presence: 'presence', // where list of online users is stored in database
-  sessions: 'sessions', // where list of user sessions is stored in database (presence must be enabled)
+  presence: "presence", // where list of online users is stored in database
+  sessions: "sessions", // where list of user sessions is stored in database (presence must be enabled)
   enableLogging: false,
   fileMetadataFactory: uploadRes => {
     // upload response from Firebase's storage upload
@@ -33,7 +32,7 @@ const rrfConfig = {
     // default factory includes name, fullPath, downloadURL
     return downloadURLs[0];
   },
-  resetBeforeLogin: false,
+  resetBeforeLogin: false
 };
 
 firebase.initializeApp(fireconfig);
@@ -44,13 +43,13 @@ const initialState = {};
 const enhancers = [];
 const middleware = [
   thunk.withExtraArgument(getFirebase),
-  routerMiddleware(history),
+  routerMiddleware(history)
 ];
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
   const { devToolsExtension } = window;
 
-  if (typeof devToolsExtension === 'function') {
+  if (typeof devToolsExtension === "function") {
     enhancers.push(devToolsExtension());
   }
 }
@@ -58,7 +57,7 @@ if (process.env.NODE_ENV === 'development') {
 const rootReducer = combineReducers({
   firebase: firebaseReducer,
   routing: routerReducer,
-  mir: mirReducer,
+  mir: mirReducer
 });
 
 const createStoreWithFirebase = compose(
@@ -71,7 +70,7 @@ const store = createStoreWithFirebase(rootReducer, initialState);
 
 const twistInit = twist => ({
   type: MIR_TWIST_LOAD,
-  twist,
+  twist
 });
 
 export const twistLoad = async () => {
