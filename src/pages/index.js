@@ -61,6 +61,9 @@ class Index extends Component {
   };
 
   render() {
+    const HomeRoute = () => <Home {...this.props} />;
+
+
     if (this.state.error) return <LoadingScreen error log={this.state.info} />;
     return (
       <div className="mirai">
@@ -80,7 +83,7 @@ class Index extends Component {
               </Toolbar>
             </AppBar>
             <Switch>
-              <Route path="/" exact component={Home} />
+              <Route path="/" exact render={HomeRoute} />
               <Route path="/monika" exact component={Monika} />
               <Route exact component={PageNotFound} />
             </Switch>

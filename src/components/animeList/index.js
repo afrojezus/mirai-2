@@ -1,6 +1,8 @@
 import React from "react";
 import "./animeList.css";
 
+import { kapi } from '../../kitsu-api';
+
 import {
   TextField,
   Grid,
@@ -11,7 +13,6 @@ import {
   ListItemAvatar,
   ListItemText,
   Avatar,
-  Divider,
 } from "@material-ui/core";
 import { StarBorder, Star } from "@material-ui/icons";
 
@@ -19,11 +20,15 @@ export default class extends React.Component {
   state = {
     search: "",
     onlyOngoing: false,
+      anime: []
   };
+  async componentDidMount() {
+      this.setState({anime: this.props.twist})
+  }
   handleChange = (event, value) => this.setState({ search: value });
   toggleOngoing = () => this.setState({ onlyOngoing: !this.state.onlyOngoing });
   render() {
-    const { search, onlyOngoing } = this.state;
+    const { search, onlyOngoing, anime } = this.state;
     return (
       <div className="element anime-list">
         <div className="search-container">
@@ -51,28 +56,7 @@ export default class extends React.Component {
               <div className="seperator-line" />
             </div>
             <List className="anime-list-list">
-              <ListItem className="anime-list-item">
-                <ListItemAvatar>
-                  <Avatar>
-                    <Typography>A</Typography>
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Anime"
-                  secondary="Smol information about this anime"
-                />
-              </ListItem>
-              <ListItem className="anime-list-item">
-                <ListItemAvatar>
-                  <Avatar>
-                    <Typography>A</Typography>
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Anime"
-                  secondary="Smol information about this anime"
-                />
-              </ListItem>
+
             </List>
           </Grid>
           <Grid item xs>
@@ -83,28 +67,7 @@ export default class extends React.Component {
               <div className="seperator-line" />
             </div>
             <List className="anime-list-list">
-              <ListItem className="anime-list-item">
-                <ListItemAvatar>
-                  <Avatar>
-                    <Typography>A</Typography>
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Anime"
-                  secondary="Smol information about this anime"
-                />
-              </ListItem>
-              <ListItem className="anime-list-item">
-                <ListItemAvatar>
-                  <Avatar>
-                    <Typography>A</Typography>
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Anime"
-                  secondary="Smol information about this anime"
-                />
-              </ListItem>
+
             </List>
           </Grid>
           <Grid item xs>
@@ -115,39 +78,17 @@ export default class extends React.Component {
               <div className="seperator-line" />
             </div>
             <List className="anime-list-list">
-              <ListItem className="anime-list-item">
+                {anime && anime.map((item, index) => <ListItem className="anime-list-item" key={index}>
                 <ListItemAvatar>
                   <Avatar>
                     <Typography>A</Typography>
                   </Avatar>
                 </ListItemAvatar>
                 <ListItemText
-                  primary="Anime"
-                  secondary="Smol information about this anime"
+                  primary={item.name}
+                  secondary={item.kitsu}
                 />
-              </ListItem>
-              <ListItem className="anime-list-item">
-                <ListItemAvatar>
-                  <Avatar>
-                    <Typography>A</Typography>
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Anime"
-                  secondary="Smol information about this anime"
-                />
-              </ListItem>
-              <ListItem className="anime-list-item">
-                <ListItemAvatar>
-                  <Avatar>
-                    <Typography>A</Typography>
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Anime"
-                  secondary="Smol information about this anime"
-                />
-              </ListItem>
+              </ListItem>)}
             </List>
           </Grid>
         </Grid>

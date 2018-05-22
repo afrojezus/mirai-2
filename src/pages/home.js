@@ -8,7 +8,7 @@ export default class extends React.Component {
     return (
       <main>
         <Banner />
-        <AnimeList />
+        <AnimeList twist={this.props.mir.twist} />
       </main>
     );
   }
