@@ -82,32 +82,13 @@ class Tos extends Component {
   componentWillMount = () => {
     checklang(this);
     scrollFix();
-    this.getColors();
-  };
-
-  getColors = () => {
-    const hue = localStorage.getItem("user-hue");
-    if (hue) {
-      let hues = JSON.parse(hue);
-      return this.setState({
-        hue: hues.hue,
-        hueVib: hues.hueVib,
-        hueVibN: hues.hueVibN,
-      });
-    } else {
-      return null;
-    }
   };
 
   componentDidMount = () => {};
 
   render = () => (
     <div>
-      <TitleHeader
-        title={this.state.lang.tos.title}
-        color={this.state.hue ? this.state.hue : "#000"}
-      />
-      <Header color={this.state.hue ? this.state.hue : null} />
+      <TitleHeader title={this.state.lang.tos.title} />
       <Root>
         <Container hasHeader>
           <div className={this.props.classes.column}>

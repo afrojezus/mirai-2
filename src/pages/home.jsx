@@ -606,374 +606,103 @@ class Home extends Component {
     return (
       <div>
         <LoadingIndicator loading={loading} />
-        {!isEmpty(user) && user.headers ? (
-          <Header image={user.headers} color={hue} />
-        ) : null}
-        {isEmpty(user) ? (
-          <TitleHeader
-            title={lang.home.welcomeanon}
-            subtitle={lang.home.welcomeSubtitle}
-            miraiLogo
-            color={"#000"}
-          />
-        ) : null}
-        <Dialogue
-          open={showMore}
-          onClose={() =>
-            this.setState({
-              showMore: false,
-              selectedRow: null,
-              selectedTitle: "",
-              selectedDesc: "",
-            })
-          }
-          title={selectedTitle}
-          actions={"close"}
-        >
-          {selectedDesc !== "" ? (
-            <Typography variant="headline">{selectedDesc}</Typography>
-          ) : null}
-
-          <ItemContainer
-            style={{
-              maxWidth: 1600,
-              maxHeight: window.innerHeight / 1.5,
-              overflowY: "auto",
-              overflowX: "hidden",
-            }}
-          >
-            {selectedRow &&
-              this.props.mir.twist &&
-              this.props.mir.twist.length > 0 &&
-              Filter(selectedRow.data.Page.media, this.props.mir.twist).map(
-                (action, index) => (
-                  <CardButton
-                    key={index}
-                    onClick={() =>
-                      this.props.history.push(`/show?s=${action.id}`)
-                    }
-                    image={action.coverImage.large}
-                    title={action.title.romaji}
-                  />
-                )
-              )}
-          </ItemContainer>
-        </Dialogue>
+        <TitleHeader
+          title={lang.home.welcomeanon}
+          subtitle="Just anime. Anytime."
+          miraiLogo
+        />
         <div className={classes.frame}>
           <Root>
-            <Container hasHeader={isEmpty(user)} spacing={16}>
-              {!isEmpty(user) ? (
-                <Column>
-                  <SectionTitle
-                    noPad
-                    title={lang.home.ongoingAnimeTitle}
-                    subtitle={
-                      ongoing &&
-                      ongoing.data &&
-                      this.props.mir &&
-                      this.props.mir.twist &&
-                      this.props.mir.twist.length > 0
-                        ? `${Filter(
-                            ongoing.data.Page.media,
-                            this.props.mir.twist
-                          ).filter(s => s.nextAiringEpisode).length - 1} ${
-                            lang.home.ongoingAnimeEstimate
-                          }`
-                        : null
-                    }
-                    button={lang.explore.showAll}
-                    buttonClick={() => this.selectThis("oA")}
+            <Container hasHeader spacing={16}>
+              <Grid item xs={3}>
+                <Card
+                  style={{
+                    background: "none",
+                    boxShadow: "none",
+                    marginBottom: 16,
+                  }}
+                >
+                  <CardHeader
+                    title="Updates"
+                    classes={{ title: classes.secTitleText }}
                   />
-                  {ongoing &&
-                  ongoing.data &&
-                  this.props.mir &&
-                  this.props.mir.twist &&
-                  this.props.mir.twist.length > 0 ? (
-                    <SuperTable
-                      data={Filter(
-                        ongoing.data.Page.media,
-                        this.props.mir.twist
-                      )
-                        .filter(s => s.nextAiringEpisode)
-                        .sort(
-                          (a, b) =>
-                            a.nextAiringEpisode.timeUntilAiring -
-                            b.nextAiringEpisode.timeUntilAiring
-                        )}
-                      type="s"
-                      typeof="ongoing"
-                      limit={12}
-                    />
-                  ) : (
-                    <SuperTable loading />
-                  )}
-                </Column>
-              ) : null}
-              {!isEmpty(user) ? (
-                <Hidden mdDown>
-                  <Grid item xs={3} style={{ padding: 16 }}>
-                    <Card
-                      style={{
-                        background: hue,
-                        border: "1px solid rgba(255,255,255,.1)",
-                        position: "relative",
-                        marginBottom: 16,
-                      }}
-                      elevation={4}
-                    >
-                      <CardHeader
-                        onClick={() => this.props.history.push("/user")}
-                        title={user.username}
-                        subheader={user.nick}
-                        avatar={<Avatar src={user.avatar} />}
-                        style={{
-                          cursor: "pointer",
-                          background: `url(${user.headers})`,
-                        }}
-                        classes={{
-                          title: classes.userTitle,
-                          subheader: classes.userNick,
-                          avatar: classes.userAvatar,
-                        }}
-                      />
-                      <Divider />
-                      <MenuItem
-                        onClick={() => this.props.history.push("/user")}
-                      >
-                        <ICON.People style={{ marginRight: 16 }} />{" "}
-                        {lang.user.friends}
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => this.props.history.push("/later")}
-                      >
-                        <ICON.WatchLater style={{ marginRight: 16 }} />{" "}
-                        {lang.superbar.later}
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() =>
-                          this.props.history.push(
-                            `/show?s=${Object.keys(randomID)[0]}`
-                          )
-                        }
-                      >
-                        <ICON.Star style={{ marginRight: 16 }} />
-                        {lang.home.random}
-                      </MenuItem>
-                    </Card>
-                    <Card
-                      style={{
-                        background: hue,
-                        border: "1px solid rgba(255,255,255,.1)",
-                        display: "none",
-                      }}
-                      elevation={4}
-                    >
-                      <AdSense.Google
-                        client="ca-pub-5718203937607584"
-                        slot="1622822370"
-                        style={{ width: "100%", height: 300 }}
-                      />
-                    </Card>
-                  </Grid>
-                </Hidden>
-              ) : (
-                <Grid item xs={3} />
-              )}
+                  <Divider />
+                </Card>
+                <Card
+                  style={{
+                    boxShadow: "none",
+                    background: "transparent",
+                  }}
+                >
+                  <AdSense.Google
+                    client="ca-pub-5718203937607584"
+                    slot="3554917696"
+                    style={{ width: "100%", height: 300 }}
+                  />
+                </Card>
+              </Grid>
               <Grid item xs>
-                {!isEmpty(user) ? (
-                  <FeedMaker color={hue} />
-                ) : (
-                  <SearchBox
-                    mir={this.props.mir}
-                    history={this.props.history}
-                    main
-                    classes={{
-                      searchBar: classes.searchBar,
-                      searchInput: classes.searchInput,
-                      searchIcon: classes.searchIcon,
-                    }}
-                  />
-                )}
-                {isEmpty(user) ? (
-                  <Container style={{ padding: 8 }}>
-                    <Column>
-                      <SectionTitle
-                        noPad
-                        title={lang.home.ongoingAnimeTitle}
-                        subtitle={
-                          ongoing &&
-                          ongoing.data &&
-                          this.props.mir &&
-                          this.props.mir.twist &&
-                          this.props.mir.twist.length > 0
-                            ? `${Filter(
-                                ongoing.data.Page.media,
-                                this.props.mir.twist
-                              ).filter(s => s.nextAiringEpisode).length - 1} ${
-                                lang.home.ongoingAnimeEstimate
-                              }`
-                            : null
-                        }
-                        button={lang.explore.showAll}
-                        buttonClick={() => this.selectThis("oA")}
-                      />
-                    </Column>
-                    {ongoing &&
-                    ongoing.data &&
-                    this.props.mir &&
-                    this.props.mir.twist &&
-                    this.props.mir.twist.length > 0 ? (
-                      <SuperTable
-                        data={Filter(
-                          ongoing.data.Page.media,
-                          this.props.mir.twist
-                        )
-                          .filter(s => s.nextAiringEpisode)
-                          .sort(
-                            (a, b) =>
-                              a.nextAiringEpisode.timeUntilAiring -
-                              b.nextAiringEpisode.timeUntilAiring
-                          )}
-                        type="s"
-                        typeof="ongoing"
-                        limit={12}
-                        single
-                      />
-                    ) : (
-                      <SuperTable loading single />
-                    )}
-                  </Container>
-                ) : null}
-                <Container style={{ padding: 8 }}>
-                  <SectionTitle title={lang.home.feeds} noPad />
-                  <div style={{ flex: 1 }} />
-                  <form>
-                    <Select value={filterFeedVal} onChange={this.filterFeed}>
-                      <MenuItem value={0}>{lang.home.all}</MenuItem>
-                      <MenuItem value={1}>{lang.home.onlyfeeds}</MenuItem>
-                      <MenuItem value={2}>{lang.home.onlyactivities}</MenuItem>
-                    </Select>
-                  </form>
-                </Container>
-                {feeds &&
-                feeds.filter(
-                  o =>
-                    filterFeedVal === 0
-                      ? o
-                      : filterFeedVal === 1
-                        ? o && !o.type
-                        : filterFeedVal === 2
-                          ? o && o.type
-                          : null
-                ).length > 0 ? (
-                  feeds
-                    .filter(
-                      o =>
-                        filterFeedVal === 0
-                          ? o
-                          : filterFeedVal === 1
-                            ? o && !o.type
-                            : filterFeedVal === 2
-                              ? o && o.type
-                              : null
-                    )
-                    .map((feed, index) => {
-                      if (feed.user && feed.user.username === undefined)
-                        // It's an update.
-                        return (
-                          <Feed
-                            key={index}
-                            ftitle={feed.name}
-                            context={"MIRAI UPDATE"}
-                            text={feed.context}
-                            date={feed.date}
-                            avatar={feed.user.image}
-                            id={feed.id}
-                            user={feed.user}
-                            mirUpdate
-                            noActions
-                            color={hue}
-                          />
-                        );
-                      else if (feed.context === "INTRO")
-                        // It's an intro feed
-                        return (
-                          <Feed
-                            key={index}
-                            ftitle={feed.user.username}
-                            context={feed.context}
-                            text={feed.text}
-                            date={feed.date}
-                            avatar={feed.user.avatar}
-                            image={feed.image}
-                            id={feed.id}
-                            user={feed.user}
-                            noDelete
-                            noActions
-                            color={hue}
-                          />
-                        );
-                      else if (feed.type)
-                        // It's an activity feed
-                        return (
-                          <Feed
-                            key={index}
-                            ftitle={feed.user.username}
-                            context={feed.activity}
-                            date={feed.date}
-                            avatar={feed.user.avatar}
-                            showId={feed.showId}
-                            id={feed.id}
-                            image={feed.coverImg}
-                            user={{
-                              avatar: feed.user.avatar,
-                              id: feed.user.userID,
-                              username: feed.user.username,
-                            }}
-                            color={hue}
-                            format={feed.format}
-                            activity
-                            noActions
-                          />
-                        );
-                      // It's an user-made feed
-                      else
-                        return (
-                          <Feed
-                            key={index}
-                            ftitle={feed.user.username}
-                            context={feed.context}
-                            text={feed.text}
-                            date={feed.date}
-                            avatar={feed.user.avatar}
-                            image={feed.image}
-                            id={feed.id}
-                            user={feed.user}
-                            color={hue}
-                            likes={feed.likes}
-                            reposts={feed.reposts}
-                          />
-                        );
-                    })
-                ) : (
-                  <Container style={{ padding: 8 }}>
-                    <SectionTitle title="Nobody has said anything..." lighter />
-                  </Container>
-                )}
+                <SearchBox
+                  mir={this.props.mir}
+                  history={this.props.history}
+                  main
+                  classes={{
+                    searchBar: classes.searchBar,
+                    searchInput: classes.searchInput,
+                    searchIcon: classes.searchIcon,
+                  }}
+                />
               </Grid>
               {!isEmpty(user) ? (
-                <Grid
-                  item
-                  xs={window.mobilecheck() ? 12 : 3}
-                  style={{ padding: 16 }}
-                >
+                <Grid item xs={window.mobilecheck() ? 12 : 3}>
                   <Card
                     style={{
-                      background: hue,
-                      border: "1px solid rgba(255,255,255,.1)",
+                      background: "none",
+                      boxShadow: "none",
+                      position: "relative",
                       marginBottom: 16,
                     }}
-                    elevation={4}
+                  >
+                    <CardHeader
+                      onClick={() => this.props.history.push("/user")}
+                      title={user.username}
+                      subheader={user.nick}
+                      avatar={<Avatar src={user.avatar} />}
+                      style={{
+                        cursor: "pointer",
+                      }}
+                      classes={{
+                        title: classes.userTitle,
+                        subheader: classes.userNick,
+                        avatar: classes.userAvatar,
+                      }}
+                    />
+                    <Divider />
+                    <MenuItem onClick={() => this.props.history.push("/user")}>
+                      <ICON.People style={{ marginRight: 16 }} />{" "}
+                      {lang.user.friends}
+                    </MenuItem>
+                    <MenuItem onClick={() => this.props.history.push("/later")}>
+                      <ICON.WatchLater style={{ marginRight: 16 }} />{" "}
+                      {lang.superbar.later}
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() =>
+                        this.props.history.push(
+                          `/show?s=${Object.keys(randomID)[0]}`
+                        )
+                      }
+                    >
+                      <ICON.Star style={{ marginRight: 16 }} />
+                      {lang.home.random}
+                    </MenuItem>
+                  </Card>
+                  <Card
+                    style={{
+                      background: "none",
+                      boxShadow: "none",
+                      marginBottom: 16,
+                    }}
                   >
                     <CardHeader
                       title={lang.home.animefavTitle}
@@ -1016,10 +745,10 @@ class Home extends Component {
                   </Card>
                   <Card
                     style={{
-                      background: hue,
-                      border: "1px solid rgba(255,255,255,.1)",
+                      background: "none",
+                      boxShadow: "none",
+                      marginBottom: 16,
                     }}
-                    elevation={4}
                   >
                     <CardHeader
                       title={lang.home.mangafavTitle}

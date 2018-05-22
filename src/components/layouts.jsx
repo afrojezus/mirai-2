@@ -209,7 +209,7 @@ const style = theme => ({
   titleheader: {
     width: "100%",
     minHeight: 900,
-    background: `linear-gradient(to top, transparent, ${blue.A200})`,
+    background: `linear-gradient(to top, transparent, #111)`,
     position: "absolute",
     top: 0,
     left: 0,
@@ -731,7 +731,9 @@ export const TitleHeader = withStyles(style, { withTheme: true })(
                   opacity: 1,
                   background: `linear-gradient(to top, transparent, ${color})`,
                 }
-              : null
+              : {
+                  opacity: 1,
+                }
           }
           {...props}
         >

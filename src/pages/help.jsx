@@ -92,11 +92,7 @@ class Help extends Component {
       );
   render = () => (
     <div>
-      <TitleHeader
-        title={this.state.lang.help.title}
-        color={this.state.hue ? this.state.hue : "#000"}
-      />
-      <Header color={this.state.hue ? this.state.hue : null} />
+      <TitleHeader title={this.state.lang.help.title} />
       <Root>
         <Container hasHeader>
           <div className={this.props.classes.column}>

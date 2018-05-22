@@ -100,12 +100,12 @@ const styles = theme => ({
     boxShadow: "none",
     borderBottom: `1px solid rgba(255,255,255,.16)`,
     "-webkitAppRegion": "drag",
+    backdropFilter: "blur(10px)",
   },
   appBarTop: {
     background: "rgba(0,0,0,0)",
     boxShadow: "none",
-    borderBottom: `1px solid rgba(255,255,255,.16)`,
-    backdropFilter: "blur(10px)",
+    borderBottom: `1px solid rgba(255,255,255,0)`,
     "-webkitAppRegion": "drag",
   },
   appFrame: {
@@ -281,10 +281,8 @@ const styles = theme => ({
     color: "white",
   },
   tabLine: {
-    filter: "drop-shadow(0 1px 12px rgba(0,0,255,.2))",
-    height: 2,
-    background: "white",
-    display: "none",
+    height: 1,
+    backgroundColor: "white",
   },
   tab: {
     height: 64,
@@ -600,10 +598,10 @@ class Superbar extends Component {
           this.props.history.push("/");
           break;
         case 1:
-          this.props.history.push("/rankings");
+          this.props.history.push("/live");
           break;
         case 2:
-          this.props.history.push("/live");
+          this.props.history.push("/booru");
           break;
         default:
           break;
@@ -631,14 +629,14 @@ class Superbar extends Component {
       case "/rankings":
         this.setState({
           currentPage: superbar.rankings,
-          tabVal: 1,
+          tabVal: 2,
           watchIsOn: false,
         });
         break;
       case "/live":
         this.setState({
           currentPage: superbar.live,
-          tabVal: 2,
+          tabVal: 1,
           watchIsOn: false,
         });
         break;
@@ -1113,7 +1111,7 @@ class Superbar extends Component {
               className={classes.contextBar}
               value={tabVal}
               onChange={this.tabChange}
-              indicatorClassName={classes.tabLine}
+              classes={{ indicator: classes.tabLine }}
               centered
             >
               <Tab
@@ -1139,19 +1137,19 @@ class Superbar extends Component {
                 label={lang.superbar.feeds}
               />*/}
               <Tab
-                icon={<CompassIcon className={classes.white} />}
+                disabled={!user}
+                icon={<LiveTvIcon className={classes.white} />}
                 classes={{
                   root: classes.tab,
                   label:
-                    tabVal === 1 ? classes.tabLabelActive : classes.tabLabel,
+                    tabVal === 3 ? classes.tabLabelActive : classes.tabLabel,
                   wrapper: classes.tabwrapper,
                   labelContainer: classes.tablabelcontainer,
                 }}
-                label={lang.superbar.rankings}
+                label={lang.superbar.live}
               />
               <Tab
-                disabled={!user}
-                icon={<LiveTvIcon className={classes.white} />}
+                icon={<CompassIcon className={classes.white} />}
                 classes={{
                   root: classes.tab,
                   label:
@@ -1159,7 +1157,7 @@ class Superbar extends Component {
                   wrapper: classes.tabwrapper,
                   labelContainer: classes.tablabelcontainer,
                 }}
-                label={lang.superbar.live}
+                label="Booru"
               />
               <Tab style={{ display: "none" }} />
             </Tabs>
@@ -1188,19 +1186,7 @@ class Superbar extends Component {
             <Hidden mdUp>
               <div className={classes.flex} />
             </Hidden>
-            {!user && tabVal === 0 ? null : !user ? (
-              <Hidden smDown>
-                <SearchBox
-                  mir={this.props.mir}
-                  history={history}
-                  classes={{
-                    searchBar: classes.searchBar,
-                    searchInput: classes.searchInput,
-                    searchIcon: classes.searchIcon,
-                  }}
-                />
-              </Hidden>
-            ) : (
+            {tabVal === 0 ? null : (
               <Hidden smDown>
                 <SearchBox
                   mir={this.props.mir}
@@ -1213,16 +1199,7 @@ class Superbar extends Component {
                 />
               </Hidden>
             )}
-            {!user && tabVal === 0 ? null : !user ? (
-              <Hidden mdUp>
-                <IconButton
-                  onClick={() => this.props.history.push("/search")}
-                  contrast={"default"}
-                >
-                  <SearchIcon />
-                </IconButton>
-              </Hidden>
-            ) : (
+            {tabVal === 0 ? null : (
               <Hidden mdUp>
                 <IconButton
                   onClick={() => this.props.history.push("/search")}

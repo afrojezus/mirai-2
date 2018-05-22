@@ -173,7 +173,6 @@ class Settings extends Component {
 
   componentWillMount = () => {
     scrollFix();
-    this.getColors();
     const lang = localStorage.getItem("language");
     switch (lang) {
       case "en-us":
@@ -206,20 +205,6 @@ class Settings extends Component {
   };
 
   removeTwist = () => localStorage.removeItem("ALTOKEN");
-
-  getColors = () => {
-    const hue = localStorage.getItem("user-hue");
-    if (hue) {
-      let hues = JSON.parse(hue);
-      return this.setState({
-        hue: hues.hue,
-        hueVib: hues.hueVib,
-        hueVibN: hues.hueVibN,
-      });
-    } else {
-      return null;
-    }
-  };
 
   componentDidMount = () =>
     setTimeout(() => this.setState({ loading: false }), 300);
@@ -393,7 +378,6 @@ class Settings extends Component {
       langCode,
       lang,
       langVal,
-      hue,
       deleteDialog,
       hasEnteredTwist,
       ALToken,
@@ -402,11 +386,7 @@ class Settings extends Component {
     if (!user) return null;
     return (
       <div>
-        <TitleHeader
-          title={lang.settings.settings}
-          color={hue ? hue : "#000"}
-        />
-        <Header color={hue ? hue : null} />
+        <TitleHeader title={lang.settings.settings} />
         <div className={classes.root}>
           <M.Grid
             container
@@ -419,10 +399,7 @@ class Settings extends Component {
             <M.Typography variant="headline" className={classes.headline}>
               {lang.settings.aesthetics}
             </M.Typography>
-            <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}
-            >
+            <M.ExpansionPanel className={classes.panel}>
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -487,10 +464,7 @@ class Settings extends Component {
                 ) : null}
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
-            <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}
-            >
+            <M.ExpansionPanel className={classes.panel}>
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -543,10 +517,7 @@ class Settings extends Component {
                 ) : null}
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
-            <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}
-            >
+            <M.ExpansionPanel className={classes.panel}>
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -598,10 +569,7 @@ class Settings extends Component {
                 ) : null}
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
-            <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}
-            >
+            <M.ExpansionPanel className={classes.panel}>
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -641,10 +609,7 @@ class Settings extends Component {
                 ) : null}
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
-            <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}
-            >
+            <M.ExpansionPanel className={classes.panel}>
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -684,10 +649,7 @@ class Settings extends Component {
                 ) : null}
               </M.ExpansionPanelActions>
             </M.ExpansionPanel>
-            <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}
-            >
+            <M.ExpansionPanel className={classes.panel}>
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -726,10 +688,7 @@ class Settings extends Component {
             <M.Typography variant="headline" className={classes.headline}>
               {lang.settings.account}
             </M.Typography>
-            <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}
-            >
+            <M.ExpansionPanel className={classes.panel}>
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">
@@ -798,10 +757,7 @@ class Settings extends Component {
             <M.Typography variant="headline" className={classes.headline}>
               {lang.settings.sync}
             </M.Typography>
-            <M.ExpansionPanel
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}
-            >
+            <M.ExpansionPanel className={classes.panel}>
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">AniList</M.Typography>
@@ -835,7 +791,7 @@ class Settings extends Component {
             </M.ExpansionPanel>
             <M.ExpansionPanel
               disabled
-              style={{ background: hue ? hue : null, display: "none" }}
+              style={{ display: "none" }}
               className={classes.panel}
             >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
@@ -876,7 +832,7 @@ class Settings extends Component {
             </M.ExpansionPanel>
             <M.ExpansionPanel
               disabled
-              style={{ background: hue ? hue : null, display: "none" }}
+              style={{ display: "none" }}
               className={classes.panel}
             >
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
@@ -919,11 +875,7 @@ class Settings extends Component {
             <M.Typography variant="headline" className={classes.headline}>
               {lang.settings.misc}
             </M.Typography>
-            <M.ExpansionPanel
-              disabled
-              style={{ background: hue ? hue : null }}
-              className={classes.panel}
-            >
+            <M.ExpansionPanel className={classes.panel}>
               <M.ExpansionPanelSummary expandIcon={<Icon.ExpandMore />}>
                 <div className={classes.column}>
                   <M.Typography variant="title">

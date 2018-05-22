@@ -134,8 +134,6 @@ class History extends Component {
     const user = isEmpty(profile) ? null : profile;
     return (
       <div>
-        <TitleHeader color={hue ? hue : "#000"} />
-        <Header color={hue ? hue : "#111"} />
         <CommandoBarTop title={lang.superbar.history}>
           <Hidden smDown>
             <div

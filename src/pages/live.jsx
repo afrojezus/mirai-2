@@ -121,7 +121,6 @@ class Live extends Component {
   };
 
   componentDidMount = () => {
-    this.getColors();
     this.props.firebase
       .database()
       .ref("/streams")
@@ -132,20 +131,6 @@ class Live extends Component {
       );
   };
 
-  getColors = () => {
-    const hue = localStorage.getItem("user-hue");
-    if (hue) {
-      let hues = JSON.parse(hue);
-      return this.setState({
-        hue: hues.hue,
-        hueVib: hues.hueVib,
-        hueVibN: hues.hueVibN,
-      });
-    } else {
-      return null;
-    }
-  };
-
   showHelp = () => this.setState({ streamModal: !this.state.streamModal });
 
   render() {
@@ -154,8 +139,6 @@ class Live extends Component {
     return (
       <div>
         <LoadingIndicator loading={this.state.loading} />
-        <TitleHeader color={hue} />
-        <Header color={hue} />
         <div id="fabShowButton" className={classes.fabContainer}>
           <Button
             color="primary"
