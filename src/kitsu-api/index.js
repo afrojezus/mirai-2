@@ -4,7 +4,7 @@
 
 import Kitsu from './kitsu/kitsu';
 
-export const kapi = new Kitsu();
+const kapi = new Kitsu();
 
 const get = async (query, type) => {
     console.log(query, type)

@@ -1,5 +1,20 @@
-@import "./assets/css/main.css";
+html {
+  /*overflow-x: hidden;*/
+  transition: background-color 0.6s ease;
+  background-color: #111111;
+}
 
+body {
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+ul::-webkit-scrollbar {
+  display: none;
+}
 @font-face {
   font-family: "Aller";
   src: url("./assets/fonts/Aller_Rg.ttf");

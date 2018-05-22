@@ -1,3 +1,4 @@
+// TODO: Fix every single eslint-airbnb issue
 import { createStore, applyMiddleware, compose, combineReducers } from "redux";
 import { routerMiddleware, routerReducer } from "react-router-redux";
 import thunk from "redux-thunk";

@@ -21,7 +21,7 @@ const load = async () => {
     const que = items.map((element, index) => {
       return output.push({
         name: element.title,
-        ongoing: false,
+        ongoing: element['anime:ongoing'],
         link: element.link,
         mal: element['mal:id'],
         kitsu: element['kitsu:id'],
