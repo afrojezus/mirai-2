@@ -1,10 +1,10 @@
-import React from 'react';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import grey from '@material-ui/core/colors/grey';
-import red from '@material-ui/core/colors/red';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import React from "react";
+import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import grey from "@material-ui/core/colors/grey";
+import red from "@material-ui/core/colors/red";
+import CssBaseline from "@material-ui/core/CssBaseline";
 
-import './assets/css/circular-std.css';
+import "./assets/css/circular-std.css";
 
 // A theme with custom primary and secondary color.
 // It's optional.
@@ -20,19 +20,24 @@ const theme = createMuiTheme({
       main: grey[500],
       dark: grey[700],
     },
-    type: 'light',
+    type: "light",
   },
   overrides: {
     MuiAppBar: {
       colorPrimary: {
-        backdropFilter: 'blur(10px)',
-        boxShadow: 'none',
-        borderBottom: '1px solid rgba(255,255,255,.1)',
+        backdropFilter: "blur(10px)",
+        boxShadow: "none",
+        borderBottom: "1px solid rgba(255,255,255,.1)",
+      },
+    },
+    MuiCard: {
+      root: {
+        borderRadius: 12,
       },
     },
   },
   typography: {
-    fontFamily: 'CircularStd',
+    fontFamily: "CircularStd",
   },
 });
 
