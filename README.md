@@ -1,15 +1,21 @@
-# Mirai (public edition)
+# Create React App example
 
-This is the source code of Mirai. It's currently under development with several new releases coming out lately.
-The code does no longer have any connections with the code the edition of the school project had.
-_This is the public edition of Mirai_
+## How to use
 
-Latest version is on the [public domain](https://miraianime.stream/)
+Download the example [or clone the repo](https://github.com/mui-org/material-ui):
 
-## Collaborators
+```bash
+curl https://codeload.github.com/mui-org/material-ui/tar.gz/master | tar -xz --strip=2 material-ui-master/examples/create-react-app
+cd create-react-app
+```
 
-This edition of Mirai is open to developers to pull requests and etc.
-Make sure you got `nodejs` and `yarn` installed. The code is written in ES6 syntax and utilizies plenty of what ES6 has to offer for JavaScript.
-Currently it's bootstraped with `create-react-app` but will be ejected in near future. Configuration files to the database and minor tokens are absent from the source code for security reasons.
+Install it and run:
 
-The code is structured with Airbnb standards with some minor tweaks.
+```bash
+npm install
+npm run start
+```
+
+## The idea behind the example
+
+[Create React App](https://github.com/facebookincubator/create-react-app) with no build configuration.
