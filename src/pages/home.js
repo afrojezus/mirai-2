@@ -10,7 +10,9 @@ import {
   CardMedia,
   Button,
   CardHeader,
+  CardContent,
 } from '@material-ui/core';
+import moment from 'moment';
 import {
   ArrowBack as PreviousIcon,
   ArrowForward as NextIcon,
@@ -47,6 +49,7 @@ class Home extends Component {
     const { ongoing } = this.state;
     const { classes, firebase } = this.props;
     const { profile } = firebase;
+    console.log(profile);
     return (
       <main>
         <section className={classes.section}>
@@ -68,41 +71,53 @@ class Home extends Component {
               New & Trending
             </Typography>
           </Toolbar>
-          <Carousel
-            slidesToShow={8}
-            slidesToScroll={8}
-            renderCenterLeftControls={({ previousSlide }) => (
-              <Button variant="fab" onClick={previousSlide}>
-                <PreviousIcon />
-              </Button>
-            )}
-            renderCenterRightControls={({ nextSlide }) => (
-              <Button variant="fab" onClick={nextSlide}>
-                <NextIcon />
-              </Button>
-            )}
-            cellSpacing={16}
-            framePadding={'0 8px'}
-            initialSlideHeight={300}
-          >
-            {ongoing.map((anime, index) => (
-              <Card key={index} className={classes.cardItem}>
-                <CardMedia
-                  className={classes.cardMedia}
-                  image={anime.coverImage.large}
-                />
-                <CardHeader
-                  classes={{
-                    title: classes.cardHeaderTitle,
+          <Grid container spacing={8}>
+            {ongoing
+              .map((anime, index) => (
+                <Grid item xs key={index} className={classes.cardItem}>
+                  <Card>
+                    <CardMedia
+                      className={classes.cardMedia}
+                      image={anime.coverImage.large}
+                    />
+                    <CardHeader
+                      classes={{
+                        title: classes.cardHeaderTitle,
+                      }}
+                      title={
+                        <Dotdotdot clamp={1}>{anime.title.romaji}</Dotdotdot>
+                      }
+                      subheader={
+                        <Dotdotdot clamp={1}>{anime.description}</Dotdotdot>
+                      }
+                    />
+                  </Card>
+                </Grid>
+              ))
+              .splice(0, 7)}
+            <Grid item xs className={classes.cardItem}>
+              <Card className={classes.cardShowMore}>
+                <div
+                  style={{
+                    margin: 'auto',
+                    alignSelf: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    alignContent: 'center',
                   }}
-                  title={<Dotdotdot clamp={1}>{anime.title.romaji}</Dotdotdot>}
-                  subheader={
-                    <Dotdotdot clamp={1}>{anime.description}</Dotdotdot>
-                  }
-                />
+                >
+                  <Button
+                    color="primary"
+                    style={{ marginBottom: 8 }}
+                    variant="fab"
+                  >
+                    <NextIcon />
+                  </Button>
+                  <Typography>Show more</Typography>
+                </div>
               </Card>
-            ))}
-          </Carousel>
+            </Grid>
+          </Grid>
         </section>
         {!isEmpty(profile) && (
           <section className={classes.section}>
@@ -114,11 +129,53 @@ class Home extends Component {
                 Last watched
               </Typography>
             </Toolbar>
-            <Grid container>
+            <Grid container spacing={8}>
+              {Object.values(profile.episodeProgress)
+                .map((anime, index) => (
+                  <Grid item xs key={index} className={classes.cardItem}>
+                    <Card>
+                      <CardMedia
+                        className={classes.cardMedia}
+                        image={anime.showArtwork}
+                      />
+                      <CardHeader
+                        classes={{
+                          title: classes.cardHeaderTitle,
+                        }}
+                        title={<Dotdotdot clamp={1}>{anime.title}</Dotdotdot>}
+                        subheader={
+                          <Dotdotdot clamp={1}>
+                            {'Episode ' +
+                              anime.ep +
+                              ' | ' +
+                              moment(anime.recentlyWatched).fromNow()}
+                          </Dotdotdot>
+                        }
+                      />
+                    </Card>
+                  </Grid>
+                ))
+                .splice(0, 7)}
               <Grid item xs className={classes.cardItem}>
-                <Card>
-                  <CardMedia className={classes.cardMedia} />
-                  <CardHeader title="Example" subheader="Description" />
+                <Card className={classes.cardShowMore}>
+                  <div
+                    style={{
+                      margin: 'auto',
+                      alignSelf: 'center',
+                      justifyContent: 'center',
+                      textAlign: 'center',
+                      alignContent: 'center',
+                    }}
+                  >
+                    <Button
+                      color="primary"
+                      style={{ marginBottom: 8 }}
+                      variant="fab"
+                    >
+                      <NextIcon />
+                    </Button>
+                    <Typography>Show more</Typography>
+                  </div>
                 </Card>
               </Grid>
             </Grid>

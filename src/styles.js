@@ -63,4 +63,18 @@ export default theme => ({
     display: 'flex',
     flexDirection: 'column',
   },
+  cardShowMore: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 300 + 69,
+  },
+  searchBar: {
+    backgroundColor: 'rgba(0,0,0,.1)',
+    borderRadius: 4,
+    padding: '0 1em',
+  },
+  searchBarContainer: {
+    maxWidth: 500,
+    padding: '0 1em',
+  },
 });

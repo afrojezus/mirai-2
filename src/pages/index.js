@@ -12,6 +12,7 @@ import {
   IconButton,
   Drawer,
   Avatar,
+  TextField,
 } from '@material-ui/core';
 import {
   Menu as MenuIcon,
@@ -46,7 +47,7 @@ class Index extends React.Component {
 
   render() {
     const { classes, firebase } = this.props;
-    const { open, index, notificationDrawer } = this.state;
+    const { open, index, notificationDrawer, search } = this.state;
     const { profile } = firebase;
     return (
       <div>
@@ -60,7 +61,18 @@ class Index extends React.Component {
               )}
             </IconButton>
             <div style={{ flex: 1 }} />
-            <Typography variant="title">Mirai</Typography>
+            <TextField
+              placeholder="Search anime"
+              value={search}
+              onChange={event => this.setState({ search: event.target.value })}
+              fullWidth
+              className={classes.searchBarContainer}
+              InputProps={{
+                fullWidth: true,
+                className: classes.searchBar,
+                disableUnderline: true,
+              }}
+            />
             <div style={{ flex: 1 }} />
             <IconButton
               onClick={this.handleClick.bind(this, 'notificationDrawer')}
