@@ -81,7 +81,11 @@ class Index extends React.Component {
               )}
             </IconButton>
             <div style={{ flex: 1 }} />
-            <div
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                this.setState({ index: 1 });
+              }}
               style={{
                 flex: 1,
                 position: "relative",
@@ -94,7 +98,6 @@ class Index extends React.Component {
                 onChange={event =>
                   this.setState({
                     search: event.target.value,
-                    index: 1,
                   })
                 }
                 fullWidth
@@ -131,7 +134,7 @@ class Index extends React.Component {
                   </Paper>
                 </Grow>
               )}
-            </div>
+            </form>
             <div style={{ flex: 1 }} />
             <IconButton
               onClick={this.handleClick.bind(this, "notificationDrawer")}
@@ -224,4 +227,7 @@ Index.propTypes = {
 
 const cp = withRoot(withStyles(styles)(Index));
 
-export default connect(state => state, null)(cp);
+export default connect(
+  state => state,
+  null
+)(cp);
