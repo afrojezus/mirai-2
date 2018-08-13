@@ -43,35 +43,33 @@ html {
   box-sizing: border-box;
   margin: 0;
   outline: none;
+  transition: all 0.3s cubic-bezier(.07,.95,0,1);
 }
 
-.button--green {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #3b8070;
-  color: #3b8070;
-  text-decoration: none;
-  padding: 10px 30px;
+h1, h2, h3, h4, h5, h6, p, span, strong, small, code {
+  color: white;
 }
 
-.button--green:hover {
-  color: #fff;
-  background-color: #3b8070;
+.icon {
+  width: 24px;
+  height: 24px;
+  margin: auto;
+  fill: white;
 }
 
-.button--grey {
-  display: inline-block;
-  border-radius: 4px;
-  border: 1px solid #35495e;
-  color: #35495e;
-  text-decoration: none;
-  padding: 10px 30px;
-  margin-left: 15px;
+button {
+  background: transparent;
+  border-radius: 0.25em;
+  -webkit-appearance: none;
+
+  border: solid 1pt rgba(255,255,255,.1);
+
+  display: inline-flex;
 }
 
-.button--grey:hover {
-  color: #fff;
-  background-color: #35495e;
-}
+  button:hover {
+    border: solid 1pt rgba(255,255,255,.2);
+    background: rgba(255,255,255,.1);
+  }
 </style>
 

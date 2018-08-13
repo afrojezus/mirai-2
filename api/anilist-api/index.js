@@ -6,6 +6,7 @@ import axios from 'axios';
 // Point to your configuration file
 import { clientID, clientSecret } from './config.json';
 import { userQuery } from './userqueries';
+import user from "../../store/modules/user";
 const client = clientID;
 const secret = clientSecret;
 
@@ -106,9 +107,31 @@ const auth = async token => {
   return console.info('[mirai] AniList token applied');
 };
 
+const fetchUser = async token => {
+  if (!token) return null;
+  try {
+     const data = await axios.post(
+       source,
+       {
+         query: userQuery,
+       },
+       {
+         headers: {
+           Authorization: 'Bearer ' + token,
+           'Content-Type': 'application/json', Accept: 'application/json',
+         }
+       });
+     console.log(data);
+     return data.data;
+  } catch (error) {
+      return error;
+  }
+};
+
 export default {
   get,
   fGet,
   auth,
   getUser,
+  fetchUser,
 };

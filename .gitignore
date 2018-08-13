@@ -9,3 +9,10 @@ npm-debug.log
 
 # Nuxt generate
 dist
+
+sw.*
+
+services/config.json
+
+api/anilist-api/config.json
+api/anilist-api/config.json

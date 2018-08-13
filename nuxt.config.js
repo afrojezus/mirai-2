@@ -13,6 +13,19 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
+  mode: 'spa',
+  modules: [
+    '@nuxtjs/pwa'
+  ],
+  vendor: [
+    'firebase',
+  ],
+  plugins: [
+    {
+      src: '~/plugins/persistentStore.js',
+      ssr: false,
+    },
+  ],
   /*
   ** Customize the progress bar color
   */

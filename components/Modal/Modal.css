@@ -1,0 +1,66 @@
+.dialog-wrapper {
+  z-index: 6000;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background: rgba(0, 0, 0, .8);
+  display: flex;
+  align-items: center;
+  margin: 0;
+  visibility: visible;
+}
+
+.dialog {
+  max-width: 840px;
+  max-height: 100vh;
+  flex: none;
+  padding: 1rem;
+  background: #1C1F29;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+}
+
+.dialog .dialog-content {
+  max-height: 100%;
+  padding-right: 5px;
+}
+
+.dialog .dialog-window-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.dialog .dialog-window-bar .close {
+  margin-left: auto;
+  fill: white;
+}
+
+.dialog .dialog-window-bar .close svg {
+  margin: auto;
+  height: 24px;
+  width: 24px;
+}
+
+.modal-fade-enter-active, .modal-fade-leave-active {
+  transition: opacity .25s;
+}
+
+.modal-fade-enter, .modal-fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 840px) {
+  .dialog {
+    max-width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}

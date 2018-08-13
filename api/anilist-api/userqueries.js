@@ -1,6 +1,6 @@
 export const userQuery = `
   query {
-    Viewer {
+    User {
         id
         name
         about(asHtml: true)
