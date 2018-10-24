@@ -20,7 +20,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-yarn.lock
-
-/src/config.json
-/src/anilist-api/config.json
+src/api/firebase
