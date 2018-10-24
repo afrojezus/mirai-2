@@ -56,5 +56,25 @@ export default (theme: any) => ({
     marginLeft: 'auto',
     marginRight: 'auto',
     width: '100%'
+  },
+  player: {
+    width: '100%',
+    height: '100%',
+    background: '#000',
+    marginBottom: theme.spacing.unit,
+    marginTop: theme.spacing.unit
+  },
+  playerInactive: {
+    height: 0,
+    background: 'transparent',
+    opacity: 0,
+    pointerEvents: 'none'
+  },
+  coverImage: {
+    width: 181,
+    height: 250,
+    objectFit: 'cover',
+    borderRadius: 4,
+    boxShadow: theme.shadows[3]
   }
 });

@@ -1,21 +1,26 @@
 import {
   Button,
   Divider,
+  Fade,
   Grid,
   LinearProgress,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
+  Tooltip,
   Typography,
   withStyles
 } from '@material-ui/core';
 import * as MICON from '@material-ui/icons';
+import classnames from 'classnames';
 import Kitsu from 'kitsu';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { firestoreConnect } from 'react-redux-firebase';
-import { compose } from 'redux';
+import { compose, Dispatch } from 'redux';
+import Twist from 'src/api/twist';
+import { MIR_PLAY_SHOW, MIR_SET_TITLE } from 'src/store/mutation-types';
 import globalStyles from '../globalStyles';
 
 // Local MUI styles for the route.
@@ -26,12 +31,9 @@ const styles = (theme: any) => ({
   buttonMargin: {
     margin: `${theme.spacing.unit * 2}px 0`
   },
-  coverImage: {
-    width: 181,
-    height: 250,
-    objectFit: 'cover',
-    borderRadius: 4,
-    boxShadow: theme.shadows[3]
+  coverImageSmall: {
+    width: 181 / 2,
+    height: 250 / 2
   },
   interactiveAreaBanner: {
     display: 'inline-flex',
@@ -44,13 +46,25 @@ const styles = (theme: any) => ({
     margin: 0
   },
   infoItemText: { padding: 0, paddingLeft: 8 },
+  list: {
+    width: 181
+  },
+  listHide: {
+    width: 0,
+    height: 0,
+    opacity: 0,
+    overflow: 'hidden'
+  },
   // ...load the global styles as well
   ...globalStyles(theme)
 });
 
 class Anime extends React.Component<any> {
   public state = {
-    data: null
+    data: null,
+    episodes: null,
+    loadingStream: false,
+    LSMessage: ''
   };
   private kitsu: Kitsu = new Kitsu();
   constructor(props: any) {
@@ -60,7 +74,10 @@ class Anime extends React.Component<any> {
   public fetchData = async () => {
     try {
       const { data }: any = await this.kitsu.get(
-        `anime/${this.props.location.search.replace('?id=', '')}`
+        `anime/${this.props.location.search.replace('?id=', '')}`,
+        {
+          include: 'categories'
+        }
       );
       // tslint:disable-next-line:no-console
       console.log(data);
@@ -70,9 +87,88 @@ class Anime extends React.Component<any> {
       console.error(error);
     }
   };
+  public handleStream = async (shareStream: boolean) =>
+    this.setState(
+      { loadingStream: true, LSMessage: 'Fetching episodes...' },
+      async () => {
+        if (shareStream) {
+          // Enable sharestream
+          try {
+            const episodes = await Twist.loadEpisodeList(
+              this.props.location.search.replace('?id=', '')
+            );
+            // tslint:disable-next-line:no-console
+            console.log(episodes);
+            if (!episodes) {
+              throw new Error('Proxy failure');
+            }
+            return this.setState({ episodes: episodes.reverse() }, () =>
+              this.props
+                .sendDataToMir({
+                  eps: this.state.episodes,
+                  meta: this.state.data,
+                  id: this.props.location.search.replace('?id=', '')
+                })
+                .then(() =>
+                  this.props.history.push(
+                    `/watch?id=${this.props.location.search.replace(
+                      '?id=',
+                      ''
+                    )}&share=true`
+                  )
+                )
+            );
+          } catch (error) {
+            // tslint:disable-next-line:no-console
+            console.error(error);
+            this.setState(
+              { LSMessage: 'An error occurred while fetching episodes :(' },
+              () =>
+                setTimeout(() => this.setState({ loadingStream: false }), 5000)
+            );
+          }
+        } else {
+          // Run locally
+          try {
+            const episodes = await Twist.loadEpisodeList(
+              this.props.location.search.replace('?id=', '')
+            );
+            // tslint:disable-next-line:no-console
+            console.log(episodes);
+            if (!episodes) {
+              throw new Error('Proxy failure');
+            }
+            return this.setState({ episodes: episodes.reverse() }, () =>
+              this.props
+                .sendDataToMir({
+                  eps: this.state.episodes,
+                  meta: this.state.data,
+                  id: this.props.location.search.replace('?id=', '')
+                })
+                .then(() =>
+                  this.props.history.push(
+                    `/watch?id=${this.props.location.search.replace(
+                      '?id=',
+                      ''
+                    )}`
+                  )
+                )
+            );
+          } catch (error) {
+            // tslint:disable-next-line:no-console
+            console.error(error);
+            this.setState(
+              { LSMessage: 'An error occurred while fetching episodes :(' },
+              () =>
+                setTimeout(() => this.setState({ loadingStream: false }), 5000)
+            );
+          }
+        }
+      }
+    );
   public render() {
     const { classes } = this.props;
-    const { data } = this.state;
+    const { data, loadingStream, LSMessage } = this.state;
     if (data === null) {
       return (
         <LinearProgress color="primary" style={{ width: '100%', height: 1 }} />
@@ -108,7 +204,10 @@ class Anime extends React.Component<any> {
             <img alt="" src="" className={classes.bannerImage} />
             <div
               className={classes.innerMargin}
-              style={{ margin: 'auto', paddingBottom: 128 }}
+              style={{
+                margin: 'auto',
+                paddingBottom: 128
+              }}
             >
               <img
                 src={d.coverImage ? d.coverImage.original : ''}
@@ -120,9 +219,9 @@ class Anime extends React.Component<any> {
                   <img
                     src={d.posterImage.original}
                     alt=""
-                    className={classes.coverImage}
+                    className={classnames(classes.coverImage)}
                   />
-                  <List dense={true}>
+                  <List className={classnames(classes.list)} dense={true}>
                     <ListItem className={classes.infoItem}>
                       <ListItemIcon className={classes.infoItemIcon}>
                         {d.showType === 'movie' ? (
@@ -177,6 +276,21 @@ class Anime extends React.Component<any> {
                         primary={d.ageRatingGuide}
                       />
                     </ListItem>
+                    <Divider style={{ marginBottom: 10 }} />
+                    {d.categories.map((category: any, index: number) => (
+                      <ListItem className={classes.infoItem} key={index}>
+                        <Tooltip
+                          TransitionComponent={Fade}
+                          title={category.description}
+                        >
+                          <ListItemText
+                            className={classes.infoItemText}
+                            primary={category.title}
+                            style={{ whiteSpace: 'normal' }}
+                          />
+                        </Tooltip>
+                      </ListItem>
+                    ))}
                   </List>
                 </Grid>
                 <Grid
@@ -184,20 +298,65 @@ class Anime extends React.Component<any> {
                   xs={true}
                   className={classes.interactiveAreaBanner}
                 >
-                  <Typography style={{ fontWeight: 700 }} variant="h2">
+                  <Typography style={{ fontWeight: 700 }} variant={'h2'}>
                     {d.titles.en_jp ? d.titles.en_jp : d.titles.en_us}
                   </Typography>
                   <div className={classes.buttonMargin} />
                   <Typography>{d.synopsis}</Typography>
                   <Divider className={classes.buttonMargin} />
+
                   <Grid container={true} spacing={8}>
-                    <Grid item={true} style={{ margin: 'auto' }}>
-                      <Button color="primary" variant="outlined">
+                    <Grid
+                      item={true}
+                      style={{
+                        padding: loadingStream ? undefined : 0,
+                        margin: loadingStream ? 'auto' : 0,
+                        opacity: loadingStream ? 1 : 0,
+                        width: loadingStream ? undefined : 0,
+                        overflow: 'hidden',
+                        height: loadingStream ? undefined : 0
+                      }}
+                    >
+                      <Typography
+                        variant="subheading"
+                        color={
+                          LSMessage.startsWith('An error') ? 'error' : 'primary'
+                        }
+                        style={{ margin: 'auto' }}
+                      >
+                        {LSMessage}
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item={true}
+                      style={{
+                        margin: 'auto',
+                        opacity: loadingStream ? 0 : 1,
+                        width: loadingStream ? 0 : undefined
+                      }}
+                    >
+                      <Button
+                        onClick={this.handleStream.bind(this, false)}
+                        color="primary"
+                        variant="outlined"
+                      >
                         Stream
                       </Button>
                     </Grid>
-                    <Grid item={true} style={{ margin: 'auto' }}>
-                      <Button variant="outlined">ShareStream</Button>
+                    <Grid
+                      item={true}
+                      style={{
+                        margin: 'auto',
+                        opacity: loadingStream ? 0 : 1,
+                        width: loadingStream ? 0 : undefined
+                      }}
+                    >
+                      <Button
+                        onClick={this.handleStream.bind(this, true)}
+                        variant="outlined"
+                      >
+                        ShareStream
+                      </Button>
                     </Grid>
                     <div style={{ flex: 1 }} />
                     <Grid
@@ -227,10 +386,28 @@ class Anime extends React.Component<any> {
   }
 }
 
+export const updateMirTitle = (title: string) => ({
+  type: MIR_SET_TITLE,
+  title
+});
+
+export const loadPlayer = (play: any) => ({
+  type: MIR_PLAY_SHOW,
+  play
+});
+
+const mapPTS = (dispatch: Dispatch) => ({
+  sendTitleToMir: (title: string) => dispatch(updateMirTitle(title)),
+  sendDataToMir: async (play: any) => dispatch(loadPlayer(play))
+});
+
 export default compose(
   firestoreConnect()(
-    connect(({ mir }: any) => ({
-      mir
-    }))(withStyles(styles as any)(Anime))
+    connect(
+      ({ mir }: any) => ({
+        mir
+      }),
+      mapPTS
+    )(withStyles(styles as any)(Anime))
   )
 );

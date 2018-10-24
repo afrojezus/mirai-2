@@ -1,13 +1,6 @@
 import {
-  // Divider,
+  ButtonBase,
   Grid,
-  // LinearProgress,
-  // List,
-  // ListItem,
-  // ListItemText,
-  List,
-  ListItem,
-  ListItemText,
   Paper,
   Typography,
   withStyles
@@ -28,10 +21,10 @@ const styles = (theme: any) => ({
     paddingTop: theme.spacing.unit
   },
   animeList: {
-    marginTop: theme.spacing.unit,
     background: 'rgba(255,255,255,.05)',
     border: '1px solid rgba(255,255,255,.1)',
     boxShadow: 'none',
+    borderRadius: 4,
     display: 'flex',
     transition: theme.transitions.create(['all']),
     '&:hover': {
@@ -44,6 +37,10 @@ const styles = (theme: any) => ({
     }
   },
   listItem: {},
+  trendingContainer: {
+    width: '100%',
+    marginTop: theme.spacing.unit
+  },
   // ...load the global styles as well
   ...globalStyles(theme)
 });
@@ -52,12 +49,31 @@ const styles = (theme: any) => ({
 class Home extends React.Component<any> {
   public state = {
     searchVal: '',
-    animes: this.props.mir.twist
+    trending: []
   };
-
   constructor(props: any) {
     super(props);
+    this.fetchData();
   }
+  public fetchData = async () => {
+    try {
+      const { data }: any = await fetch(
+        'https://kitsu.io/api/edge/trending/anime',
+        {
+          headers: {
+            Accept: 'application/vnd.api+json',
+            'Content-Type': 'application/vnd.api+json'
+          }
+        }
+      ).then((response: Response) => response.json());
+      // tslint:disable-next-line:no-console
+      console.log(data);
+      this.setState({ trending: data });
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(error);
+    }
+  };
 
   public handleChangeText = (event: any) =>
     this.setState({ searchVal: event.target.value });
@@ -99,11 +115,17 @@ class Home extends React.Component<any> {
     return clonedAnime;
   };
 
-  public goToAnime = (id: number) => this.props.history.push(`/anime?id=${id}`);
+  public goToAnime = (anime: any) =>
+    this.props.history.push(`/anime?id=${anime.kitsu}`, { anime });
+
+  public goToAnime2 = (anime: any) =>
+    this.props.history.push(`/anime?id=${anime.id}`, {
+      anime: anime.attributes
+    });
 
   public render() {
     const { classes } = this.props;
-    const { searchVal } = this.state;
+    const { searchVal, trending } = this.state;
     return (
       <main className="routeContainer" style={{ height: '100%' }}>
         <Grid
@@ -127,7 +149,7 @@ class Home extends React.Component<any> {
                 Mirai
               </Typography>
               <Typography
-                variant="headline"
+                variant="h5"
                 style={{ textAlign: 'right', width: '100%', margin: 'auto' }}
               >
                 Stream anime without any of the bullshit.
@@ -140,7 +162,34 @@ class Home extends React.Component<any> {
                 submit={this.handleSubmit}
               />
             </div>
-            <Paper className={classes.animeList}>
+            <Grid
+              container={true}
+              spacing={8}
+              className={classes.trendingContainer}
+            >
+              {trending.length > 0
+                ? trending
+                    .map((anime: any, index: number) => (
+                      <Grid key={index} item={true}>
+                        <ButtonBase onClick={this.goToAnime2.bind(this, anime)}>
+                          <img
+                            className={classes.coverImage}
+                            alt=""
+                            src={anime.attributes.posterImage.original}
+                          />
+                        </ButtonBase>
+                      </Grid>
+                    ))
+                    .splice(0, 4)
+                : [{}, {}, {}, {}].map((e: any, index: number) => (
+                    <Grid key={index} item={true}>
+                      <Paper className={classes.animeList}>
+                        <img className={classes.coverImage} alt="" src="" />
+                      </Paper>
+                    </Grid>
+                  ))}
+            </Grid>
+            {/*<Paper className={classes.animeList}>
               <List
                 style={{
                   flex: 1,
@@ -153,7 +202,7 @@ class Home extends React.Component<any> {
                 {this.props.mir.twist.length > 0
                   ? this.props.mir.twist.map((anime: any, index: number) => (
                       <ListItem
-                        onClick={this.goToAnime.bind(this, anime.kitsu)}
+                        onClick={this.goToAnime.bind(this, anime)}
                         button={true}
                         key={index}
                       >
@@ -162,7 +211,7 @@ class Home extends React.Component<any> {
                     ))
                   : null}
               </List>
-            </Paper>
+                  </Paper>*/}
           </div>
         </Grid>
       </main>
