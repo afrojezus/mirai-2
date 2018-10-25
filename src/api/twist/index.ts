@@ -1,6 +1,6 @@
 // Twist API-wrapper for the application. Nallown hasn't done shit on that end for other sites (understandably so), but in case they open up for ways to stream the content.
 
-const Proxy2 = 'https://crossorigin.me/';
+const Proxy2 = 'https://cors.io/?';
 
 // Use feed url instead for much safer keeping
 const APIURL = 'https://twist.moe/feed/anime?format=json';

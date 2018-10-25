@@ -5,6 +5,7 @@ import { Route, Switch, withRouter } from 'react-router-dom';
 import { Dispatch } from 'redux';
 import { compose } from 'redux';
 import Bar from './components/appbar';
+import VideoPlayer from './components/video-player';
 import materialize from './materialize';
 import Anime from './routes/anime';
 import Home from './routes/home';
@@ -34,6 +35,7 @@ class App extends React.Component<any> {
           <Route path="/settings" exact={true} component={Settings} />
           <Route path="/anime" exact={true} component={Anime} />
         </Switch>
+        <VideoPlayer />
       </div>
     );
   }

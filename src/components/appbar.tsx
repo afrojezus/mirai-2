@@ -17,6 +17,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import MiraiIcon from '../assets/icon.png';
 import globalStyles from '../globalStyles';
+import Searchbar from './searchbar';
 
 // Main toolbar for the application
 class Bar extends React.Component<any> {
@@ -43,6 +44,9 @@ class Bar extends React.Component<any> {
       case '/anime':
         routeName = 'Anime';
         break;
+      case '/watch':
+        routeName = 'Anime';
+        break;
       default:
         break;
     }
@@ -60,7 +64,13 @@ class Bar extends React.Component<any> {
               </IconButton>
             )}
             {location.pathname === '/' ? null : (
-              <Typography variant="title">{routeName}</Typography>
+              <Typography variant="title" style={{ marginRight: 16 }}>
+                {routeName}
+              </Typography>
+            )}
+            <div style={{ flex: 1 }} />
+            {location.pathname === '/' ? null : (
+              <Searchbar style={{ width: 800 }} />
             )}
             <div style={{ flex: 1 }} />
             <IconButton>
@@ -99,10 +109,13 @@ class Bar extends React.Component<any> {
                   <img
                     src={MiraiIcon}
                     alt=""
-                    style={{ margin: 'auto 0', width: 32 }}
+                    style={{ margin: 'auto 0', width: 32, height: 32 }}
                   />
                 </ListItemIcon>
-                <ListItemText primary="Mirai 2.0" />
+                <ListItemText
+                  primary="Mirai"
+                  secondary="version 2.0, developed by nani"
+                />
               </ListItem>
             </Menu>
           </Toolbar>

@@ -1,8 +1,10 @@
 import {
   Button,
+  CircularProgress,
   Divider,
   Fade,
   Grid,
+  Icon,
   LinearProgress,
   List,
   ListItem,
@@ -64,12 +66,31 @@ class Anime extends React.Component<any> {
     data: null,
     episodes: null,
     loadingStream: false,
-    LSMessage: ''
+    LSMessage: '',
+    w: false,
+    error: false
   };
   private kitsu: Kitsu = new Kitsu();
+  private unlisten = this.props.history.listen((location: Location) => {
+    const id = location.search.replace('?id=', '');
+    const d: any = this.state.data;
+    if (location.pathname === '/anime') {
+      if (!d || id !== d.id) {
+        return this.setState({ data: null, error: false }, () =>
+          this.fetchData()
+        );
+      }
+      return false;
+    }
+    return false;
+  });
   constructor(props: any) {
     super(props);
     this.fetchData();
+  }
+  public componentWillUnmount() {
+    // tslint:disable-next-line:no-unused-expression
+    this.unlisten;
   }
   public fetchData = async () => {
     try {
@@ -85,93 +106,104 @@ class Anime extends React.Component<any> {
     } catch (error) {
       // tslint:disable-next-line:no-console
       console.error(error);
+      this.setState({ error: true });
     }
   };
   public handleStream = async (shareStream: boolean) =>
     this.setState(
-      { loadingStream: true, LSMessage: 'Fetching episodes...' },
+      {
+        loadingStream: true,
+        LSMessage: `Fetching ${
+          (this.state.data as any).showType === 'movie'
+            ? 'movie...'
+            : 'episodes...'
+        }`
+      },
       async () => {
         if (shareStream) {
           // Enable sharestream
-          try {
-            const episodes = await Twist.loadEpisodeList(
-              this.props.location.search.replace('?id=', '')
-            );
-            // tslint:disable-next-line:no-console
-            console.log(episodes);
-            if (!episodes) {
-              throw new Error('Proxy failure');
-            }
-            return this.setState({ episodes: episodes.reverse() }, () =>
-              this.props
-                .sendDataToMir({
-                  eps: this.state.episodes,
-                  meta: this.state.data,
-                  id: this.props.location.search.replace('?id=', '')
-                })
-                .then(() =>
-                  this.props.history.push(
-                    `/watch?id=${this.props.location.search.replace(
-                      '?id=',
-                      ''
-                    )}&share=true`
-                  )
-                )
-            );
-          } catch (error) {
-            // tslint:disable-next-line:no-console
-            console.error(error);
-            this.setState(
-              { LSMessage: 'An error occurred while fetching episodes :(' },
-              () =>
-                setTimeout(() => this.setState({ loadingStream: false }), 5000)
-            );
-          }
+          return this.fetchEpisodes(
+            this.props.location.search.replace('?id=', ''),
+            true
+          );
         } else {
           // Run locally
-          try {
-            const episodes = await Twist.loadEpisodeList(
-              this.props.location.search.replace('?id=', '')
-            );
-            // tslint:disable-next-line:no-console
-            console.log(episodes);
-            if (!episodes) {
-              throw new Error('Proxy failure');
-            }
-            return this.setState({ episodes: episodes.reverse() }, () =>
-              this.props
-                .sendDataToMir({
-                  eps: this.state.episodes,
-                  meta: this.state.data,
-                  id: this.props.location.search.replace('?id=', '')
-                })
-                .then(() =>
-                  this.props.history.push(
-                    `/watch?id=${this.props.location.search.replace(
-                      '?id=',
-                      ''
-                    )}`
-                  )
-                )
-            );
-          } catch (error) {
-            // tslint:disable-next-line:no-console
-            console.error(error);
-            this.setState(
-              { LSMessage: 'An error occurred while fetching episodes :(' },
-              () =>
-                setTimeout(() => this.setState({ loadingStream: false }), 5000)
-            );
-          }
+          return this.fetchEpisodes(
+            this.props.location.search.replace('?id=', ''),
+            false
+          );
         }
       }
     );
+  public fetchEpisodes = async (id: number, share: boolean) => {
+    try {
+      const episodes = await Twist.loadEpisodeList(id);
+      // tslint:disable-next-line:no-console
+      console.log(episodes);
+      if (!episodes) {
+        throw new Error('Proxy failure');
+      }
+      return this.setState({ episodes: episodes.reverse() }, () =>
+        this.props
+          .sendDataToMir({
+            eps: this.state.episodes,
+            meta: this.state.data,
+            id
+          })
+          .then(() =>
+            this.setState({ w: true }, () =>
+              setTimeout(
+                () =>
+                  this.props.history.push(
+                    `/watch?id=${id}${share ? '&share=true' : '&share=false'}`
+                  ),
+                300
+              )
+            )
+          )
+      );
+    } catch (error) {
+      // tslint:disable-next-line:no-console
+      console.error(error);
+      this.setState(
+        { LSMessage: 'An error occurred while fetching episodes :(' },
+        () => setTimeout(() => this.setState({ loadingStream: false }), 5000)
+      );
+    }
+  };
   public render() {
     const { classes } = this.props;
-    const { data, loadingStream, LSMessage } = this.state;
-    if (data === null) {
+    const { data, loadingStream, LSMessage, w, error } = this.state;
+    if (data === null && error === false) {
       return (
         <LinearProgress color="primary" style={{ width: '100%', height: 1 }} />
+      );
+    } else if (error) {
+      return (
+        <main
+          className="routeContainer"
+          style={{ height: '100%', opacity: w ? 0 : 1, backgroundColor: 'red' }}
+        >
+          <Grid
+            container={true}
+            className={classes.grid}
+            style={{ height: '100%' }}
+          >
+            <div
+              className={classes.innerMargin}
+              style={{
+                margin: 'auto'
+              }}
+            >
+              <Typography variant="h2" style={{ fontWeight: 700 }}>
+                Did you search for Boku no Pico?
+              </Typography>
+              <Typography variant="h5">
+                Please stop, we don't have that gay shit here.
+              </Typography>
+            </div>
+          </Grid>
+        </main>
       );
     } else {
       const d: any = data;
@@ -195,7 +227,10 @@ class Anime extends React.Component<any> {
         popularity = 'Quite popular';
       }
       return (
-        <main className="routeContainer" style={{ height: '100%' }}>
+        <main
+          className="routeContainer"
+          style={{ height: '100%', opacity: w ? 0 : 1 }}
+        >
           <Grid
             container={true}
             className={classes.grid}
@@ -205,8 +240,7 @@ class Anime extends React.Component<any> {
             <div
               className={classes.innerMargin}
               style={{
-                margin: 'auto',
-                paddingBottom: 128
+                margin: 'auto'
               }}
             >
               <img
@@ -314,9 +348,23 @@ class Anime extends React.Component<any> {
                         opacity: loadingStream ? 1 : 0,
                         width: loadingStream ? undefined : 0,
                         overflow: 'hidden',
-                        height: loadingStream ? undefined : 0
+                        height: loadingStream ? undefined : 0,
+                        display: 'inline-flex'
                       }}
                     >
+                      {LSMessage.startsWith('An error') ? (
+                        <Icon
+                          color="error"
+                          style={{ margin: 'auto', marginRight: 8 }}
+                        >
+                          <MICON.ErrorOutlined />
+                        </Icon>
+                      ) : (
+                        <CircularProgress
+                          size={20}
+                          style={{ margin: 'auto', marginRight: 8 }}
+                        />
+                      )}
                       <Typography
                         variant="subheading"
                         color={
@@ -332,7 +380,8 @@ class Anime extends React.Component<any> {
                       style={{
                         margin: 'auto',
                         opacity: loadingStream ? 0 : 1,
-                        width: loadingStream ? 0 : undefined
+                        width: loadingStream ? 0 : undefined,
+                        pointerEvents: loadingStream ? 'none' : undefined
                       }}
                     >
                       <Button
@@ -348,7 +397,8 @@ class Anime extends React.Component<any> {
                       style={{
                         margin: 'auto',
                         opacity: loadingStream ? 0 : 1,
-                        width: loadingStream ? 0 : undefined
+                        width: loadingStream ? 0 : undefined,
+                        pointerEvents: loadingStream ? 'none' : undefined
                       }}
                     >
                       <Button
