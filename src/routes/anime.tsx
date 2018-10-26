@@ -136,6 +136,7 @@ class Anime extends React.Component<any> {
       }
     );
   public fetchEpisodes = async (id: number, share: boolean) => {
+    // const slug = this.props.location.state.anime.slug;
     try {
       const episodes = await Twist.loadEpisodeList(id);
       // tslint:disable-next-line:no-console
