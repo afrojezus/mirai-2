@@ -13,6 +13,7 @@
     "classnames": "^2.2.6",
     "firebase": "^5.5.5",
     "kitsu": "^6.4.0",
+    "node-vibrant": "^3.0.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-redux": "^5.0.7",

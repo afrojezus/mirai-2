@@ -1,5 +1,5 @@
 // The main video player for the application. Fuck ReactPlayer. Fuck depending on other shit for tiny things.
-import { IconButton, Paper, Toolbar, withStyles } from '@material-ui/core';
+import { IconButton, Paper, Toolbar, Typography, withStyles } from '@material-ui/core';
 import * as MICON from '@material-ui/icons';
 import classnames from 'classnames';
 import * as React from 'react';
@@ -8,6 +8,7 @@ import { firestoreConnect } from 'react-redux-firebase';
 import { compose } from 'redux';
 import Twist from 'src/api/twist';
 import { history } from 'src/store';
+import { MIR_PLAY_SHOW } from 'src/store/mutation-types';
 
 const styles = (theme: any) => ({
   root: {
@@ -36,23 +37,30 @@ const styles = (theme: any) => ({
     bottom: 0,
     width: '100%'
   },
+  controlsOnTop: {
+    position: 'absolute',
+    top: 0,
+    width: '100%'
+  },
   inactive: {
     opacity: 0,
     pointerEvents: 'none'
   }
 });
 
+const defaultState = {
+  mini: false,
+  fullscreen: false,
+  active: false,
+  source: '',
+  playing: false,
+  watchURL: ''
+}
+
 class VideoPlayer extends React.Component<any> {
   public container: HTMLElement | null = null;
   public video: HTMLVideoElement | null = null;
-  public state = {
-    mini: false,
-    fullscreen: false,
-    active: false,
-    source: '',
-    playing: false,
-    watchURL: ''
-  };
+  public state = defaultState;
   private unlisten = history.listen((location: any) => {
     if (location.pathname === '/watch') {
       return this.setState(
@@ -108,11 +116,15 @@ class VideoPlayer extends React.Component<any> {
       }
     });
   public goBackToWatch = () => history.push(this.state.watchURL);
+  public closePlayer = () => {
+    this.props.removeDataFromMir(null);
+    return this.setState(defaultState);
+  }
 
   public togglePlay = () => this.setState({ playing: !this.state.playing });
 
   public render() {
-    const { classes } = this.props;
+    const { classes, mir } = this.props;
     const { mini, fullscreen, active, source, playing } = this.state;
     const v: HTMLVideoElement = this.video as HTMLVideoElement;
 
@@ -142,6 +154,13 @@ class VideoPlayer extends React.Component<any> {
           onPlaying={this.onPlaying}
           ref={this.setVideo}
         />
+        {mini ? <Toolbar className={classes.controlsOnTop}>
+          <Typography variant='body1'>{active ? mir.play.meta.titles.en_jp : null}</Typography>
+          <div style={{ flex: 1 }} />
+          <IconButton onClick={this.closePlayer}>
+            <MICON.CloseOutlined />
+          </IconButton>
+        </Toolbar> : null}
         <Toolbar className={classes.controls}>
           <IconButton onClick={this.togglePlay}>
             {playing ? <MICON.PauseOutlined /> : <MICON.PlayArrowOutlined />}
@@ -152,24 +171,33 @@ class VideoPlayer extends React.Component<any> {
               <MICON.OpenInNewOutlined />
             </IconButton>
           ) : (
-            <IconButton onClick={this.toggleFullscreen}>
-              {fullscreen ? (
-                <MICON.FullscreenExitOutlined />
-              ) : (
-                <MICON.FullscreenOutlined />
-              )}
-            </IconButton>
-          )}
+              <IconButton onClick={this.toggleFullscreen}>
+                {fullscreen ? (
+                  <MICON.FullscreenExitOutlined />
+                ) : (
+                    <MICON.FullscreenOutlined />
+                  )}
+              </IconButton>
+            )}
         </Toolbar>
       </Paper>
     );
   }
 }
 
+export const loadPlayer = (play: any) => ({
+  type: MIR_PLAY_SHOW,
+  play
+});
+
+const mapPTS = (dispatch: any) => ({
+  removeDataFromMir: (play: any) => dispatch(loadPlayer(play)),
+});
+
 export default compose(
   firestoreConnect()(
     connect(({ mir }: any) => ({
       mir
-    }))(withStyles(styles as any)(VideoPlayer))
+    }), mapPTS)(withStyles(styles as any)(VideoPlayer))
   )
 );
