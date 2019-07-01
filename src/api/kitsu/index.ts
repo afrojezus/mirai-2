@@ -1,1 +1,0 @@
-// Kitsu API-wrapper for the application. Kitsu is prioritized first due to its massive information cave compared to AniList.
