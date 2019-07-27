@@ -18,18 +18,19 @@ export default (theme: Theme) => ({
   },
   AppBarTitle: {
     fontWeight: 700,
-    marginRight: theme.spacing.unit * 2,
+    marginRight: theme.spacing(2),
     fontFamily: `Raleway, 'sans-serif'`,
     letterSpacing: 3,
-    cursor: 'pointer'
+    marginTop: theme.spacing(0.5),
+    cursor: 'pointer',
   },
   AppBarMenu: {
     marginLeft: -12,
     marginRight: 20
   },
   AppBarDivider: {
-    marginLeft: theme.spacing.unit,
-    marginRight: theme.spacing.unit * 2,
+    marginLeft: theme.spacing(0),
+    marginRight: theme.spacing(2),
     height: 32,
     borderRight: `${1}px solid ${
       theme.palette.type === 'dark'
@@ -41,15 +42,29 @@ export default (theme: Theme) => ({
     marginLeft: 'auto',
     marginRight: 'auto',
     maxWidth: 800,
-    marginTop: theme.spacing.unit * 8
+    marginTop: theme.spacing(8)
   },
   largeTitle: {
     fontSize: 48,
     fontWeight: 700
   },
   largeToolbar: {
-    paddingTop: theme.spacing.unit * 4,
-    paddingBottom: theme.spacing.unit * 4
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4)
+  },
+  paperSearch: {
+    boxShadow: realBoxShadow,
+    borderRadius: 0,
+    minHeight: 50,
+    minWidth: 800,
+    overflow: 'hidden',
+    //animation: 'SplashPaperIntro 0.4s ease',
+    background: 'rgba(255,255,255,0.2)',
+    position: 'fixed',
+    left: '50%',
+    right: '50%',
+    transitions: theme.transitions.create(['all']),
+    transform: 'translateX(-50%)',
   },
   paperBlock: {
     boxShadow: realBoxShadow,
@@ -57,7 +72,7 @@ export default (theme: Theme) => ({
     minHeight: 50,
     minWidth: '100%',
     overflow: 'hidden',
-    animation: 'SplashPaperIntro 0.4s ease'
+    animation: 'SplashPaperIntro 0.4s ease',
   },
   paperBlockMini: {
     boxShadow: realBoxShadow,
@@ -65,12 +80,12 @@ export default (theme: Theme) => ({
     height: 32,
     minWidth: 200,
     overflow: 'hidden',
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(0),
     animation: 'SplashPaperIntro 0.4s ease'
   },
   paperPaddingMini: {},
   paperPadding: {
-    padding: theme.spacing.unit
+    padding: theme.spacing(1)
   },
   paperInput: {
     marginLeft: 8,
@@ -78,7 +93,7 @@ export default (theme: Theme) => ({
     width: 'calc(100% - 8px)'
   },
   drawer: {
-    width: 200,
+    width: 400,
     height: '100%'
   },
   containerBgImg: {

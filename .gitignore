@@ -21,5 +21,8 @@ yarn-debug.log*
 yarn-error.log*
 
 src/api/firebase
+src/firebase.json
+
+src/utils/supersecretkeys.ts
 
 old

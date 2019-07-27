@@ -16,7 +16,9 @@ import {
   MenuList,
   Button,
   Paper,
-  InputBase
+  InputBase,
+  Hidden,
+  ListSubheader
 } from '@material-ui/core';
 import * as MICON from '@material-ui/icons';
 import globalStyles from '../globalStyles';
@@ -63,8 +65,8 @@ class Bar extends React.Component<any> {
 
     switch (history.location.pathname) {
       case '/':
-        routeContext = 'Splash';
-        hidden = true;
+        routeContext = 'Home';
+        hidden = false;
         break;
       case '/explore':
         routeContext = 'Explore';
@@ -120,7 +122,7 @@ class Bar extends React.Component<any> {
                 <Typography>未</Typography>
                 <Typography style={{ marginTop: -8 }}>来</Typography>
               </div>
-              <Typography variant="h6" className={classes.AppBarTitle}>
+              <Typography variant="h5" className={classes.AppBarTitle}>
                 MIRAI
               </Typography>
             </div>
@@ -140,26 +142,25 @@ class Bar extends React.Component<any> {
                 <MICON.People />
               </IconButton>
             </div>
-            <Divider className={classes.AppBarDivider} />
-            <Typography variant="h6">{routeContext}</Typography>
-            <div style={{ flex: 1 }} />
-            {history.location.pathname === '/explore' ? null : (
-              <Paper elevation={0} className={classes.paperBlockMini}>
-                <div className={classes.paperPaddingMini}>
-                  <InputBase
-                    className={classes.paperInput}
-                    placeholder="Search for anime"
-                  />
-                </div>
-              </Paper>
-            )}
+            {/*<Divider className={classes.AppBarDivider} style={{display: history.location.pathname === '/' ? 'none' : undefined }} />*/}
+            {/*<Typography variant="h6">{routeContext}</Typography>*/}
+            <div style={{flex: 1}} />
+            <Paper elevation={24} className={classes.paperSearch}>
+            <div className={classes.paperPadding}>
+              <InputBase
+                className={classes.paperInput}
+                placeholder="Search for anime"
+              />
+            </div>
+          </Paper>
+            <div style={{flex: 1}} />
+            
             <IconButton onClick={this.toggleNotifications}>
               <MICON.Notifications />
             </IconButton>
-            <Avatar
-              src={ava_example}
-              onClick={() => history.push('/account')}
-            />
+            <IconButton onClick={this.handleMenu}>
+              <MICON.MoreHoriz />
+              </IconButton>
           </Toolbar>
         </AppBar>
         <Drawer
@@ -169,6 +170,7 @@ class Bar extends React.Component<any> {
           className={classes.drawer}
         >
           <List className={classes.drawer}>
+            <ListSubheader>Notifications</ListSubheader>
             <ListItem button>
               <ListItemText primary="UwU" />
             </ListItem>

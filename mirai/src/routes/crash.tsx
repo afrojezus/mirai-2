@@ -20,14 +20,14 @@ class Crash extends React.Component<any> {
       <div className={classes.MainContainer}>
         <Toolbar disableGutters className={classes.largeToolbar}>
           <div style={{ flex: 1 }} />
-          <Typography variant="display1" className={classes.largeTitle}>
+          <Typography variant="h1" className={classes.largeTitle}>
             Crashed!
           </Typography>
           <div style={{ flex: 1 }} />
         </Toolbar>
         <Toolbar disableGutters>
           <div style={{ flex: 1 }} />
-          <Typography variant="display4">
+          <Typography variant="h4">
             That wasn't quite what was supposed to happen. Maybe refresh?
           </Typography>
           <div style={{ flex: 1 }} />

@@ -19,7 +19,7 @@ class ToS extends React.Component<any> {
     return (
       <div className={classes.MainContainer}>
         <Toolbar disableGutters className={classes.largeToolbar}>
-          <Typography variant="display1" className={classes.largeTitle}>
+          <Typography variant="h1" className={classes.largeTitle}>
             Terms of Service
           </Typography>
         </Toolbar>

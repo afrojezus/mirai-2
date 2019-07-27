@@ -6,7 +6,8 @@ import {
   Typography,
   Toolbar,
   InputBase,
-  Grid
+  Grid,
+  IconButton
 } from '@material-ui/core';
 import globalStyles, { realNearBoxShadow } from '../globalStyles';
 import Player from 'components/player';
@@ -28,10 +29,20 @@ const styles = (theme: Theme) => ({
     width: 200
   },
   animeBlock: {
-    marginTop: theme.spacing.unit,
-    animation: 'SplashPaperIntro 0.4s ease',
+    marginTop: theme.spacing(0),
+    animation: 'SplashPaperIntro 1s ease',
     boxShadow: realNearBoxShadow,
     borderRadius: 0
+  },
+  bgTitle: {
+    fontWeight: 700,
+    position: 'fixed',
+    fontSize: 256,
+    left: '1%',
+    top: '5%',
+    color: theme.palette.background.default,
+    zIndex: -1,
+    animation: 'SplashPaperIntroText 1s ease'
   },
   ...globalStyles(theme)
 });
@@ -45,11 +56,12 @@ class Anime extends React.Component<any> {
         <img alt="" className={classes.bg} src={anime.coverImage.large} />
         <Toolbar disableGutters className={classes.largeToolbar}>
           <div style={{ flex: 1 }} />
-          <Typography variant="h6" className={classes.specialTitle}>
-            {anime.titles.ja_jp}
-          </Typography>
           <div style={{ flex: 1 }} />
         </Toolbar>
+
+        <Typography variant="h1" className={classes.bgTitle}>
+            {anime.titles.en_jp}
+          </Typography>
 
         <Paper elevation={24} className={classes.animeBlock}>
           <Player src="" />
@@ -61,7 +73,16 @@ class Anime extends React.Component<any> {
                 className={classes.posterImage}
               />
             </Grid>
-            <Grid item xs />
+            <Grid item xs>
+              <Toolbar>
+              <Typography variant="h5" style={{fontWeight: 700}}>
+            {anime.titles.en_jp}
+          </Typography>
+          <div style={{flex: 1}} />
+          <Typography style={{margin: '0 16px'}}>Popular</Typography>
+          <Typography>Ongoing</Typography>
+              </Toolbar>
+              </Grid>
           </Grid>
         </Paper>
       </div>
