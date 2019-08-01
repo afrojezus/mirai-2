@@ -12,39 +12,30 @@ const styles = (theme: Theme) => ({
     borderRadius: 0,
     boxShadow: realNearBoxShadow
   },
-  feedInputContainer: {
+  feedInput: {
+    marginLeft: theme.spacing(4),
+    flex: 1,
+    fontSize: 20,
     borderRadius: 0,
-    margin: theme.spacing(2),
-    background: theme.palette.background.paper,
-    minHeight: 50,
-    minWidth: '100%',
+    minWidth: `calc(100% - ${theme.spacing(4)}px)`,
     overflow: 'hidden',
     animation: 'SplashPaperIntro 0.4s ease',
-  },
-  feedPadding: {
-    padding: theme.spacing(1)
-  },
-  feedInput: {
-    marginLeft: 8,
-    flex: 1,
-    width: 'calc(100% - 8px)'
   },
   ...globalStyles(theme)
 });
 
 class FeedFactory extends React.Component<any> {
+
   render() {
     const { classes } = this.props;
     return (
       <Paper className={classes.feedfactory}>
-          <Paper elevation={24} className={classes.feedInputContainer}>
-            <div className={classes.feedPadding}>
               <InputBase
+              multiline
+              rowsMax={3}
                 className={classes.feedInput}
                 placeholder="What's on your mind?"
               />
-            </div>
-          </Paper>
           <Toolbar>
               <IconButton>
                   <Image />

@@ -1,95 +1,112 @@
 @import url('assets/fonts/SFCompact/stylesheet.css');
 @import url('assets/fonts/SFPro/stylesheet.css');
 @import url('https://fonts.googleapis.com/css?family=Raleway:500&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i&display=swap&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese');
 
 * {
-  transition: all 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+    transition: all 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
 
 ::-webkit-scrollbar {
-  display: 'none'
+    display: none;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     'SF UI Display', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
 
 @keyframes AppBarIntro {
-  from {
-    transform: translateY(-50%);
-  }
-  to {
-  }
+    from {
+        transform: translateY(-50%);
+    }
+    to {
+    }
 }
 
 @keyframes SplashPaperIntro {
-  from {
-    transform: translateY(25%);
-  }
-  to {
-  }
+    from {
+        transform: translateY(25%);
+    }
+    to {
+    }
+}
+
+@keyframes SplashPaperIntroFade {
+    from {
+        transform: translateY(50%);
+        opacity: 0;
+    }
+    to {
+    }
+}
+
+@keyframes SplashPaperIntroFadeMore {
+    from {
+        transform: translateY(75%);
+        opacity: 0;
+    }
+    to {
+    }
+}
+
+@keyframes SplashPaperIntroFadeFar {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+    }
 }
 
 
 @keyframes SplashPaperIntroText {
-  from {
-    transform: translateY(-50%);
-    opacity: 0;
-    z-index: -1;
-    left: 1%;
-    top: 5%;
-  }
-  to {
-    left: 1%;
-    top: 5%;
-  }
+    from {
+        transform: translateY(-50%);
+        opacity: 0;
+        z-index: -1;
+        left: 1%;
+        top: 5%;
+    }
+    to {
+        left: 1%;
+        top: 5%;
+    }
 }
 
 @keyframes BgIntro {
-  from {
-    opacity: 0;
-  }
-  to {
-  }
+    from {
+        opacity: 0;
+    }
+    to {
+    }
 }
 
 @keyframes animeBGIntro {
-  0% {
-    filter: blur(30px);
-    transform: scale(0.5);
-    opacity: 1;
-  }
-  50% {
-    filter: blur(15px);
-    transform: scale(0.5);
-    opacity: 0.5;
-  }
-  100% {
-    filter: blur(0px);
-    transform: scale(1);
-    opacity: 0.1;
-  }
-}
-
-.route-wrapper {
-  position: relative;
-}
-
-.route-wrapper > div {
-  position: absolute;
-  height: 100vh;
-  width: 100%;
-  overflow: auto;
+    0% {
+        filter: blur(30px);
+        transform: scale(0.5);
+        opacity: 1;
+    }
+    50% {
+        filter: blur(15px);
+        transform: scale(0.5);
+        opacity: 0.5;
+    }
+    100% {
+        filter: blur(0px);
+        transform: scale(1);
+        opacity: 0.1;
+    }
 }

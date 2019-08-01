@@ -2,7 +2,6 @@
  * Colorizer
  */
 import Vibrant from "node-vibrant";
-import { Palette } from "node-vibrant/lib/color";
 
 const proxy = "https://cors-anywhere.herokuapp.com/" as string;
 
@@ -11,10 +10,8 @@ const proxy = "https://cors-anywhere.herokuapp.com/" as string;
  * @returns {Promise}
  * @param {String} image - Image source (URL)
  */
-export default (image: string) => {
-  return Vibrant.from(proxy + image)
-    .getPalette()
-    .then((palette: Palette) => {
-      return palette;
-    });
+export default async (image: string) => {
+    const palette = await Vibrant.from(proxy + image)
+        .getPalette();
+    return palette;
 };

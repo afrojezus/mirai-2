@@ -11,11 +11,11 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 )
 
-interface Crash {
-    error: Error | undefined;
+interface Loader {
+    loading: boolean;
 }
 
-export default ({error}: Crash) => {
+export default ({loading}: Loader) => {
     const classes = useStyles();
     return (
         <div>
@@ -25,10 +25,8 @@ export default ({error}: Crash) => {
                 left: '50%',
                 transform: 'translate(-50%, -50%)'
             }}>
-                <Grow in={Boolean(error)}><Typography variant='h4' className={classes._title}>
-                    OH GOD OH FUCK
-                    <br/>
-                    {error}
+                <Grow in={loading}><Typography variant='h4' className={classes._title}>
+                    MIRAI
                 </Typography></Grow>
             </div>
         </div>
