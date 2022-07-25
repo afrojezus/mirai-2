@@ -1,0 +1,39 @@
+{
+  "name": "mirai",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
+    "@lagunovsky/redux-react-router": "^4.0.0",
+    "@material/material-color-utilities": "^0.1.2",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/material": "^5.9.1",
+    "@reduxjs/toolkit": "^1.8.3",
+    "clsx": "^1.2.1",
+    "firebase": "^9.9.1",
+    "framer-motion": "^6.5.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^8.0.3",
+    "react-player": "^2.10.1",
+    "react-router-dom": "^6.3.0",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^2.4.1",
+    "swr": "^1.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "@vitejs/plugin-react": "^2.0.0",
+    "sass": "^1.54.0",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.0"
+  }
+}

@@ -1,0 +1,29 @@
+.root {
+    max-width: 72px !important;
+    min-width: 72px !important;
+    min-height: 72px !important;
+    max-height: 72px !important;
+    padding: 8px 8px !important;
+    border-radius: 16px !important;
+
+    &.iconOnly {
+        padding-top: 24px !important;
+        padding-bottom: 10px !important;
+    }
+
+    &.selected {}
+}
+
+.label {
+    padding-top: 4 !important;
+
+    &.selected {
+        font-size: 12px !important;
+    }
+
+    &.iconOnly {}
+}
+
+.selected {}
+
+.iconOnly {}
